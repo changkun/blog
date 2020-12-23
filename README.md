@@ -6,19 +6,20 @@ The source code.
 
 ## Build
 
-```
-go install github.com/gohugoio/hugo@latest
+```sh
+$ go install github.com/gohugoio/hugo@latest
 ```
 
-```
-make
-make s
+```sh
+$ make
+$ make bin # require Go 1.16
+$ make dev # require Go 1.16
 ```
 
 ## Writing
 
-```
-hugo new posts/2020-12-24-i-got-a-new-idea.md
+```sh
+$ hugo new posts/2020-12-24-i-got-a-new-idea.md
 ```
 
 Update header before posting:
