@@ -1,0 +1,19 @@
+{{ define "main_class"}}{{ end}}
+
+{{ define "main_content" }}
+<div id="posts" class="posts-expand">
+    {{ if eq .Data.Plural  "tags" }}
+    <div class="tag-cloud">
+    <div class="tag-cloud-title">
+        {{ i18n "StatsTags" . }}
+    </div>
+    <div class="tag-cloud-tags">
+        {{ range $name, $items := .Site.Taxonomies.tags }}
+            <a href="/tags/{{ $name | urlize | lower  }}" style="font-size: 24.5px; color: #212121">{{ $name }}</a>
+            <span class="tag-list-count"><sup>{{ len $items }}</sup></span>
+            {{ end }}
+    </div>
+    </div>
+    {{ end }}
+</div>
+{{ end }}

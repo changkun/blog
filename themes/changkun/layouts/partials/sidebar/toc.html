@@ -1,0 +1,15 @@
+<!-- {{ if isset .Params "toc"}}
+<section class="post-toc-wrap sidebar-panel sidebar-panel-active">
+    <div class="post-toc">
+        <div class="post-toc-content">{{ .TableOfContents }}</div>
+    </div>
+</section>
+{{ end }} -->
+
+{{ if and (gt .WordCount 400 ) (.Params.toc) }}
+<section class="post-toc-wrap sidebar-panel sidebar-panel-active">
+    <div class="post-toc">
+        <div class="post-toc-content">{{ .TableOfContents }}</div>
+    </div>
+</section>
+{{ end }}

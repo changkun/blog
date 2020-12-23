@@ -1,0 +1,19 @@
+<nav class="site-state">
+    <div class="site-state-item site-state-posts">
+      <a href="/archives/">
+        <span class="site-state-item-count">{{ len (where .Site.RegularPages "Section" "archives") }}</span>
+        <span class="site-state-item-name">{{ i18n "Blog" }}</span>
+      </a>
+    </div>
+
+    <div class="site-state-item site-state-tags">
+        <a href="/tags/">
+        {{if isset .Site.Taxonomies "tags"}} 
+        <span class="site-state-item-count">{{len .Site.Taxonomies.tags}}</span>
+        {{else}}
+        <span class="site-state-item-count">0</span>
+        {{end}}
+        <span class="site-state-item-name">{{ i18n "Tag" }}</span>
+        </a>
+    </div>
+</nav>
