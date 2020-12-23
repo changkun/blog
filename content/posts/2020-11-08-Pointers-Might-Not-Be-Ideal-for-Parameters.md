@@ -1,7 +1,9 @@
 ---
 date: 2020-11-05 08:59:17
+toc: true
 id: 267
-path: source/_posts/2020-11-08-Pointers-Might-Not-Be-Ideal-for-Parameters.md
+aliases:
+  - /archives/2020/11/267/
 tags:
   - Go
 title: Pointers Might Not Be Ideal for Parameters
