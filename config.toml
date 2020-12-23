@@ -1,6 +1,6 @@
 Title =  "Changkun's Blog"
 LanguageCode = "en-US"
-BaseUrl = "https://blogchangkun.de/"
+BaseUrl = "https://blog.changkun.de/"
 Theme =  "changkun"
 MetaDataFormat =  "yaml"
 CanonifyUrls =  true
@@ -13,7 +13,7 @@ pygmentsUseClasses=true
 UglyUrls = false
 disqusShortname = "changkun"
 [permalinks]
-  posts = "/posts/:title"
+  posts = "/:slug"
 [markup.highlight]
   anchorLineNos = false
   codeFences = true
