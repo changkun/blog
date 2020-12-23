@@ -18,7 +18,7 @@
     </div>
     <footer class="post-footer">
       {{ partial "post/tags.html" .}}
-      {{ if eq .Dir "posts/" }}
+      {{ if eq $.File.Dir "posts/" }}
       <ul class="post-copyright">
         <li class="post-copyright-author">
           <strong>Author:</strong> Changkun Ou
