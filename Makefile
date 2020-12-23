@@ -1,3 +1,5 @@
+# Copyright (c) 2020 Changkun Ou. All rights reserved.
+
 all: clean
 	hugo -D --minify
 
