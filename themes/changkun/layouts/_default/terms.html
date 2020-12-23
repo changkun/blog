@@ -9,8 +9,12 @@
     </div>
     <div class="tag-cloud-tags">
         {{ range $name, $items := .Site.Taxonomies.tags }}
-            <a href="/tags/{{ $name | urlize | lower  }}" style="font-size: 24.5px; color: #212121">{{ $name }}</a>
-            <span class="tag-list-count"><sup>{{ len $items }}</sup></span>
+            <!-- @changkun: new non-linear transformation based on the following line from hexo -->
+            <!-- tagcloud({min_font: 12, max_font: 30, amount: 200, color: true, start_color: '#ccc', end_color: '#111'}) -->
+            <a href="/tags/{{ $name | urlize | lower  }}"
+               style="font-size: {{ len $items | math.Sqrt | mul 3 | add 12}}px; color: #212121">
+               {{ $name }}
+            </a>
             {{ end }}
     </div>
     </div>

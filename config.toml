@@ -6,16 +6,32 @@ MetaDataFormat =  "yaml"
 CanonifyUrls =  true
 BuildDrafts =  false
 PaginatePath =  "p"
-Paginate = 8
+Paginate = 5
 DisablePathToLower =  false
 HasCJKLanguage = true
+pygmentsUseClasses=true
 UglyUrls = false
-PygmentsStyle = "monokai"
-pygmentsCodefences = true
-pygmentsCodefencesGuessSyntax = true
+disqusShortname = "changkun"
+
+[permalinks]
+  archives = "/archives/:title"
+
+[markup]
+  [markup.highlight]
+    anchorLineNos = false
+    codeFences = true
+    guessSyntax = false
+    hl_Lines = ""
+    lineAnchors = ""
+    lineNoStart = 1
+    lineNos = true
+    lineNumbersInTable = true
+    noClasses = true
+    style = "vs"
+    tabWidth = 4
 
 [Params]
-  Introduce = "Think Difficulty"
+  Introduce = "Stop Talking. Just Coding."
   Description = "Science | Art | Blog"
   Keywords =  "Changkun Ou,Blog,Science,Art,Tech,Life,Notes,Reading,Think,Share"
   Subtitle = "Science and art, life in between."
@@ -79,3 +95,20 @@ pygmentsCodefencesGuessSyntax = true
   Name = "Zhihu"
   Icon = "book"
   URL = "https://www.zhihu.com/people/ouchangkun"
+
+[[Params.Links]]
+  Name = "Frimin"
+  Icon = "users"
+  URL = "https://www.frimin.com/"
+[[Params.Links]]
+  Name = "ZZZero"
+  Icon = "user-secret"
+  URL = "https://www.zz-zero.com/"
+[[Params.Links]]
+  Name = "march1993"
+  Icon = "user-md"
+  URL = "https://march1993.com/en/"
+[[Params.Links]]
+  Name = "Qcrao"
+  Icon = "tree"
+  URL = "https://qcrao.com"
