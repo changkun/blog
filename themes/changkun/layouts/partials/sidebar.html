@@ -20,6 +20,12 @@
     <section class="site-overview sidebar-panel {{ if not (isset .Params "toc") }} sidebar-panel-active {{ end }}">
       {{ partial "sidebar/author.html" . }}
       {{ partial "sidebar/state.html" . }}
+      <div class="darkmode-switch">
+        <label class="switch">
+          <input id="dark-mode-checkbox" type="checkbox" onchange="darkmode()">
+          <span class="slider"></span>
+        </label>
+      </div>
       {{ partial "sidebar/rss.html" . }}
       {{ partial "sidebar/social.html" . }}
       {{ partial "sidebar/link.html" . }}
