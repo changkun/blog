@@ -1,11 +1,15 @@
 ---
-date: 2015-03-27 18:10:20
+date: "2015-03-27 18:10:20"
+toc: true
 id: 177
-path: source/_posts/2015-03-27-Wordpress 站点搬家.md
+slug: /posts/wordpress-站点搬家
+aliases:
+    - /archives/2015/03/177/
 tags:
-  - Wordpress
-  - LNMP
-  - 运维
+    - 博客
+    - Wordpress
+    - LNMP
+    - 运维
 title: Wordpress 站点搬家
 ---
 

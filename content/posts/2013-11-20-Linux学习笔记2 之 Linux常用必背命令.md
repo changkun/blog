@@ -1,9 +1,12 @@
 ---
-date: 2013-11-20 00:28:48
+date: "2013-11-20 00:28:48"
+toc: true
 id: 129
-path: source/_posts/2013-11-20-Linux学习笔记2 之 Linux常用必背命令.md
+slug: /posts/learn-linux-2
+aliases:
+    - /archives/2013/11/129/
 tags:
-  - Linux
+    - Linux
 title: Linux学习笔记 2 Linux常用必背命令
 ---
 

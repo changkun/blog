@@ -1,9 +1,12 @@
 ---
-date: 2020-09-30 11:01:26
+date: "2020-09-30 11:01:26"
+toc: true
 id: 266
-path: source/_posts/2020-09-30-A-Source-of-Errors-in-Go-Benchmarking.md
+slug: /posts/eliminating-a-source-of-measurement-errors-in-benchmarks
+aliases:
+    - /archives/2020/09/266/
 tags:
-  - Go
+    - Go
 title: Eliminating A Source of Measurement Errors in Benchmarks
 ---
 

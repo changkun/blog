@@ -1,10 +1,13 @@
 ---
-date: 2016-06-04 14:14:39
+date: "2016-06-04 14:14:39"
+toc: true
 id: 199
-path: source/_posts/2016-06-04-Kaldi-上的-TIMIT-例子.md
+slug: /posts/kaldi-timit-example
+aliases:
+    - /archives/2016/06/199/
 tags:
-  - Kaldi
-  - 语音识别
+    - Kaldi
+    - 语音识别
 title: Kaldi 上的 TIMIT 例子
 ---
 

@@ -1,11 +1,14 @@
 ---
-date: 2018-10-01 14:11:30
+date: "2018-10-01 14:11:30"
+toc: true
 id: 258
-path: source/_posts/2018-10-01-Go-source-code-study-is-now-open-source.md
+slug: /posts/go-source-code-study-is-open-source
+aliases:
+    - /archives/2018/10/258/
 tags:
-  - Go
-  - 源码分析
-title: Go source code study is open source now
+    - Go
+    - 源码分析
+title: Go source code study is open source
 ---
 
 Since the middle of last month, I started to read the source code of

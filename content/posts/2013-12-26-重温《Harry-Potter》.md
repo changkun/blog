@@ -1,9 +1,12 @@
 ---
-date: 2013-12-26 18:30:38
+date: "2013-12-26 18:30:38"
+toc: true
 id: 137
-path: source/_posts/2013-12-26-重温《Harry-Potter》.md
+slug: /posts/review-harry-potter
+aliases:
+    - /archives/2013/12/137/
 tags:
-  - 随笔
+    - 随笔
 title: 重温《Harry Potter》
 ---
 

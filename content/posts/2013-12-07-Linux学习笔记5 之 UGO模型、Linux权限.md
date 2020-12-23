@@ -1,9 +1,12 @@
 ---
-date: 2013-12-07 19:52:14
+date: "2013-12-07 19:52:14"
+toc: true
 id: 134
-path: source/_posts/2013-12-07-Linux学习笔记5 之 UGO模型、Linux权限.md
+slug: /posts/learn-linux-5
+aliases:
+    - /archives/2013/12/134/
 tags:
-  - Linux
+    - Linux
 title: Linux学习笔记 5 UGO模型、Linux权限
 ---
 

@@ -1,10 +1,13 @@
 ---
-date: 2014-11-20 13:21:45
+date: "2014-11-20 13:21:45"
+toc: true
 id: 169
-path: source/_posts/2014-11-20-WatchKit框架与WatchApp交互初窥.md
+slug: /posts/watchkit-and-watchapp
+aliases:
+    - /archives/2014/11/169/
 tags:
-  - Apple Watch
-  - iOS
+    - Apple Watch
+    - iOS
 title: WatchKit框架与WatchApp交互初窥
 ---
 

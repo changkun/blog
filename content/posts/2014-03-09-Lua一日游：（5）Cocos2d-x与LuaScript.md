@@ -1,10 +1,13 @@
 ---
-date: 2014-03-09 16:55:50
+date: "2014-03-09 16:55:50"
+toc: true
 id: 148
-path: source/_posts/2014-03-09-Lua一日游：（5）Cocos2d-x与LuaScript.md
+slug: /posts/lua-5
+aliases:
+    - /archives/2014/03/148/
 tags:
-  - Lua
-  - cocos2dx
+    - Lua
+    - cocos2dx
 title: Lua一日游:(5) cocos2dx 与 Lua
 ---
 

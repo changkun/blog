@@ -1,10 +1,13 @@
 ---
-date: 2014-05-18 08:04:40
+date: "2014-05-18 08:04:40"
+toc: true
 id: 156
-path: source/_posts/2014-05-18-Mac下新安装的MySQL无法登陆root用户解决方法.md
+slug: /posts/login-issue-after-install-mysql-on-mac
+aliases:
+    - /archives/2014/05/156/
 tags:
-  - MySQL
-  - Mac
+    - MySQL
+    - Mac
 title: Mac下新安装的MySQL无法登陆root用户解决方法
 ---
 

@@ -1,9 +1,12 @@
 ---
-date: 2015-03-28 21:11:42
+date: "2015-03-28 21:11:42"
+toc: true
 id: 178
-path: source/_posts/2015-03-28-Doxygen 生成中文 Latex 文档.md
+slug: /posts/doxygen-latex-doc
+aliases:
+    - /archives/2015/03/178/
 tags:
-  - LaTeX
+    - LaTeX
 title: Doxygen 生成中文 Latex 文档
 ---
 

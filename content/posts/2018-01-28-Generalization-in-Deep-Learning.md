@@ -1,13 +1,16 @@
 ---
-date: 2018-01-28 18:04:57
+date: "2018-01-28 18:04:57"
+toc: true
 id: 243
-path: source/_posts/2018-01-28-Generalization-in-Deep-Learning.md
+slug: /posts/generalization-in-deep-learning
+aliases:
+    - /archives/2018/01/243/
 tags:
-  - Deep Learning
-  - Generalization
-  - 深度学习
-  - 泛化理论
-  - 统计学习
+    - Deep Learning
+    - Generalization
+    - 深度学习
+    - 泛化理论
+    - 统计学习
 title: 论文笔记：Generalization in Deep Learning
 ---
 

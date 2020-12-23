@@ -1,12 +1,15 @@
 ---
-date: 2016-08-21 19:15:13
+date: "2016-08-21 19:15:13"
+toc: true
 id: 209
-path: source/_posts/2016-08-21-Guacamole-与-VNC-的坑.md
+slug: /posts/guacamole-源码分析与-vnc-中-rfb-协议的坑
+aliases:
+    - /archives/2016/08/209/
 tags:
-  - guacamole
-  - VNC
-  - Linux
-  - DevOps
+    - guacamole
+    - VNC
+    - Linux
+    - DevOps
 title: Guacamole 源码分析与 VNC 中 RFB 协议的坑
 ---
 
@@ -332,14 +335,122 @@ void guac_vnc_cut_text(rfbClient* client, const char* text, int textlen) {
 > RFB provides limited support for synchronizing the "cut buffer" of selected text between client and server.  This message tells the server that the client has new ISO 8859-1 (Latin-1) text in its cut buffer.  Ends of lines are represented by the newline character (hex 0a) alone.  No carriage-return (hex 0d) is used.  **There is no way to transfer text outside the Latin-1 character set.**
 
 ```
-+--------------+--------------+--------------+
++---
+
+
+---
+
+
+---
+
+
+---
+
+
+--+---
+
+
+---
+
+
+---
+
+
+---
+
+
+--+---
+
+
+---
+
+
+---
+
+
+---
+
+
+--+
 | No. of bytes | Type [Value] | Description  |
-+--------------+--------------+--------------+
++---
+
+
+---
+
+
+---
+
+
+---
+
+
+--+---
+
+
+---
+
+
+---
+
+
+---
+
+
+--+---
+
+
+---
+
+
+---
+
+
+---
+
+
+--+
 | 1            | U8 [6]       | message-type |
 | 3            |              | padding      |
 | 4            | U32          | length       |
 | length       | U8 array     | text         |
-+--------------+--------------+--------------+
++---
+
+
+---
+
+
+---
+
+
+---
+
+
+--+---
+
+
+---
+
+
+---
+
+
+---
+
+
+--+---
+
+
+---
+
+
+---
+
+
+---
+
+
+--+
 ```
 
 
@@ -348,14 +459,122 @@ void guac_vnc_cut_text(rfbClient* client, const char* text, int textlen) {
 > The server has new ISO 8859-1 (Latin-1) text in its cut buffer.  Ends of lines are represented by the newline character (hex 0a) alone.  No carriage-return (hex 0d) is used.  There is no way to transfer text outside the Latin-1 character set.
 
 ```
-+--------------+--------------+--------------+
++---
+
+
+---
+
+
+---
+
+
+---
+
+
+--+---
+
+
+---
+
+
+---
+
+
+---
+
+
+--+---
+
+
+---
+
+
+---
+
+
+---
+
+
+--+
 | No. of bytes | Type [Value] | Description  |
-+--------------+--------------+--------------+
++---
+
+
+---
+
+
+---
+
+
+---
+
+
+--+---
+
+
+---
+
+
+---
+
+
+---
+
+
+--+---
+
+
+---
+
+
+---
+
+
+---
+
+
+--+
 | 1            | U8 [3]       | message-type |
 | 3            |              | padding      |
 | 4            | U32          | length       |
 | length       | U8 array     | text         |
-+--------------+--------------+--------------+
++---
+
+
+---
+
+
+---
+
+
+---
+
+
+--+---
+
+
+---
+
+
+---
+
+
+---
+
+
+--+---
+
+
+---
+
+
+---
+
+
+---
+
+
+--+
 ```
 
 在这两个消息的设计中，所有的内容均按照 `text/plain` 的方式进行传输，彻底忽略了剪切板中的 `minetype`，最终导致了无法传输除了 `ISO 8859-1` 标准规定以外的字符。

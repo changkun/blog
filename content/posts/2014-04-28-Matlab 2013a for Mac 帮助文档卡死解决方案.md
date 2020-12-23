@@ -1,10 +1,13 @@
 ---
-date: 2014-04-28 20:12:27
+date: "2014-04-28 20:12:27"
+toc: true
 id: 155
-path: source/_posts/2014-04-28-Matlab 2013a for Mac 帮助文档卡死解决方案.md
+slug: /posts/matlab-2013a-for-mac-hanging-issue
+aliases:
+    - /archives/2014/04/155/
 tags:
-  - Matlab
-  - Mac
+    - Matlab
+    - Mac
 title: Matlab 2013a for Mac 帮助文档卡死解决方案
 ---
 

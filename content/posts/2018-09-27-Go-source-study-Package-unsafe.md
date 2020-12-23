@@ -1,11 +1,14 @@
 ---
-date: 2018-09-27 10:55:18
+date: "2018-09-27 10:55:18"
+toc: true
 id: 257
-path: source/_posts/2018-09-27-Go-source-study-Package-unsafe.md
+slug: /posts/go-source-unsafe-pattern
+aliases:
+    - /archives/2018/09/257/
 tags:
-  - Go
-  - 源码分析
-  - unsafe
+    - Go
+    - 源码分析
+    - unsafe
 title: 'Go source study: unsafe Pattern'
 ---
 

@@ -1,9 +1,12 @@
 ---
-date: 2014-03-27 12:48:13
+date: "2014-03-27 12:48:13"
+toc: true
 id: 152
-path: source/_posts/2014-03-27-Python QuickStart.md
+slug: /posts/python-quickstart
+aliases:
+    - /archives/2014/03/152/
 tags:
-  - Python
+    - Python
 title: Python QuickStart
 ---
 

@@ -1,10 +1,13 @@
 ---
-date: 2016-06-05 11:56:48
+date: "2016-06-05 11:56:48"
+toc: true
 id: 200
-path: source/_posts/2016-06-05-记一次完整的-Kaldi-TIMIT-示例运行.md
+slug: /posts/kaldi-timit-example2
+aliases:
+    - /archives/2016/06/200/
 tags:
-  - 语音识别
-  - Kaldi
+    - 语音识别
+    - Kaldi
 title: 记一次完整的 Kaldi-TIMIT 示例运行
 ---
 

@@ -1,10 +1,14 @@
 ---
-date: 2017-06-21 01:35:57
+date: "2017-06-21 01:35:57"
+toc: true
 id: 232
-path: source/_posts/2017-06-21-Hexo-GitHub-Travis-CI-VPS-自动部署.md
+slug: /posts/hexo-github-travis-ci-vps-ci-cd
+aliases:
+    - /archives/2017/06/232/
 tags:
-  - DevOps
-  - 运维
+    - DevOps
+    - 运维
+    - 博客
 title: Hexo + GitHub + Travis CI + VPS 自动部署
 ---
 

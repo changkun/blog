@@ -1,9 +1,12 @@
 ---
-date: 2014-10-14 17:15:00
+date: "2014-10-14 17:15:00"
+toc: true
 id: 164
-path: source/_posts/2014-10-14-The Worst Presentation.md
+slug: /posts/the-worst-presentation
+aliases:
+    - /archives/2014/10/164/
 tags:
-  - 随笔
+    - 随笔
 title: The worst Presentation
 ---
 

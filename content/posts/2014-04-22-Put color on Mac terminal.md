@@ -1,10 +1,13 @@
 ---
-date: 2014-04-22 13:41:23
+date: "2014-04-22 13:41:23"
+toc: true
 id: 154
-path: source/_posts/2014-04-22-Put color on Mac terminal.md
+slug: /posts/put-color-on-mac-terminal
+aliases:
+    - /archives/2014/04/154/
 tags:
-  - Vim
-  - Mac
+    - Vim
+    - Mac
 title: Put color on Mac terminal
 ---
 

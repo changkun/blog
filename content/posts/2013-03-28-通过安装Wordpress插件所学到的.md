@@ -1,12 +1,15 @@
 ---
-date: 2013-03-28 13:41:10
+date: "2013-03-28 13:41:10"
+toc: true
 id: 92
-path: source/_posts/2013-03-28-通过安装Wordpress插件所学到的.md
+slug: /posts/通过安装-wordpress-插件所学到的
+aliases:
+    - /archives/2013/03/92/
 tags:
-  - Wordpress
-  - LaTeX
-  - Linux
-  - 运维
+    - Wordpress
+    - LaTeX
+    - Linux
+    - 运维
 title: 通过安装 Wordpress 插件所学到的
 ---
 

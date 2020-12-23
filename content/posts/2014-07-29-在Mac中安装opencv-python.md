@@ -1,10 +1,13 @@
 ---
-date: 2014-07-29 10:34:37
+date: "2014-07-29 10:34:37"
+toc: true
 id: 159
-path: source/_posts/2014-07-29-在Mac中安装opencv-python.md
+slug: /posts/install-opencv-python-on-mac
+aliases:
+    - /archives/2014/07/159/
 tags:
-  - OpenCV
-  - Python
+    - OpenCV
+    - Python
 title: 在 Mac 中安装 opencv-python
 ---
 

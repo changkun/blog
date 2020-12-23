@@ -1,9 +1,12 @@
 ---
-date: 2014-03-09 15:20:37
+date: "2014-03-09 15:20:37"
+toc: true
 id: 145
-path: source/_posts/2014-03-09-Lua一日游：（2）Table和Array.md
+slug: /posts/lua-2
+aliases:
+    - /archives/2014/03/145/
 tags:
-  - Lua
+    - Lua
 title: Lua一日游:(2)Table和Array
 ---
 

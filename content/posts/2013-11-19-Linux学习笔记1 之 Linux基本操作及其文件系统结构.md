@@ -1,9 +1,12 @@
 ---
-date: 2013-11-19 23:47:33
+date: "2013-11-19 23:47:33"
+toc: true
 id: 128
-path: source/_posts/2013-11-19-Linux学习笔记1 之 Linux基本操作及其文件系统结构.md
+slug: /posts/learn-linux-1
+aliases:
+    - /archives/2013/11/128/
 tags:
-  - Linux
+    - Linux
 title: Linux学习笔记 1 Linux基本操作及其文件系统结构
 ---
 

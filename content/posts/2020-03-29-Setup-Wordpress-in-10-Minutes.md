@@ -1,9 +1,12 @@
 ---
-date: 2020-03-29 18:36:02
+date: "2020-03-29 18:36:02"
+toc: true
 id: 265
-path: source/_posts/2020-03-29-Setup-Wordpress-in-10-Minutes.md
+slug: /posts/setup-wordpress-in-10-minutes
+aliases:
+    - /archives/2020/03/265/
 tags:
-  - Wordpress
+    - Wordpress
 title: Setup Wordpress in 10 Minutes
 ---
 

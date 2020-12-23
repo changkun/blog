@@ -1,10 +1,13 @@
 ---
-date: 2013-03-31 21:54:21
+date: "2013-03-31 21:54:21"
+toc: true
 id: 93
-path: source/_posts/2013-03-31-my-string-copystr-v2.md
+slug: /posts/string-标准库实现日志
+aliases:
+    - /archives/2013/03/93/
 tags:
-  - C
-  - 标准库
+    - C
+    - 标准库
 title: string 标准库实现日志
 ---
 

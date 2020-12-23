@@ -1,10 +1,13 @@
 ---
-date: 2014-11-06 13:38:07
+date: "2014-11-06 13:38:07"
+toc: true
 id: 168
-path: source/_posts/2014-11-06-Python-MySQLdb 教程.md
+slug: /posts/python-mysqldb-tutorial
+aliases:
+    - /archives/2014/11/168/
 tags:
-  - MySQL
-  - Python
+    - MySQL
+    - Python
 title: Python-MySQLdb 教程
 ---
 

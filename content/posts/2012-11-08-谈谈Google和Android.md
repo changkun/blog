@@ -1,9 +1,12 @@
 ---
-date: 2012-11-08 06:08:51
+date: "2012-11-08 06:08:51"
+toc: true
 id: 84
-path: source/_posts/2012-11-08-谈谈Google和Android.md
+slug: /posts/谈谈google和android
+aliases:
+    - /archives/2012/11/84/
 tags:
-  - 随笔
+    - 随笔
 title: 谈谈Google和Android
 ---
 

@@ -1,12 +1,15 @@
 ---
-date: 2013-08-26 03:23:09
+date: "2013-08-26 03:23:09"
+toc: true
 id: 105
-path: source/_posts/2013-08-26-在Mackintosh中配置OpenCV.md
+slug: /posts/install-opencv-on-mac
+aliases:
+    - /archives/2013/08/105/
 tags:
-  - OpenCV
-  - Mac
-  - 运维
-  - 计算机视觉
+    - OpenCV
+    - Mac
+    - 运维
+    - 计算机视觉
 title: 在 Mac 中配置OpenCV
 ---
 

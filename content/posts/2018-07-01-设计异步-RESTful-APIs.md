@@ -1,13 +1,16 @@
 ---
-date: 2018-07-01 19:34:30
+date: "2018-07-01 19:34:30"
+toc: true
 id: 253
-path: source/_posts/2018-07-01-设计异步-RESTful-APIs.md
+slug: /posts/designing-asynchronous-restful-apis
+aliases:
+    - /archives/2018/07/253/
 tags:
-  - Web
-  - 异步
-  - RESTful
-  - 设计
-  - 最佳实践
+    - Web
+    - 异步
+    - RESTful
+    - 设计
+    - 最佳实践
 title: Designing Asynchronous RESTful APIs
 ---
 

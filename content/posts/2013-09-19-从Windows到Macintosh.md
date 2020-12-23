@@ -1,10 +1,13 @@
 ---
-date: 2013-09-19 17:33:59
+date: "2013-09-19 17:33:59"
+toc: true
 id: 112
-path: source/_posts/2013-09-19-从Windows到Macintosh.md
+slug: /posts/from-windows-to-macintosh
+aliases:
+    - /archives/2013/09/112/
 tags:
-  - Windows
-  - Mac
+    - Windows
+    - Mac
 title: 从 Windows 到 Macintosh
 ---
 

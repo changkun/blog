@@ -1,9 +1,12 @@
 ---
-date: 2013-12-07 19:01:47
+date: "2013-12-07 19:01:47"
+toc: true
 id: 132
-path: source/_posts/2013-12-07-Linux学习笔记4 之 Linux文件系统基本操作.md
+slug: /posts/learn-linux-4
+aliases:
+    - /archives/2013/12/132/
 tags:
-  - Linux
+    - Linux
 title: Linux学习笔记 4 Linux文件系统基本操作
 ---
 

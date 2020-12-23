@@ -1,9 +1,12 @@
 ---
-date: 2019-05-15 13:02:49
+date: "2019-05-15 13:02:49"
+toc: true
 id: 260
-path: source/_posts/2019-05-15-Beyond-Communications.md
+slug: /posts/rethinking-the-reflections-on-communications-and-trusts
+aliases:
+    - /archives/2019/05/260/
 tags:
-  - 随笔
+    - 随笔
 title: Rethinking the Reflections on Communications and Trusts
 ---
 

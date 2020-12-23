@@ -1,11 +1,12 @@
 ---
-date: 2020-11-05 08:59:17
+date: "2020-11-05 08:59:17"
 toc: true
 id: 267
+slug: /posts/pointers-might-not-be-ideal-for-parameters
 aliases:
-  - /archives/2020/11/267/
+    - /archives/2020/11/267/
 tags:
-  - Go
+    - Go
 title: Pointers Might Not Be Ideal for Parameters
 ---
 
