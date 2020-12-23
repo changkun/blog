@@ -9,8 +9,10 @@
         </a>
       </h1>
       <div class="post-meta">
+      {{ if eq $.File.Dir "posts/" }}
       {{ partial "post/date.html" .}} 
       {{ partial "post/readtime.html" .}}
+      {{ end }}
       </div>
     </header>
     <div class="post-body" itemprop="articleBody">

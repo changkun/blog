@@ -53,20 +53,25 @@ disqusShortname = "changkun"
   URL = "/"
   Weight = 1
 [[Menu.Main]]
+  Name = "Ideas"
+  Pre = "lightbulb-o"
+  URL = "/ideas/"
+  Weight = 2
+[[Menu.Main]]
   Name = "Archives"
   Pre = "archive"
   URL = "/posts/"
-  Weight = 2
+  Weight = 3
 [[Menu.Main]]
   Name = "Tags"
   Pre = "tag"
   URL = "/tags/"
-  Weight = 3
+  Weight = 4
 [[Menu.Main]]
   Name = "Bio"
   Pre = "user"
   URL = "/about/"
-  Weight = 4
+  Weight = 5
 
 [[Params.Socials]]
   Name = "Homepage"
