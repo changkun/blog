@@ -3,14 +3,16 @@
 all: clean
 	hugo --minify
 
-bin: clean # require Go 1.16
+bin: clean
 	hugo --minify
 	go build
 
-# base url https://blog.changkun.de/
 dev: clean 
-	hugo -D --minify --baseURL http://0.0.0.0:9129
+	hugo --debug -D --log --minify --baseURL http://0.0.0.0:9129
 	go build
+
+s: clean
+	hugo server --debug -D -p 9219
 
 clean:
 	rm -rf blog resources public

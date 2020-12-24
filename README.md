@@ -12,6 +12,7 @@ $ go install github.com/gohugoio/hugo@latest
 
 ```sh
 $ make
+$ make s   # local server
 $ make bin # require Go 1.16
 $ make dev # require Go 1.16
 ```
