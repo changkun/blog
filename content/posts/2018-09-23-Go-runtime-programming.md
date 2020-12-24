@@ -28,16 +28,7 @@ title: Go runtime programming
 即便你进行不涉及调度器的相关工作，理解它们仍然很重要。
 
 Gs, Ms, Ps
----
-
-
----
-
-
----
-
-
--
+----------
 
 "G" 是 goroutine 的缩写。由 `g` 类型表示。当 goroutine 退出时，`g` 被归还到有效的 `g` 池，
 能够被后续 goroutine 使用。
@@ -58,16 +49,7 @@ P 可以理解一个 OS 调度器中的 CPU，`p` 类型的内容类似于每个
 因此，运行时可以在调度器内避免 write barrier。
 
 用户栈与系统栈
----
-
-
----
-
-
----
-
-
----
+------------
 
 每个非 dead 状态的 G 均被关联到**用户栈**上，即用户 Go 代码执行的地方。用户栈初始大小很小（例如 2K），然后动态的增加或减少。
 
@@ -76,34 +58,7 @@ P 可以理解一个 OS 调度器中的 CPU，`p` 类型的内容类似于每个
 运行时代码经常会临时通过 `systemstack`, `mcall` 或 `asmcgocall` 切换到系统栈以执行那些无法扩展用户栈、或切换用户 goroutine 的不可抢占式任务。运行在系统栈上的代码是隐式不可抢占的、且不会被垃圾回收检测。当运行在系统栈上时，当前用户栈没有被用于执行代码。
 
 `getg()` 与 `getg().m.curg`
----
-
-
----
-
-
----
-
-
----
-
-
----
-
-
----
-
-
----
-
-
----
-
-
----
-
-
--
+---------------------------
 
 为获取当前用户 `g`，可以使用 `getg().m.curg`。
 
@@ -201,91 +156,19 @@ P 可以理解一个 OS 调度器中的 CPU，`p` 类型的内容类似于每个
 除了 "go doc compile" 文档中说明的 "//go:" 标志外，编译器还未运行时支持了额外的标志。
 
 go:systemstack
----
-
-
----
-
-
----
-
-
----
-
-
---
+--------------
 
 `go:systemstack` 表示函数必须在系统堆栈上运行。由特殊的函数序言（function prologue，指汇编程序函数开头的几行代码，通常是寄存器准备）进行动态检查。
 
 go:nowritebarrier
----
-
-
----
-
-
----
-
-
----
-
-
----
-
-
---
+-----------------
 
 如果函数包含 write barrier，则 `go:nowritebarrier` 触发一个编译器错误（它不会抑制 write barrier 的产生，只是一个断言）。
 
 你通常希望 `go:nowritebarrierrec`。`go:nowritebarrier` 主要适用于没有 write barrier 会更好的情况，但没有要求正确性。
 
 go:nowritebarrierrec 和 go:yeswritebarrierrec
----
-
-
----
-
-
----
-
-
----
-
-
----
-
-
----
-
-
----
-
-
----
-
-
----
-
-
----
-
-
----
-
-
----
-
-
----
-
-
----
-
-
----
-
-
--
+---------------------------------------------
 
 .如果声明的函数或任何它递归调用的函数甚至于 `go:yeswritebarrierrec` 包含 write barrier，则 `go:nowritebarrierrec` 触发编译器错误。
 
@@ -298,16 +181,7 @@ go:nowritebarrierrec 和 go:yeswritebarrierrec
 这两个指令都在调度程序中使用。 write barrier 需要一个活跃的P（ `getg().mp != nil`）并且调度程序代码通常在没有活动 P 的情 况下运行。在这种情况下，go：nowritebarrierrec用于释放P的函数或者可以在没有P的情况下运行并且去 ：当代码重新获取活动P时使用yeswritebarrierrec。由于这些是功能级注释，因此释放或获取P的代码可能需要分为两个函数。
 
 go:notinheap
----
-
-
----
-
-
----
-
-
----
+------------
 
 `go:notinheap` 适用于类型声明。它表明一种不能从 GC 堆中分配的类型。具体来说，指向此类型必须让 `runtime.inheap` 检查失败。类型可能是用于全局变量，堆栈变量或用于对象非托管内存（例如使用 `sysAlloc` 分配、`persistentalloc`、`fixalloc` 或手动管理的范围）。特别的：
 
