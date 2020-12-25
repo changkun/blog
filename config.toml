@@ -28,9 +28,16 @@ disqusShortname = "changkun"
   noClasses = true
   style = "vs"
   tabWidth = 4
+
+# For chinese characters (not important for me):
+# [markup]
+#   defaultMarkdownHandler = "blackfriday"
+# [markup.blackfriday]
+#   extensions = ["joinLines"]
+
 [markup.goldmark.renderer]
     unsafe= true
-
+  
 [Params]
   Introduce = "Stop Talking. Just Coding."
   Description = "Science | Art | Blog"
