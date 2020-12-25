@@ -115,6 +115,15 @@ disqusShortname = "changkun"
   Icon = "user-md"
   URL = "https://march1993.com/en/"
 [[Params.Links]]
-  Name = "Qcrao"
+  Name = "qcrao"
   Icon = "tree"
   URL = "https://qcrao.com"
+[[Params.Links]]
+  Name = "maiyang"
+  Icon = "coffee"
+  URL = "https://maiyang.me"
+[[Params.Links]]
+  Name = "xargin"
+  Icon = "tasks"
+  URL = "https://xargin.com/"
+# https://fontawesome.com/v4.7.0/icons/
