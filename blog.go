@@ -35,7 +35,11 @@ func main() {
 	r := http.NewServeMux()
 	r.Handle("/", http.FileServer(http.FS(blogFS{public})))
 
-	const addr = "0.0.0.0:9129"
+	addr := os.Getenv("CHANGKUN_BLOG_ADDR")
+	if len(addr) == 0 {
+		addr = "localhost:80"
+	}
+
 	s := &http.Server{
 		Addr:         addr,
 		Handler:      logger(r),

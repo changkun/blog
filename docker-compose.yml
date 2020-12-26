@@ -1,0 +1,18 @@
+# Copyright 2020 Changkun Ou. All rights reserved.
+
+version: '3'
+
+services:
+  blog:
+    build: .
+    restart: always
+    image: blog:latest
+    environment:
+      - "CHANGKUN_BLOG_ADDR=blog:80"
+    networks:
+      - traefik_default
+    labels:
+      - "traefik.http.routers.blog.rule=Host(`blog.localhost`)"
+networks:
+  traefik_default:
+    external: true
