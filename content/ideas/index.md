@@ -5,6 +5,378 @@ toc: true
 
 在这里分享并记录一些零散的想法及写作。
 
+## 2020/12/27 Concurrency Patterns
+
+**Fan-In** multiplexes multiple input channels onto one output channel.
+
+```go
+func Funnel(sources ...<-chan int) <-chan int {
+    dest := make(chan int)                  // The shared output channel
+
+    var wg sync.WaitGroup                   // Used to automatically close dest
+                                            // when all sources are closed
+
+    wg.Add(len(sources))                    // Increment the sync.WaitGroup
+
+    for _, ch := range sources {            // Start a goroutine for each source
+        go func(c <-chan int) {
+            defer wg.Done()                 // Notify WaitGroup when c closes
+
+            for n := range c {
+                dest <- n
+            }
+        }(ch)
+    }
+
+    go func() {                             // Start a goroutine to close dest
+        wg.Wait()                           // after all sources close
+        close(dest)
+    }()
+
+    return dest
+}
+```
+
+Fan-Out evenly distributes messages from an input channel to multiple output channels.
+
+```go
+func Split(source <-chan int, n int) []<-chan int {
+    dests := make([]<-chan int, 0)          // Create the dests slice
+
+    for i := 0; i < n; i++ {                // Create n destination channels
+        ch := make(chan int)
+        dests = append(dests, ch)
+
+        go func() {                         // Each channel gets a dedicated
+            defer close(ch)                 // goroutine that competes for reads
+
+            for val := range source {
+                ch <- val
+            }
+        }()
+    }
+
+    return dests
+}
+```
+
+Future provides a placeholder for a value that’s not yet known.
+
+```go
+type Future interface {
+    Result() (string, error)
+}
+
+type InnerFuture struct {
+    once sync.Once
+    wg   sync.WaitGroup
+
+    res   string
+    err   error
+    resCh <-chan string
+    errCh <-chan error
+}
+
+func (f *InnerFuture) Result() (string, error) {
+    f.once.Do(func() {
+        f.wg.Add(1)
+        defer f.wg.Done()
+        f.res = <-f.resCh
+        f.err = <-f.errCh
+    })
+
+    f.wg.Wait()
+
+    return f.res, f.err
+}
+
+func SlowFunction(ctx context.Context) Future {
+    resCh := make(chan string)
+    errCh := make(chan error)
+
+    go func() {
+        select {
+        case <-time.After(time.Second * 2):
+            resCh <- "I slept for 2 seconds"
+            errCh <- nil
+        case <-ctx.Done():
+            resCh <- ""
+            errCh <- ctx.Err()
+        }
+    }()
+
+    return &InnerFuture{resCh: resCh, errCh: errCh}
+}
+```
+
+Sharding splits a large data structure into multiple partitions to localize
+the effects of read/write locks.
+
+```go
+type Shard struct {
+    sync.RWMutex                            // Compose from sync.RWMutex
+    m map[string]interface{}                // m contains the shard's data
+}
+
+type ShardedMap []*Shard                    // ShardedMap is a *Shards slice
+
+func NewShardedMap(nshards int) ShardedMap {
+    shards := make([]*Shard, nshards)       // Initialize a *Shards slice
+
+    for i := 0; i < nshards; i++ {
+        shard := make(map[string]interface{})
+        shards[i] = &Shard{m: shard}
+    }
+
+    return shards                           // A ShardedMap IS a *Shards slice!
+}
+
+func (m ShardedMap) getShardIndex(key string) int {
+    checksum := sha1.Sum([]byte(key))       // Use Sum from "crypto/sha1"
+    hash := int(checksum[17])               // Pick a random byte as our hash
+    index := hash % len(shards)             // Mod by len(shards) to get index
+}
+
+func (m ShardedMap) getShard(key string) *Shard {
+    index := m.getShardIndex(key)
+    return m[index]
+}
+
+func (m ShardedMap) Get(key string) interface{} {
+    shard := m.getShard(key)
+    shard.RLock()
+    defer shard.RUnlock()
+
+    return shard.m[key]
+}
+
+func (m ShardedMap) Set(key string, value interface{}) {
+    shard := m.getShard(key)
+    shard.Lock()
+    defer shard.Unlock()
+
+    shard.m[key] = value
+}
+
+func (m ShardedMap) Keys() []string {
+    keys := make([]string, 0)               // Create an empty keys slice
+    wg := sync.WaitGroup{}                  // Create a wait group and add a
+    wg.Add(len(m))                          // wait value for each slice
+    for _, shard := range m {               // Run a goroutine for each slice
+        go func(s *Shard) {
+            s.RLock()                       // Establish a read lock on s
+            for key, _ := range s.m {       // Get the slice's keys
+                keys = append(keys, key)
+            }
+            s.RUnlock()                     // Release the read lock
+            wg.Done()                       // Tell the WaitGroup it's done
+        }(shard)
+    }
+    wg.Wait()                               // Block until all reads are done
+    return keys                             // Return combined keys slice
+}
+```
+
+## 2020/12/26 Stability Patterns
+
+**Circuit Breaker** automatically degrades service functions in response to
+a likely fault, preventing larger or cascading failures by eliminating
+recurring errors and providing reasonable error responses.
+
+```go
+type Circuit func(context.Context) (string, error)
+ 
+// Breaker wraps a circuit with a given failure threashould.
+func Breaker(circuit Circuit, failureThreshold uint64) Circuit {
+    var lastStateSuccessful = true
+    var consecutiveFailures uint64 = 0
+    var lastAttempt time.Time = time.Now()
+
+    return func(ctx context.Context) (string, error) {
+        if consecutiveFailures >= failureThreshold {
+            backoffLevel := consecutiveFailures - failureThreshold
+            shouldRetryAt := lastAttempt.Add(time.Second * 2 << backoffLevel)
+
+            if !time.Now().After(shouldRetryAt) {
+                return "", errors.New("circuit open -- service unreachable")
+            }
+        }
+
+        lastAttempt = time.Now()
+        response, err := circuit(ctx)
+
+        if err != nil {
+            if !lastStateSuccessful {
+                consecutiveFailures++
+            }
+            lastStateSuccessful = false
+            return response, err
+        }
+
+        lastStateSuccessful = true
+        consecutiveFailures = 0
+
+        return response, nil
+    }
+}
+```
+
+**Debounce** limits the frequency of a function call to one among a cluster
+of invocations.
+
+```go
+type Circuit func(context.Context) (string, error)
+
+func DebounceFirst(circuit Circuit, d time.Duration) Circuit {
+    var threshold time.Time
+    var cResult string
+    var cError error
+
+    return func(ctx context.Context) (string, error) {
+        if threshold.Before(time.Now()) {
+            cResult, cError = circuit(ctx)
+        }
+
+        threshold = time.Now().Add(d)
+        return cResult, cError
+    }
+}
+func DebounceLast(circuit Circuit, d time.Duration) Circuit {
+    var threshold time.Time = time.Now()
+    var ticker *time.Ticker
+    var result string
+    var err error
+
+    return func(ctx context.Context) (string, error) {
+        threshold = time.Now().Add(d)
+
+        if ticker == nil {
+            ticker = time.NewTicker(time.Millisecond * 100)
+            tickerc := ticker.C
+
+            go func() {
+                defer ticker.Stop()
+
+                for {
+                    select {
+                    case <-tickerc:
+                        if threshold.Before(time.Now()) {
+                            result, err = circuit(ctx)
+                            ticker.Stop()
+                            ticker = nil
+                            break
+                        }
+                    case <-ctx.Done():
+                        result, err = "", ctx.Err()
+                        break
+                    }
+                }
+            }()
+        }
+
+        return result, err
+    }
+}
+```
+
+**Retry** accounts for a possible transient fault in a distributed system by transparently retrying a failed operation.
+
+```go
+type Effector func(context.Context) (string, error)
+
+func Retry(effector Effector, retries int, delay time.Duration) Effector {
+    return func(ctx context.Context) (string, error) {
+        for r := 0; ; r++ {
+            response, err := effector(ctx)
+            if err == nil || r >= retries {
+                return response, err
+            }
+
+            log.Printf("Attempt %d failed; retrying in %v", r + 1, delay)
+
+            select {
+            case <-time.After(delay):
+            case <-ctx.Done():
+                return "", ctx.Err()
+            }
+        }
+    }
+}
+```
+
+**Throttle** limits the frequency of a function call to some maximum number of invocations per unit of time.
+
+```go
+type Effector func(context.Context) (string, error)
+
+func Throttle(e Effector, max uint, refill uint, d time.Duration) Effector {
+    var ticker *time.Ticker = nil
+    var tokens uint = max
+
+    var lastReturnString string
+    var lastReturnError error
+
+    return func(ctx context.Context) (string, error) {
+        if ctx.Err() != nil {
+            return "", ctx.Err()
+        }
+
+        if ticker == nil {
+            ticker = time.NewTicker(d)
+            defer ticker.Stop()
+
+            go func() {
+                for {
+                    select {
+                    case <-ticker.C:
+                        t := tokens + refill
+                        if t > max {
+                            t = max
+                        }
+                        tokens = t
+                    case <-ctx.Done():
+                        ticker.Stop()
+                        break
+                    }
+                }
+            }()
+        }
+
+        if tokens > 0 {
+            tokens--
+            lastReturnString, lastReturnError = e(ctx)
+        }
+
+        return lastReturnString, lastReturnError
+    }
+}
+```
+
+**Timeout** allows a process to stop waiting for an answer once it’s clear that an answer may not be coming.
+
+```go
+func Timeout(slowfunc func(interface{}) (interface{}, error),
+    arg interface{}) func(context.Context) (interface{}, error) {
+    chres := make(chan interface{})
+    cherr := make(chan error)
+
+    go func() {
+        res, err := flowfunc(arg)
+        chres <- res
+        cherr <- err
+    }()
+
+    return func(ctx context.Context) (interface{}, error) {
+        select {
+        case res := <-chres:
+            return res, <-cherr
+        case <-ctx.Done():
+            return "", ctx.Err()
+        }
+    }
+}
+```
+
 ## 2020/12/25 LBRY
 
 一个去中心化的视频平台，似乎是 YouTube 的竞争对手？
