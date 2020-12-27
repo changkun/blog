@@ -7,12 +7,12 @@ services:
     build: .
     restart: always
     image: blog:latest
+    deploy:
+      replicas: 3
     environment:
-      - "CHANGKUN_BLOG_ADDR=blog:80"
+      - "BLOG_ADDR=blog:80"
     networks:
-      - traefik_default
-    labels:
-      - "traefik.http.routers.blog.rule=Host(`blog.localhost`)"
+      - traefik_proxy
 networks:
-  traefik_default:
+  traefik_proxy:
     external: true
