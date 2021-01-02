@@ -11,7 +11,6 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"path"
 	"strings"
 	"time"
 )
@@ -19,21 +18,17 @@ import (
 //go:embed public/*
 var public embed.FS
 
-// blogFS implements fs.FS
-type blogFS struct {
-	content embed.FS
-}
-
-func (b blogFS) Open(name string) (fs.File, error) {
-	return b.content.Open(path.Join("public", name))
-}
-
 func main() {
 	l := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile|log.Lmsgprefix)
 	logger := logging(l)
 
+	fsys, err := fs.Sub(public, "public")
+	if err != nil {
+		l.Fatalf("cannot access sub file system: %v", err)
+	}
+
 	r := http.NewServeMux()
-	r.Handle("/", http.FileServer(http.FS(blogFS{public})))
+	r.Handle("/", http.FileServer(http.FS(fsys)))
 
 	addr := os.Getenv("BLOG_ADDR")
 	if len(addr) == 0 {
