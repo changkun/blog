@@ -5,6 +5,22 @@ toc: true
 
 在这里分享并记录一些零散的想法及写作。
 
+## 2021/01/18 Daily Reading
+
+- What to expect when monitoring memory usage for modern Go applications. https://www.bwplotka.dev/2019/golang-memory-monitoring/
+- Distributed Systems. https://www.youtube.com/watch?v=UEAMfLPZZhE
+- Golang News. https://www.golangnews.com/
+- SIGCHI Symposium on Engineering Interactive Computing Systems. http://eics.acm.org/
+- runtime: use MADV_FREE on Linux if available https://go-review.googlesource.com/c/go/+/135395/
+- runtime: make the page allocator scale https://github.com/golang/go/issues/35112
+- runtime: add per-p mspan cache https://go-review.googlesource.com/c/go/+/196642
+- A New Smoothing Algorithm for Quadrilateral and Hexahedral Meshes. https://link.springer.com/content/pdf/10.1007%2F11758525_32.pdf
+- OpenGL Docs. https://docs.gl
+- On Playing Chess. https://blog.gardeviance.org/2018/03/on-playing-chess.html
+- Memory Models: A Case For Rethinking Parallel Languages and Hardware. https://cacm.acm.org/magazines/2010/8/96610-memory-models-a-case-for-rethinking-parallel-languages-and-hardware/fulltext
+- Engineer level & competency framework. https://github.com/spring2go/engineer_competency_framework
+- A Concurrent Window System. http://doc.cat-v.org/bell_labs/concurrent_window_system/concurrent_window_system.pdf
+
 ## 2021/01/06 Creating A Window
 
 如何使用 Go 创建一个窗口？macOS 有 Cocoa、Linux 有 X11，但访问这些 API 似乎都需要
@@ -28,6 +44,8 @@ GUI 工具包:
 - https://github.com/BurntSushi/graphics-go
 - https://github.com/azul3d/engine
 - https://github.com/KorokEngine/Korok
+- https://github.com/EngoEngine/engo/
+- http://mumax.github.io/
 
 这里有一小部分：
 
