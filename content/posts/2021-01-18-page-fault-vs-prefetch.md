@@ -14,6 +14,8 @@ title: 缺页与预取带来的性能差异
 
 <!--more-->
 
+## 模拟缺页行为
+
 想要实现这样的基准测试，需要了解 Linux 下对内存管理的两个底层的系统调用：`mmap` 和 `madvise`。
 对于内存分配场景，mmap 可以使用匿名、私有映射两个参数 `MAP_ANON` 和 `MAP_PRIVATE`，
 这时候创建的内存实际上属于缺页状态，任何对其申请到内存区域的访问行为都将导致缺页，利用这一原理，
@@ -107,10 +109,12 @@ PageFault/512MiB-16   94100µs ±0%
 PageFault/1024MiB-16 187000µs ±1%
 ```
 
-可以看到随着分配内存的增大，预取带来的性能提升是非常客观的：
+可以看到随着分配内存的增大，预取带来的性能提升是非常可观的：
 
 ![](/images/posts/272/bench.png)
 
+
+## `MADV_DONTNEED` v.s. `MADV_FREE`
 
 值得一提的是这里使用的是 `MADV_DONTNEED` 参数来释放内存。对于另一种释放模式 `MADV_FREE` 而言，因为其本质是懒惰释放，使用这个参数宣告释放的内存不会立刻进入缺页状态，进而对后续的内存操作可能带来影响，原则上应该会带来一定的性能提升。那么，但根据同样可以简单的验证换用 `MADV_FREE` 参数后带来的影响：
 
@@ -258,11 +262,30 @@ Prefetch/MADV-DONTNEED-512MiB-16     35.7ms ±2%
 Prefetch/MADV-FREE-512MiB-16          101ms ±1%
 ```
 
-这就比较有有趣了。
+这就比较有有趣了。为什么会这样呢？在内核增加 `MADV_FREE` 支持的时候有这样一个[邮件列表](https://lwn.net/Articles/591214/)讨论：
 
+```
+...
+MADV_FREE is about 2 time faster than MADV_DONTNEED but
+it starts slow down as memory pressure is heavy compared to
+DONTNEED. It's natural because MADV_FREE needs more steps to
+free pages so one thing I have a mind to overcome is just
+purge them if memory pressure is severe(ex, kswapd active)
+rather than giving a chance to promote freeing page
+from inactive LRU when madvise_free is called.
+...
+```
+
+至于如何进一步验证这些说法可能需要把内核代码拿出来溜了，不过这个解释读起来从理论上分析是比较可信的。
+由于从 `MADV_FREE` 的行为来看只是延缓了释放的行为，实际上当内存紧张时还是需要释放的。
+我们上面的基准测试反复申请内存，很容易造成内存紧张的假象，某种程度上属于极端的模拟情况，
+实际状态下可能跟此前的 PageFault 测试中还未造成内存高压相似。
+即大部分情况下 `MADV_FREE` 略好于 `MADV_DONTNEED`，
+在面临高压时 `MADV_FREE` 反逊于 `MADV_DONTNEED`。
 
 ## 进一步阅读的参考
 
 - http://golang.design/s/bench
 - https://man7.org/linux/man-pages/man2/mmap.2.html
 - https://man7.org/linux/man-pages/man2/madvise.2.html
+- https://lwn.net/Articles/591214/
