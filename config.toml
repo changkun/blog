@@ -133,4 +133,8 @@ disqusShortname = "changkun"
   Name = "Xargin"
   Icon = "tasks"
   URL = "https://xargin.com/"
+[[Params.Links]]
+  Name = "Muniao"
+  Icon = "tree"
+  URL = "https://www.qtmuniao.com/"
 # https://fontawesome.com/v4.7.0/icons/
