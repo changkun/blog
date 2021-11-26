@@ -10,7 +10,8 @@ services:
     deploy:
       replicas: 1
     environment:
-      - "BLOG_ADDR=blog:80"
+      BLOG_ADDR: blog:80
+      NEWRELIC_LICENSE: ${NEWRELIC_LICENSE}
     networks:
       - traefik_proxy
 networks:

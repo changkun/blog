@@ -19,7 +19,7 @@ import (
 var public embed.FS
 
 func main() {
-	l := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile|log.Lmsgprefix)
+	l := log.New(os.Stdout, "blog:", log.LstdFlags|log.Lshortfile|log.Lmsgprefix)
 	logger := logging(l)
 
 	fsys, err := fs.Sub(public, "public")
@@ -28,7 +28,7 @@ func main() {
 	}
 
 	r := http.NewServeMux()
-	r.Handle("/", http.FileServer(http.FS(fsys)))
+	r.Handle(wrapper(app, "/", http.FileServer(http.FS(fsys))))
 
 	addr := os.Getenv("BLOG_ADDR")
 	if len(addr) == 0 {
