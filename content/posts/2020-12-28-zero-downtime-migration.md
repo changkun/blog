@@ -10,7 +10,7 @@ tags:
 title: Migration with Zero Downtime
 ---
 
-在[这篇文章](https://blog.changkun.de/posts/all-in-go/) 中我介绍了
+在[这篇文章](https://changkun.de/blog/posts/all-in-go/) 中我介绍了
 changkun.de 重新调整后的一个整体的架构，
 但并没有仔细的介绍进行架构升级的过程是怎样的、升级过程中是否有进行停机等等。
 这次我们就来简单聊一聊这个迁移过程。

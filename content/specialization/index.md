@@ -14,10 +14,10 @@ type: "post"
 
 ## 统计学习理论 (Statistical Learning Theory)
 
-1. UMSLT01: A Breif History of Regularization [中文](https://blog.changkun.de/archives/2018/02/245/)
-2. UMSLT02: A Breif History of Neural Networks [中文](https://blog.changkun.de/archives/2018/02/246/)
-3. UMSLT03: A Gentle Start of Learning Theory [中文](https://blog.changkun.de/archives/2018/03/247/)
-4. UMSLT04: The Past and Present of SGD [中文](https://blog.changkun.de/archives/2018/03/248/)
+1. UMSLT01: A Breif History of Regularization [中文](https://changkun.de/blog/archives/2018/02/245/)
+2. UMSLT02: A Breif History of Neural Networks [中文](https://changkun.de/blog/archives/2018/02/246/)
+3. UMSLT03: A Gentle Start of Learning Theory [中文](https://changkun.de/blog/archives/2018/03/247/)
+4. UMSLT04: The Past and Present of SGD [中文](https://changkun.de/blog/archives/2018/03/248/)
 5. UMSLT05: The consistency of learning process
 6. UMSLT06: Theorem of Large Numbers in Functional Spaces
 7. UMSLT07: The Entropy of Functional Set
@@ -39,16 +39,16 @@ Github: https://github.com/changkun/ss18-machine-learning-tutorial
 
 ## 人肉计算(Human Computation)
 
-1. [众包与群众智慧](https://blog.changkun.de/archives/2017/05/223/)
-2. [意图博弈 GWAPs](https://blog.changkun.de/archives/2017/05/224/)
-3. [输入数据聚合与链路预测](https://blog.changkun.de/archives/2017/05/225/)
-4. [输入数据聚合与PageRank](https://blog.changkun.de/archives/2017/06/227/)
-5. [信用风险评级模型与特征向量中心性](https://blog.changkun.de/archives/2017/06/230/)
-6. [预测市场](https://blog.changkun.de/archives/2017/06/231/)
-7. [社会行为分析](https://blog.changkun.de/archives/2017/06/233/)
-8. [数据科学中的陷阱](https://blog.changkun.de/archives/2017/07/234/)
-9. [陷阱的解法](https://blog.changkun.de/archives/2017/07/236/)
-10. [系统参与的激励](https://blog.changkun.de/archives/2017/07/237/)
+1. [众包与群众智慧](https://changkun.de/blog/archives/2017/05/223/)
+2. [意图博弈 GWAPs](https://changkun.de/blog/archives/2017/05/224/)
+3. [输入数据聚合与链路预测](https://changkun.de/blog/archives/2017/05/225/)
+4. [输入数据聚合与PageRank](https://changkun.de/blog/archives/2017/06/227/)
+5. [信用风险评级模型与特征向量中心性](https://changkun.de/blog/archives/2017/06/230/)
+6. [预测市场](https://changkun.de/blog/archives/2017/06/231/)
+7. [社会行为分析](https://changkun.de/blog/archives/2017/06/233/)
+8. [数据科学中的陷阱](https://changkun.de/blog/archives/2017/07/234/)
+9. [陷阱的解法](https://changkun.de/blog/archives/2017/07/236/)
+10. [系统参与的激励](https://changkun.de/blog/archives/2017/07/237/)
 
 ---
 
@@ -56,9 +56,9 @@ Github: https://github.com/changkun/ss18-machine-learning-tutorial
 
 ### **数学建模试题(自制)**
 
-- [链接](https://blog.changkun.de/archives/2013/10/123/)
+- [链接](https://changkun.de/blog/archives/2013/10/123/)
 
-### [数学建模初步教程](https://blog.changkun.de/math-modeling)
+### [数学建模初步教程](https://changkun.de/blog/math-modeling)
 
 - [**YouTube 合集**](https://www.youtube.com/watch?v=EUfXE3vP9_A&list=PLwUqqMt5en7c7iZIseCVAS5BX6RPkS-qR)
 - 目录
@@ -117,54 +117,54 @@ Github: https://github.com/changkun/ss18-machine-learning-tutorial
 
 ## Electron 实践系列
 
-- [Electron 深度实践总结](https://blog.changkun.de/archives/2017/03/105/)
+- [Electron 深度实践总结](https://changkun.de/blog/archives/2017/03/105/)
 
 ---
 
 ## Lua 一日游
 
-1. [Mac环境搭建与基本语法](https://blog.changkun.de/archives/2014/03/42/)
-2. [Table 与 Array](https://blog.changkun.de/archives/2014/03/43/)
-3. [面向对象——复制表形式](https://blog.changkun.de/archives/2014/03/44/)
-4. [面向对象——函数闭包](https://blog.changkun.de/archives/2014/03/45/)
-5. [cocos2dx 与 Lua](https://blog.changkun.de/archives/2014/03/46/)
+1. [Mac环境搭建与基本语法](https://changkun.de/blog/archives/2014/03/42/)
+2. [Table 与 Array](https://changkun.de/blog/archives/2014/03/43/)
+3. [面向对象——复制表形式](https://changkun.de/blog/archives/2014/03/44/)
+4. [面向对象——函数闭包](https://changkun.de/blog/archives/2014/03/45/)
+5. [cocos2dx 与 Lua](https://changkun.de/blog/archives/2014/03/46/)
 
 ---
 
 ## Linux 入门笔记
 
-1. [Linux基本操作基文件系统结构](https://blog.changkun.de/archives/2013/11/31/)
-2. [Linux常用必备命令](https://blog.changkun.de/archives/2013/11/32/)
-3. [Vim必备命令](https://blog.changkun.de/archives/2013/11/33/)
-4. [Linux文件系统基本操作](https://blog.changkun.de/archives/2013/12/34/)
-5. [UGO模型与Linux权限](https://blog.changkun.de/archives/2013/12/35/)
-6. [Linux网络及相关配置](https://blog.changkun.de/archives/2013/12/36/)
-7. [获取帮助](https://blog.changkun.de/archives/2013/12/37/)
+1. [Linux基本操作基文件系统结构](https://changkun.de/blog/archives/2013/11/31/)
+2. [Linux常用必备命令](https://changkun.de/blog/archives/2013/11/32/)
+3. [Vim必备命令](https://changkun.de/blog/archives/2013/11/33/)
+4. [Linux文件系统基本操作](https://changkun.de/blog/archives/2013/12/34/)
+5. [UGO模型与Linux权限](https://changkun.de/blog/archives/2013/12/35/)
+6. [Linux网络及相关配置](https://changkun.de/blog/archives/2013/12/36/)
+7. [获取帮助](https://changkun.de/blog/archives/2013/12/37/)
 
 ---
 
 ## Linux 内核分析
 
-1. [计算机工作原理](https://blog.changkun.de/archives/2015/03/173/)
-2. [时间片轮转调度](https://blog.changkun.de/archives/2015/03/174/)
-3. [start_kernel()过程分析](https://blog.changkun.de/archives/2015/03/176/)
-4. [系统调用](https://blog.changkun.de/archives/2015/03/179/)
-5. [system_call中断过程](https://blog.changkun.de/archives/2015/04/181/)
-6. [进程的创建过程](https://blog.changkun.de/archives/2015/04/183/)
+1. [计算机工作原理](https://changkun.de/blog/archives/2015/03/173/)
+2. [时间片轮转调度](https://changkun.de/blog/archives/2015/03/174/)
+3. [start_kernel()过程分析](https://changkun.de/blog/archives/2015/03/176/)
+4. [系统调用](https://changkun.de/blog/archives/2015/03/179/)
+5. [system_call中断过程](https://changkun.de/blog/archives/2015/04/181/)
+6. [进程的创建过程](https://changkun.de/blog/archives/2015/04/183/)
 
 ---
 
 ## ELK 若干实践
 
-1. [ELK+Redis 最佳实践](https://blog.changkun.de/archives/2016/07/204/)
+1. [ELK+Redis 最佳实践](https://changkun.de/blog/archives/2016/07/204/)
 2. [ELK on Docker 最佳实践]
 
 ---
 
 ## Docker 极速入门教程
 
-1. [Docker 基本概念和操作](https://blog.changkun.de/archives/2016/08/206/)
-2. [Docker 镜像与容器管理](https://blog.changkun.de/archives/2016/08/207/)
+1. [Docker 基本概念和操作](https://changkun.de/blog/archives/2016/08/206/)
+2. [Docker 镜像与容器管理](https://changkun.de/blog/archives/2016/08/207/)
 3. [Docker 数据与网络管理及 Docker 安全]
 4. [Docker 与 Dockerfile]
 5. [Docker 运维之一: Docker Compose]

@@ -1249,7 +1249,7 @@ Vec/addv-16    4.99ns ± 1%    0.25ns ± 2%  -95.05%  (p=0.000 n=9+10)
 Vec/addp-16    3.35ns ± 1%    2.20ns ± 0%  -34.37%  (p=0.000 n=10+8)
 ```
 
-那么问题又来了，在没有内联的情况下，为什么指针更快呢？请阅读 https://blog.changkun.de/posts/pointers-might-not-be-ideal-for-parameters/
+那么问题又来了，在没有内联的情况下，为什么指针更快呢？请阅读 https://changkun.de/blog/posts/pointers-might-not-be-ideal-for-parameters/
 
 ## 2020/11/03 Timer 的一枚优化
 

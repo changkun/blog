@@ -11,8 +11,8 @@ tags:
 
 **Docker 极速入门教程系列 (往期)**
 
-- [Docker 极速入门教程01 - 基本概念和操作](https://blog.changkun.de/archives/2016/08/95/)
-- [Docker 极速入门教程02 - 镜像与容器管理](https://blog.changkun.de/archives/2016/08/96/)
+- [Docker 极速入门教程01 - 基本概念和操作](https://changkun.de/blog/archives/2016/08/95/)
+- [Docker 极速入门教程02 - 镜像与容器管理](https://changkun.de/blog/archives/2016/08/96/)
 
 ## 数据卷管理
 

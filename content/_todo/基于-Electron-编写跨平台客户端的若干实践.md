@@ -60,7 +60,7 @@ function createWindow() {
           preload: `${__dirname}/preload.js`,
         }
     });
-    win.loadURL(`https://blog.changkun.de`);
+    win.loadURL(`https://changkun.de/blog`);
     win.on('closed', () => {
         app.exit(0);
     });

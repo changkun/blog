@@ -2,7 +2,7 @@
 
 Title =  "Changkun's Blog"
 LanguageCode = "en-US"
-BaseUrl = "https://blog.changkun.de/"
+BaseUrl = "https://changkun.de/blog"
 Theme =  "changkun"
 MetaDataFormat =  "yaml"
 CanonifyUrls =  true
@@ -37,7 +37,7 @@ disqusShortname = "changkun"
 
 [markup.goldmark.renderer]
     unsafe= true
-  
+
 [Params]
   Introduce = "Stop Talking. Just Coding."
   Description = "Science | Art | Blog"

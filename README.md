@@ -1,6 +1,6 @@
 # Changkun's Blog
 
-_https://blog.changkun.de_
+_https://changkun.de/blog_
 
 The source code.
 
