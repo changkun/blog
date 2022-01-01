@@ -11,7 +11,6 @@ bin: clean
 build:
 	hugo --minify
 	CGO_ENABLED=0 GOOS=linux go build
-	# docker build -t $(NAME):$(VERSION) -t $(NAME):latest .
 	docker build -t $(NAME):latest .
 up:
 	docker-compose up -d

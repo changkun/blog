@@ -28,7 +28,7 @@ func main() {
 	}
 
 	r := http.NewServeMux()
-	r.Handle(wrapper(app, "/", http.FileServer(http.FS(fsys))))
+	r.Handle("/", http.FileServer(http.FS(fsys)))
 
 	addr := os.Getenv("BLOG_ADDR")
 	if len(addr) == 0 {
