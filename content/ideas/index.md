@@ -5,6 +5,23 @@ toc: true
 
 在这里分享并记录一些零散的想法及写作。
 
+## 2021/02/15 Daily Readings
+
+- What are the most important statistical ideas of the past 50 years? https://arxiv.org/pdf/2012.00174.pdf
+
+## 2021/02/14 Big Changes in Go 1.17
+
+Runtime changes:
+
+- New GC Pacer: https://golang.org/issue/44167
+- Scheduler performance: https://golang.org/issue/43997
+
+Toolchain changes:
+
+- Register-based calling convention: https://golang.org/issue/40724
+- Fuzzing: golang.org/s/draft-fuzzing-design
+
+
 ## 2021/02/10 A New GC Pacer
 
 今天，Go 团队发布了一个全新的 GC 的调步器（Pacer）设计。这次就来简单聊一聊这个以前的设计有什么问题，新的设计又旨在解决什么问题。
@@ -26,6 +43,202 @@ toc: true
 2. 新调步器的设计文档：https://go.googlesource.com/proposal/+/a216b56e743c5b6b300b3ef1673ee62684b5b63b/design/44167-gc-pacer-redesign.md
 3. 相关的提案：https://golang.org/issue/44167
 4. GC 新调步器模型的模拟器：https://github.com/mknyszek/pacer-model
+
+## 2021/01/27 Go 1.16 Big Changes
+
+Go 1.16 发布了非常多非常有趣的变，尝试做一个简单的总结：
+
+russ cos: deprecated.
+   + https://twitter.com/_rsc/status/1351676094664110082
+   + https://go-review.googlesource.com/c/go/+/285378
+   + https://github.com/golang/go/issues/43724
+
+1. 支持 darwin/arm64
+   1. 支持 darwin/arm64 上遇到的问题
+      + 苹果的bug: 与信号抢占有关
+   2. Apple Silicon M1 性能
+      + 但是在加密上性能很差
+      + 发版周期：https://github.com/golang/go/wiki/Go-Release-Cycle
+   3. 编译器自举过程
+
+- 安装 Go：https://gist.github.com/Dids/dbe6356377e2a0b0dc8eacb0101dc3a7
+- https://github.com/golang/go/issues/42684
+  - 内核恐慌的第 62 期：你的电脑不是你的，代码签名，OCSP Server
+  - ken thompson 图灵奖演讲：reflections on trusting trust
+    - TODO
+  - 苹果代码签名的老问题，早年做 electron 也是这类问题，现在这样的问题还是存在
+- 异步抢占随机崩溃，是 Rosetta 的 Bug：https://github.com/golang/go/issues/42700
+- 自居，安装的困惑：https://github.com/golang/go/issues/38485#issuecomment-735360572
+  - Go 语言的自举分为三个步骤
+    - 0. 1.4 C version TODO
+	- 1. tool chain 1
+    - 2. tool chain 2
+    - 3. tool chain 3
+
+- 在 Rosetta 下运行 x86 程序：`arch --x86_64`
+- dotfiles 中关于 M1 的兼容性情况：https://github.com/changkun/dotfiles/issues/2
+  - https://doesitarm.com/
+  - https://isapplesiliconready.com/
+- 十二月初入手 如今已经使用快两个月了 非常流畅 续航逆天
+- 我的必备第三方软件列表：
+  + homebrew (支持性不好，好在现在大部分依赖的软件是用 Go 写的，而且 Go 的支持非常完善)
+    + 不考虑兼容性 随意破坏兼容性移除软件分发，有一个 rmtrash 的工具，我从2014年左右就开始使用，但是去年被从软件分发中移除了，所以自己写了一个全兼容的工具changkun.de/s/rmtrash，但没有被合并，他们说了要被原软件作者任何才能不受受欢迎程度的限制，但实际上软件作者已经联系不到了
+  + vscode（已在长期使用 Insider）
+  + macvim
+  + tmux
+  + oh-my-zsh
+  + Blender（Cycles 光追渲染不支持 GPU，但编辑顶点小于百万级别的网格是没有问题的）
+  + iTerm：支持 M1
+  + Chrome：支持 M1
+  + MacTex：支持 M1
+  + Docker：圣诞节前一周发布支持，很完美，至今没有遇到问题
+
+1. Go Modules 的变更
+   1. 收集反馈
+   2. 复杂依赖管理，你实践中管理过最复杂的项目依赖多少模块，每次依赖升级都有写什么？在没有 Go modules 之前你用的是什么？
+      1. 我的经历：[Go vendor](https://github.com/kardianos/govendor), 1.10 dep, 1.11 go modules,
+      2. GOPATH 的项目管理，现在虽然移除了 gopath，但我还是沿用了 gopath 的习惯
+   3. 最小版本选择
+      1. Semantic Versioning: major.minor.patch
+      2. 经典的钻石依赖问题：A依赖B和C，BC分别依赖 D 的不同版本，而这两个版本的 D 不兼容，所以无法在依赖中选取一个特定的D版本，semantic import versioning 消除了这种依赖，在import path的最后添加了主版本号的要求/v2
+      3. dep 不允许钻石依赖，升级非常难
+      4. 构建的可重复性，没有lock文件，>=的依赖会随着时间的变化而变化
+      5. 选择最小的可以依赖的版本，构建不会随时间的变化而变化
+      6. https://www.youtube.com/watch?v=F8nrpe0XWRg&ab_channel=SingaporeGophers
+      7. 不被理解的工作方式
+        1. GOPATH
+        2. vendor
+      8.  三大要点
+		1. 兼容性
+		2. 可重复性
+		3. 合作(通常被很多人忽略)
+   1. 默认启用 Go Moduels, go build 必须包含 go.mod 文件，否则编译失败
+   2. build/test 不会升级 modules
+   3. 默认 -mod=vendor
+
+2. 文件系统接口
+   1. fs.FS 抽象的重要性在哪里
+      1. unix file system abstract always disk blocks
+      2. network file systems (upspin) abstract away machines
+      3. rest abstract nearly anything
+      4. cp 不关心是否移动文件的区块，甚至不关心文件在哪个位置，可能是不同的磁盘也可能是不同的机器
+      5. 定义任何文件类型工具的「泛型」
+      6.
+   2. 导致了哪些主要变化
+      1. io/ioutil
+         1. Russ cox 对 deprecated 在 go 中的解释（https://twitter.com/_rsc/status/1351676094664110082）
+         2. https://www.srcbeat.com/2021/01/golang-ioutil-deprecated/
+      2. 其他 fs 的抽象
+      3. Rob Pike 的 2016/2017 Gopherfest， Upspin、Changkun 的 Midgard
+         1. https://www.youtube.com/watch?v=ENLWEfi0Tkg&ab_channel=TheGoProgrammingLanguage
+         2. FUSE: filesystem in userspace
+         3. https://changkun.de/s/midgard
+         4. every user has a private root, no global root, `r@golang.org/some/stuff`, user names look like email address
+         5. access control defined by plain text files `read: r@golang.org, ann@example.com`
+      4. 目前的非常简单的实现，只是一个只读文件系统
+      5. ReadDir and DirEntry
+         1. https://benhoyt.com/writings/go-readdir/
+      6. 可扩展的方向：memoryFS，支持回写到磁盘、hashFS 为 CDN 提供支持
+      7. 还存在的问题。。例如 44166
+
+
+		```go
+		import _ "embed"
+		//go:embed a.txt
+		var s string
+
+		import "embed"
+		type embed.String string
+		var s embed.String
+		```
+
+3. 文件嵌入 //go:embed
+   1. 新特性的基本功能
+   2. 一些可能的应用
+   3. 一些在feature freeze cycle 中才讨论出来的feature
+   4. https://blog.carlmjohnson.net/post/2021/how-to-use-go-embed/
+
+4. 运行时内存管理
+   1. 回归 MADV_DONTNEED
+	+ https://blog.changkun.de/posts/pss-uss-rss/
+   2. 新的监控基础设施 runtime/metrics
+    + 以前的监控函数：runtime.ReadMemStats, debug.GCStats,
+    + runtime/metrics:
+      + metrics.All()
+      + Issue 37112
+
+```
+package main
+
+import (
+	"fmt"
+	"runtime/metrics"
+)
+
+func main() {
+	// Get descriptions for all supported metrics.
+	descs := metrics.All()
+
+	// Create a sample for each metric.
+	samples := make([]metrics.Sample, len(descs))
+	for i := range samples {
+		samples[i].Name = descs[i].Name
+	}
+
+	// Sample the metrics. Re-use the samples slice if you can!
+	metrics.Read(samples)
+
+	// Iterate over all results.
+	for _, sample := range samples {
+		// Pull out the name and value.
+		name, value := sample.Name, sample.Value
+
+		// Handle each sample.
+		switch value.Kind() {
+		case metrics.KindUint64:
+			fmt.Printf("%s: %d\n", name, value.Uint64())
+		case metrics.KindFloat64:
+			fmt.Printf("%s: %f\n", name, value.Float64())
+		case metrics.KindFloat64Histogram:
+			// The histogram may be quite large, so let's just pull out
+			// a crude estimate for the median for the sake of this example.
+			fmt.Printf("%s: %f\n", name, medianBucket(value.Float64Histogram()))
+		case metrics.KindBad:
+			// This should never happen because all metrics are supported
+			// by construction.
+			panic("bug in runtime/metrics package!")
+		default:
+			// This may happen as new metrics get added.
+			//
+			// The safest thing to do here is to simply log it somewhere
+			// as something to look into, but ignore it for now.
+			// In the worst case, you might temporarily miss out on a new metric.
+			fmt.Printf("%s: unexpected metric Kind: %v\n", name, value.Kind())
+		}
+	}
+}
+
+func medianBucket(h *metrics.Float64Histogram) float64 {
+	total := uint64(0)
+	for _, count := range h.Counts {
+		total += count
+	}
+	thresh := total / 2
+	total = 0
+	for i, count := range h.Counts {
+		total += count
+		if total > thresh {
+			return h.Buckets[i]
+		}
+	}
+	panic("should not happen")
+}
+```
+
+1. 其他值得一提的特性
+   1. os/signal.NotifyContext
+   2. 内存模型修复
+   3. 链接器优化
 
 ## 2021/01/18 Daily Reading
 
@@ -578,13 +791,13 @@ https://odysee.com/
 
 偶然间读到了一篇文章的节选片段《The Rise of Worse is Better》，这篇文章的作者 Richard 围绕为什么 C 和 Unix 能够成功展开了反思。这篇文章中聊到了几个软件设计的四大目标简单、正确、一致和完整。其中围绕四个目标发展出了两大很有代表性的流派: MIT 流派和 New Jersey 流派（贝尔实验室所在地）。MIT 流派认为软件要绝对的正确和一致，然后才是完整，最后才是简单；而一并“讽刺”了 New Jersey 流派反其道而行之的做法，他们将简单的优先级设为最高，为了简单甚至能够放弃正确。换句话说，软件的质量（受欢迎的程度）并不随着功能的增加而提高，从实用性以及易用性来考虑，功能较少的软件反而更受到使用者和市场青睐。
 
-所以你看到为什么总是有些人总是抱怨 Go 这也不行那也不行，这也没有那也没有了。因为来自贝尔实验室的 Rob Pike 就是一个彻彻底底的 New Jersey 流派中人。所以总结起来 Go 的特点就是: 
+所以你看到为什么总是有些人总是抱怨 Go 这也不行那也不行，这也没有那也没有了。因为来自贝尔实验室的 Rob Pike 就是一个彻彻底底的 New Jersey 流派中人。所以总结起来 Go 的特点就是:
 
 1. 简单
 2. 非常简单
 3. 除了简单就是简单
 
-然后围绕 Worse is Better 还有好几篇后续文章: 
+然后围绕 Worse is Better 还有好几篇后续文章:
 
 - 原始文章: Richard P. Gabriel. The Rise of Worse is Better. 1989. https://www.dreamsongs.com/RiseOfWorseIsBetter.html
 - 后续1: Nickieben Bourbaki. Worse is Better is Worse. 1991. https://dreamsongs.com/Files/worse-is-worse.pdf
@@ -601,7 +814,7 @@ https://odysee.com/
 
 我们都知道 Moore 定律说集成电路上晶体管数量每 18 个月番一番，但这篇论文则研究并验证了所谓的Proebsting 定律: 编译器优化技术带来的性能提升每 18 年番一番。Proebsting 定律是在 1998 年提出的，当时的提出者 Todd Proebsting 可能只是在开玩笑，因为他建议编译器和编程语言研究界应该减少对性能优化的关注，而应该更多的关注程序员工作效率的提升。
 
-现在我们来事后诸葛亮评价这一建议就能发现其实这并不是无道理的: Go 语言的编译器虽然经历过几大版本的优化，但其使用的技术并不够 fancy，相反而是很传统且中规中矩的优化技术。然而这并不影响 Go 语言的成功，因为它尝试解决的正是程序员的工作效率: 
+现在我们来事后诸葛亮评价这一建议就能发现其实这并不是无道理的: Go 语言的编译器虽然经历过几大版本的优化，但其使用的技术并不够 fancy，相反而是很传统且中规中矩的优化技术。然而这并不影响 Go 语言的成功，因为它尝试解决的正是程序员的工作效率:
 
 1. 通过避免循环以来而极大的减少了程序员等待编译的时间
 2. 非常简洁的语言设计与特性极大的减少了程序员思考如何使用语言的时间
@@ -614,12 +827,12 @@ https://odysee.com/
 
 因为欧洲疫情依然很糟糕，所以现在甚至于想去苹果店购物都要提前预约。因为最近急需要去苹果店一次，又苦于刷不到可用的预约位置，刚刚顺手就糊一个工具来检查，当预约可用时给telegram发送一条提醒消息。工具地址: https://changkun.de/s/apreserve
 
-用 Go 和 telegram 进行交互没有任何难度: 
+用 Go 和 telegram 进行交互没有任何难度:
 1. 从 botfather 创建一个 bot
 2. 获得这个 bot 的 token 以及跟它对话的 chatid
 3. 于是可以处理消息了
 
-- BotFather: https://t.me/botfather 
+- BotFather: https://t.me/botfather
 - Tg bot API Go bindings: https://github.com/go-telegram-bot-api/telegram-bot-api
 
 ```go
@@ -640,7 +853,7 @@ func main() {
 
 ## 2020/12/10 Apple Silicon
 
-Go在darwin/arm64上的编译性能怎么样？我很不严谨的粗略比较了Intel Mac 和 M1 Mac 的 Go 编译性能。这个编译报告由如下指令生成: 
+Go在darwin/arm64上的编译性能怎么样？我很不严谨的粗略比较了Intel Mac 和 M1 Mac 的 Go 编译性能。这个编译报告由如下指令生成:
 
 $ go build -gcflags=‘-bench=bench.out’ -a
 $ cat bench.out
@@ -736,7 +949,7 @@ func MkdirTemp(dir, pattern string) (string, error)
 func CreateTemp(dir, pattern string) (f *File, err error)
 ```
 
-总结起来就是三点: 
+总结起来就是三点:
 
 1. Discard, NopCloser, ReadAll 挪到了 io 包中
 2. ReadDir, ReadFile, WriteFile 挪到了 os 包中
@@ -770,16 +983,16 @@ func TestFS(fsys fs.FS, expected ...string) error
 
 ## 2020/12/01 回顾异步抢占
 
-你确定你看懂异步抢占了吗？今天跟曹大@Xargin  交流起异步抢占的流程里被中断的 G 是如何恢复到之前的执行现场时才发现对异步抢占的理解还不够全面。在《Go 语言原本》中是这样描述异步抢占的: 不妨给正在运行的两个线程命名为 M1 和 M2，抢占调用的整体逻辑可以被总结为: 
+你确定你看懂异步抢占了吗？今天跟曹大@Xargin  交流起异步抢占的流程里被中断的 G 是如何恢复到之前的执行现场时才发现对异步抢占的理解还不够全面。在《Go 语言原本》中是这样描述异步抢占的: 不妨给正在运行的两个线程命名为 M1 和 M2，抢占调用的整体逻辑可以被总结为:
 
 1. M1 发送中断信号（`signalM(mp, sigPreempt)`）
 2. M2 收到信号，操作系统中断其执行代码，并切换到信号处理函数（`sighandler(signum, info, ctxt, gp)`）
 3. M2 修改执行的上下文，并恢复到修改后的位置（`asyncPreempt`）
 4. 重新进入调度循环进而调度其他 Goroutine（`preemptPark` 和 `gopreempt_m`）
 
-这个总结并不完全正确，因为它并没有总结清楚 `preemptPark`  和  `gopreempt_m` 这两者之间的区别。这周我们来简单补充一下异步抢占的整体行为: 
+这个总结并不完全正确，因为它并没有总结清楚 `preemptPark`  和  `gopreempt_m` 这两者之间的区别。这周我们来简单补充一下异步抢占的整体行为:
 
-假设系统监控充当 M1，当系统监控发送中断信号后，会来到 `asyncPreempt2`: 
+假设系统监控充当 M1，当系统监控发送中断信号后，会来到 `asyncPreempt2`:
 
 ```go
 //go:nosplit
@@ -864,7 +1077,7 @@ func resumeG(state suspendGState) {
 
 ## 2020/11/26 错误提案的总结
 
-错误处理有多无聊 看看这个非常相近的总结就知道了 
+错误处理有多无聊 看看这个非常相近的总结就知道了
 
 https://seankhliao.com/blog/12020-11-23-go-error-handling-proposals/
 
@@ -1229,11 +1442,11 @@ Vec/addv-16  0.25ns ± 2%
 Vec/addp-16  2.20ns ± 0%
 
 name         alloc/op
-Vec/addv-16   0.00B     
-Vec/addp-16   0.00B     
+Vec/addv-16   0.00B
+Vec/addp-16   0.00B
 
 name         allocs/op
-Vec/addv-16    0.00     
+Vec/addv-16    0.00
 Vec/addp-16    0.00
 ```
 
@@ -1500,7 +1713,7 @@ func Get() (id uint64) {
 
 ## 2020/10/19 基准测试的番外
 
-很多人都编写过 Benchmark 测试程序，在 Go 夜读第 83 期 对 Go 程序进行可靠的性能测试 (https://talkgo.org/t/topic/102) 分享中也跟大家分享过如何利用 benchstat, perflock 等工具进行严谨可靠的性能测试。在那个分享中也曾简单的讨论过基准测试程序的测量方法及其实现原理，但由于内容较多时间有限对性能基准测试的原理还不够深入。因此，今天跟大家进一步分享两个未在第 83 期覆盖，但在进行某些严格测试时较容易被忽略的细节问题: 
+很多人都编写过 Benchmark 测试程序，在 Go 夜读第 83 期 对 Go 程序进行可靠的性能测试 (https://talkgo.org/t/topic/102) 分享中也跟大家分享过如何利用 benchstat, perflock 等工具进行严谨可靠的性能测试。在那个分享中也曾简单的讨论过基准测试程序的测量方法及其实现原理，但由于内容较多时间有限对性能基准测试的原理还不够深入。因此，今天跟大家进一步分享两个未在第 83 期覆盖，但在进行某些严格测试时较容易被忽略的细节问题:
 
 1. 进行基准测试时，被测量的代码片段会的执行次数通常大于 b.N 次。在此前的分享中我们谈到，testing 包会通过多次运行被测代码片段，逐步预测在要求的时间范围内（例如 1 秒）能够**连续**执行被测代码的次数（例如 100000 次）。但这里有一个实现上的细节问题: 为什么不是逐步多次的累积执行被测代码的执行时间，使得t1+t2+...+tn ≈ 1s，而是通过多次运行被测代码寻找最大的 b.N 使得 b.N 次循环的总时间 ≈ 1s？原因是逐步运行基准测试会产生更多的测量系统误差。基准测试在执行的初期通常很不稳定（例如，cache miss），将多个增量运行的结果进行累积会进一步放大这种误差。相反，**通过寻找最大的 b.N 使得循环的总时间尽可能的满足要求范围的连续执行能够很好的在每个测试上均摊（而非累积）这一系统误差**。
 2. 那么是不是可以说 testing 包中的实现方式就非常完美，作为用户的我们只需写出基准测试、在 perflock 下运行、使用 benchstat 消除统计误差后我们不需要做任何额外的操心了呢？事情也并没有这么简单，因为 **testing 包的测量程序本身也存在系统误差，在极端场景下这种误差会对测量程序的结果产生相当大的偏差**。但要讲清楚这个问题就需要更多额外的篇幅了，所以这里再额外分享了一篇文章 Eliminating A Source of Measurement Errors in Benchmarks（https://github.com/golang-design/research/blob/master/bench-time.md），以供你进一步阅读。在这篇文章里你可以进一步了解这种测量程序内在的系统测量误差是什么，以及当你需要对这种场景进行基准测试时，几种消除这类误差源的可靠应对方案。
