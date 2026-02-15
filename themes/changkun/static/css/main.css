@@ -995,19 +995,9 @@ pre .javascript .function {
 .posts-expand {
   padding-top: 40px;
 }
-.posts-expand .post {
-  background: #fff;
-  border: 1px solid #e8e8e8;
-  border-radius: 8px;
-  padding: 30px 40px;
-  margin-bottom: 30px;
-}
 @media (max-width: 767px) {
   .posts-expand {
-    margin: 0 10px;
-  }
-  .posts-expand .post {
-    padding: 20px 15px;
+    margin: 0 20px;
   }
   .post-body pre,
   .post-body .highlight {
@@ -2081,11 +2071,11 @@ body {
 .brand {
   display: block;
   padding: 0;
-  color: #222;
+  color: #fff;
   background: none;
 }
 .brand:hover {
-  color: #555;
+  color: #ccc;
 }
 [data-theme="dark"] .brand {
   color: #e0e3e6;
@@ -2628,5 +2618,108 @@ body {
   [data-theme="dark"] .pagination .next:hover,
   [data-theme="dark"] .pagination .page-number:hover {
     border-bottom-color: #e0e3e6;
+  }
+}
+
+/* Ideas stream */
+.ideas-stream {
+  max-width: 800px;
+  margin: 0 auto;
+}
+.ideas-header {
+  margin-bottom: 30px;
+}
+.ideas-intro {
+  margin-bottom: 20px;
+  color: #555;
+  font-size: 14px;
+}
+.ideas-search-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.ideas-search {
+  flex: 1;
+  padding: 8px 14px;
+  font-size: 14px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  outline: none;
+  background: #fff;
+  transition: border-color 0.2s;
+  font-family: inherit;
+}
+.ideas-search:focus {
+  border-color: #999;
+}
+.ideas-count {
+  font-size: 13px;
+  color: #999;
+  white-space: nowrap;
+}
+.idea-card {
+  padding: 20px 0;
+  border-bottom: 1px solid #eee;
+}
+.idea-card:last-child {
+  border-bottom: none;
+}
+.idea-meta {
+  margin-bottom: 6px;
+}
+.idea-date {
+  font-size: 13px;
+  color: #999;
+  font-family: monospace;
+}
+.idea-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 10px 0;
+  line-height: 1.3;
+}
+.idea-body {
+  font-size: 14px;
+  line-height: 1.7;
+}
+.idea-body p:first-child {
+  margin-top: 0;
+}
+.idea-body p:last-child {
+  margin-bottom: 0;
+}
+
+/* Ideas dark mode */
+[data-theme="dark"] .ideas-intro {
+  color: #aaa;
+}
+[data-theme="dark"] .ideas-search {
+  background: #1e1e1e;
+  border-color: #3a3d41;
+  color: #e0e3e6;
+}
+[data-theme="dark"] .ideas-search:focus {
+  border-color: #666;
+}
+[data-theme="dark"] .idea-card {
+  border-bottom-color: #3a3d41;
+}
+[data-theme="dark"] .idea-date {
+  color: #888;
+}
+
+/* Ideas responsive */
+@media (max-width: 767px) {
+  .ideas-search-wrap {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+  .ideas-count {
+    text-align: right;
+  }
+  .idea-title {
+    font-size: 16px;
   }
 }
