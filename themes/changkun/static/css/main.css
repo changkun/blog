@@ -995,9 +995,18 @@ pre .javascript .function {
 .posts-expand {
   padding-top: 40px;
 }
+.posts-expand .post {
+  background: #fff;
+  border-radius: 8px;
+  padding: 30px 40px;
+  margin-bottom: 30px;
+}
 @media (max-width: 767px) {
   .posts-expand {
-    margin: 0 20px;
+    margin: 0 10px;
+  }
+  .posts-expand .post {
+    padding: 20px 15px;
   }
   .post-body pre,
   .post-body .highlight {
@@ -1202,7 +1211,7 @@ pre .javascript .function {
   font-size: 16px;
 }
 .posts-expand .post-meta {
-  margin: 3px 0 60px 0;
+  margin: 3px 0 30px 0;
   color: #999;
   font-family: Optima, Candara, Calibri, Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
   font-size: 12px;
@@ -1246,7 +1255,7 @@ pre .javascript .function {
   }
 }
 .post-more-link {
-  margin-top: 50px;
+  margin-top: 30px;
 }
 .post-more-link .btn {
   color: #555;
@@ -1323,13 +1332,6 @@ pre .javascript .function {
   left: auto;
 }
 .posts-expand .post-eof {
-  display: block;
-  margin: 60px auto;
-  width: 100%;
-  height: 1px;
-  background: #e8e8e8;
-}
-.post:last-child .post-eof {
   display: none;
 }
 .post-gallery {
@@ -2039,7 +2041,7 @@ body {
   padding: 40px;
   max-width: 780px;
   margin: 0 auto;
-  background: #fff;
+  background: #f0f0f0;
   min-height: 700px;
 }
 @media (max-width: 991px) {
@@ -2383,7 +2385,7 @@ body {
   background: #1e2022;
 }
 [data-theme="dark"] .content-wrap {
-  background: #1e2022;
+  background: #141617;
 }
 [data-theme="dark"] .site-subtitle {
   color: #8e9297;
@@ -2458,8 +2460,8 @@ body {
 }
 
 /* Posts */
-[data-theme="dark"] .posts-expand .post-eof {
-  background: #3a3d41;
+[data-theme="dark"] .posts-expand .post {
+  background: #1e2022;
 }
 [data-theme="dark"] .posts-expand .post-title-link {
   color: #c8ccd0;
@@ -2728,4 +2730,29 @@ body {
   .idea-title {
     font-size: 16px;
   }
+}
+
+/* Ideas TOC in sidebar */
+.idea-toc-date {
+  font-family: monospace;
+  font-size: 0.85em;
+  color: #999;
+  margin-right: 4px;
+}
+.idea-toc-year {
+  margin-top: 6px;
+  list-style: none;
+}
+.idea-toc-year > strong {
+  font-size: 0.9em;
+  color: #555;
+}
+.idea-toc-year > ul {
+  padding-left: 10px;
+}
+[data-theme="dark"] .idea-toc-date {
+  color: #777;
+}
+[data-theme="dark"] .idea-toc-year > strong {
+  color: #aaa;
 }

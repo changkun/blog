@@ -1,7 +1,27 @@
 {{ if isset .Params "toc" }}
 <section class="post-toc-wrap sidebar-panel sidebar-panel-active">
     <div class="post-toc">
-        <div class="post-toc-content">{{ .TableOfContents }}</div>
+        <div class="post-toc-content">
+        {{ if eq .Section "ideas" }}
+            <nav>
+            <ul>
+            {{ $prevYear := "" }}
+            {{ range .Pages.ByDate.Reverse }}
+                {{ $year := .Date.Format "2006" }}
+                {{ if ne $year $prevYear }}
+                    {{ if ne $prevYear "" }}</ul></li>{{ end }}
+                    <li class="idea-toc-year"><strong>{{ $year }}</strong><ul>
+                    {{ $prevYear = $year }}
+                {{ end }}
+                <li><a href="#idea-{{ .File.ContentBaseName }}"><span class="idea-toc-date">{{ .Date.Format "01-02" }}</span> {{ .Title }}</a></li>
+            {{ end }}
+            {{ if ne $prevYear "" }}</ul></li>{{ end }}
+            </ul>
+            </nav>
+        {{ else }}
+            {{ .TableOfContents }}
+        {{ end }}
+        </div>
     </div>
 </section>
 {{ end }}

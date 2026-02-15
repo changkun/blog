@@ -11,7 +11,7 @@
   </div>
 
   {{ range .Pages.ByDate.Reverse }}
-  <article class="idea-card" data-searchable="{{ .Title }} {{ .Plain }}">
+  <article class="idea-card" id="idea-{{ .File.ContentBaseName }}" data-searchable="{{ .Title }} {{ .Plain }}">
     <div class="idea-meta">
       <time class="idea-date" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006-01-02" }}</time>
     </div>
