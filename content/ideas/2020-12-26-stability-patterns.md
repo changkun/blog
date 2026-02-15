@@ -1,5 +1,5 @@
 ---
-date: 2020-12-26T00:00:00+01:00
+date: 2020-12-26T00:00:00
 title: "Stability Patterns"
 ---
 
