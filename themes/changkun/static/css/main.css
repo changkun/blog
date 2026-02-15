@@ -2068,7 +2068,8 @@ body {
   color: #fff;
   background: none;
 }
-.brand:hover {
+.brand:hover,
+.sidebar-wrapper .brand:hover {
   color: #ccc;
 }
 [data-theme="dark"] .brand {
