@@ -19,6 +19,9 @@
     <div class="idea-body post-body">
       {{ .Content }}
     </div>
+    {{ if findRE `idea-augmented` .Content }}
+    <button class="idea-toggle" onclick="toggleAugmented(this)">Show deep dive</button>
+    {{ end }}
   </article>
   {{ end }}
 </section>
@@ -51,5 +54,14 @@
     countEl.textContent = q ? visible + ' / ' + total + ' ideas' : total + ' ideas';
   }
 })();
+
+function toggleAugmented(btn) {
+  var card = btn.closest('.idea-card');
+  var aug = card.querySelector('.idea-augmented');
+  if (!aug) return;
+  var hidden = aug.style.display === 'none' || !aug.style.display;
+  aug.style.display = hidden ? 'block' : 'none';
+  btn.textContent = hidden ? 'Hide deep dive' : 'Show deep dive';
+}
 </script>
 {{ end }}
