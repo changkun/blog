@@ -1,6 +1,7 @@
 {{ define "main_class"}}page-home{{ end}}
 
 {{ define "main_content" }}
+{{ $paginator := .Paginate (.Pages.ByDate.Reverse) 10 }}
 <section class="ideas-stream">
   <div class="ideas-header">
     <p class="ideas-intro">{{ .Content }}</p>
@@ -10,7 +11,7 @@
     </div>
   </div>
 
-  {{ range .Pages.ByDate.Reverse }}
+  {{ range $paginator.Pages }}
   <article class="idea-card" id="idea-{{ .File.ContentBaseName }}" data-searchable="{{ .Title }} {{ .Plain }}">
     <div class="idea-meta">
       <time class="idea-date" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006-01-02" }}</time>
@@ -25,6 +26,8 @@
   </article>
   {{ end }}
 </section>
+
+{{ partial "pagination.html" . }}
 
 <script>
 (function() {
