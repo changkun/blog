@@ -1,18 +1,11 @@
 {{ if .Site.Params.Links }}
-    <div class="links-of-blogroll inline">
-    <div class="links-of-blogroll-title">
-        <i class="fa fa-fw fa-globe"></i>
-        {{ i18n "Link" }}
-    </div>
-    <ul class="links-of-blogroll-list">
-        {{ range .Site.Params.Links }}
+<div class="links-of-author">
+    {{ range .Site.Params.Links }}
         <span class="links-of-author-item">
-            <a href="{{ .URL }}" target="_blank" title="{{ .Name }}">
-                <i class="fa fa-fw fa-{{ .Icon }}"></i>
-                {{ .Name }}
-            </a>
-            </span>
-        {{ end }}
-    </ul>
-    </div>
+        <a href="{{ .URL }}" target="_blank" title="{{ .Name }}">
+            <i class="fa fa-fw fa-{{ .Icon }}"></i>
+        </a>
+        </span>
+    {{ end }}
+</div>
 {{ end }}
