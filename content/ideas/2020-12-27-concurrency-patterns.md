@@ -1,5 +1,5 @@
 ---
-date: 2020-12-27
+date: 2020-12-27T00:00:00+01:00
 title: "Concurrency Patterns"
 ---
 

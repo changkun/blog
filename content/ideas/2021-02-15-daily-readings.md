@@ -1,5 +1,5 @@
 ---
-date: 2021-02-15
+date: 2021-02-15T00:00:00+01:00
 title: "Daily Readings"
 ---
 

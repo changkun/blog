@@ -1,5 +1,5 @@
 ---
-date: 2021-02-14
+date: 2021-02-14T00:00:00+01:00
 title: "Big Changes in Go 1.17"
 ---
 
