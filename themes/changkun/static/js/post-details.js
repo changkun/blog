@@ -3,7 +3,6 @@
 $(document).ready(function () {
 
   initScrollSpy();
-  NexT.utils.needAffix() && initAffix();
   initTOCDimension();
 
   function initScrollSpy () {
@@ -127,14 +126,6 @@ $(document).ready(function () {
       }, 500);
   });
 
-  // Expand sidebar on post detail page by default, when post has a toc.
-  NexT.motion.middleWares.sidebar = function () {
-    var $tocContent = $('.post-toc-content');
-
-    if (CONFIG.sidebar.display === 'post' || CONFIG.sidebar.display === 'always') {
-      if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
-        NexT.utils.displaySidebar();
-      }
-    }
-  };
+  // Sidebar is now always visible via CSS fixed positioning
+  NexT.motion.middleWares.sidebar = function () {};
 });

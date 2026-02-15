@@ -1,5 +1,3 @@
 $(document).ready(function () {
-  var sidebarTop = $('.header-inner').height() + 10;
-
-  $('#sidebar').css({ 'margin-top': sidebarTop }).show();
+  // Sidebar is now always visible via CSS fixed positioning
 });
