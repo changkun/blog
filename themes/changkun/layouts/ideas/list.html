@@ -7,7 +7,7 @@
     <p class="ideas-intro">{{ .Content }}</p>
     <div class="ideas-search-wrap">
       <input type="text" id="ideas-search" class="ideas-search" placeholder="Search ideas..." autocomplete="off" />
-      <span class="ideas-count" id="ideas-count">{{ len .Pages }} ideas</span>
+      <span class="ideas-count" id="ideas-count">{{ len $paginator.Pages }} / {{ len .Pages }} ideas</span>
     </div>
   </div>
 
@@ -54,7 +54,7 @@
         cards[i].style.display = 'none';
       }
     }
-    countEl.textContent = q ? visible + ' / ' + total + ' ideas' : total + ' ideas';
+    countEl.textContent = q ? visible + ' / ' + total + ' ideas' : '{{ len $paginator.Pages }} / {{ len .Pages }} ideas';
   }
 })();
 
