@@ -10,11 +10,11 @@
     {{ with .Site.Params.Author.Name }}<meta name="author" content="{{ . }}">{{ end }}
     <meta property="og:title" content="{{ if ne .Permalink " / " }}{{ .Title }}{{else}}{{ .Site.Title }}{{end}}">
     <meta property="og:site_name" content="{{ .Site.Title }}">
-    <meta property="og:image" content="/images/logo.png"> 
+    <meta property="og:image" content="https://changkun.de/logo.png">
     <meta name="title" content="{{ if ne .Permalink " / " }}{{ .Title }} - {{ end }}{{ .Site.Title }}" />
     {{ with .Description }}<meta name="description" content="{{ . }}" />
     {{ else }}<meta name="description" content="{{ .Site.Params.Description }}">{{ end }} 
-    <link rel="icon" href="/images/logo.png" />
+    <link rel="icon" href="https://changkun.de/logo.png" />
     <link href="/js/vendor/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
     {{ if and .Site.Params.Fancybox .IsPage}}<link href="/js/vendor/fancybox/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />{{ end }}
     <link href="/css/main.css" rel="stylesheet" type="text/css" />
