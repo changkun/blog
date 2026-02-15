@@ -1,0 +1,25 @@
+SiteTitle:   { en: "Changkun's Blog", zh: "欧长坤的博客" }
+SiteSubtitle: { en: "Science and art, life in between.", zh: "科学与艺术，生活在其间。" }
+Introduce:   { en: "Human-AI interaction researcher, engineer, and writer.", zh: "人机交互研究者、工程师、写作者。" }
+Description: { en: "Bridging HCI, AI, and systems programming. Building intelligent human-in-the-loop optimization systems. Informed by psychology, philosophy, and social science.", zh: "连接人机交互、AI 与系统编程。构建智能的人在环优化系统。融合心理学、哲学与社会科学。" }
+Blog:        { en: "Blogs",    zh: "博客" }
+Tag:         { en: "Tags",     zh: "标签" }
+Archive:     { en: "Archive",  zh: "归档" }
+ReadMore:    { en: "Read More", zh: "阅读更多" }
+Time:        { en: "Published at", zh: "发布于" }
+View:        { en: "Reading",  zh: "阅读" }
+Colon:       { en: ":",        zh: "：" }
+Copyright:   { en: "All rights reserved.", zh: "保留所有权利。" }
+TOC:         { en: "TOC",      zh: "目录" }
+Overview:    { en: "Overview",  zh: "概览" }
+MenuHome:    { en: "Home",     zh: "首页" }
+MenuIdeas:   { en: "Ideas",    zh: "想法" }
+MenuArchives: { en: "Archives", zh: "归档" }
+MenuTags:    { en: "Tags",     zh: "标签" }
+MenuBio:     { en: "Bio",      zh: "关于" }
+Author:      { en: "Author:",  zh: "作者：" }
+LinkLabel:   { en: "Link:",    zh: "链接：" }
+License:     { en: "All articles in this blog are licensed under", zh: "本博客所有文章均采用" }
+LicenseEnd:  { en: "unless stating additionally.", zh: "许可协议，除非另有声明。" }
+RSS:         { en: "RSS",      zh: "RSS" }
+Link:        { en: "Friends",  zh: "友链" }

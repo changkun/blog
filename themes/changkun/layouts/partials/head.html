@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html lang="{{ with .Site.LanguageCode }}{{ . }}{{ else }}zh-CN{{ end }}">
+<html lang="en-US">
 <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
@@ -19,6 +19,7 @@
     {{ if and .Site.Params.Fancybox .IsPage}}<link href="/js/vendor/fancybox/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />{{ end }}
     <link href="/css/main.css" rel="stylesheet" type="text/css" />
     <link href="/css/syntax.css" rel="stylesheet" type="text/css" />
+    <style>[data-lang="en"] .lang-zh{display:none!important}[data-lang="zh"] .lang-en{display:none!important}</style>
     <script type="text/javascript">
       // Apply theme immediately to prevent flash of wrong theme.
       (function() {
@@ -36,6 +37,9 @@
           document.documentElement.style.visibility = 'hidden';
           document.documentElement.style.background = '#181a1b';
         }
+        var lang = localStorage.getItem('lang') || 'en';
+        document.documentElement.setAttribute('data-lang', lang);
+        document.documentElement.setAttribute('lang', lang === 'zh' ? 'zh-CN' : 'en-US');
       })();
     </script>
     <script type="text/javascript">

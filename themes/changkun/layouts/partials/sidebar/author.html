@@ -3,13 +3,7 @@
         src="{{ .Site.Params.AuthorImg }}"
         alt="{{ .Site.Params.Author.Name }}" />
     <p class="site-author-name" itemprop="name">{{ .Site.Params.Author.Name }}</p>
-    {{ with .Site.Params.Introduce }}
-    <p class="site-role">{{ . }}</p>
-    {{ end }}
-    {{ with .Site.Params.Description }}
-    <p class="site-bio" itemprop="description">{{ . }}</p>
-    {{ end }}
-    {{ with .Site.Params.Subtitle }}
-    <p class="site-tagline">{{ . }}</p>
-    {{ end }}
+    <p class="site-role">{{ partial "bilingual.html" "Introduce" }}</p>
+    <p class="site-bio" itemprop="description">{{ partial "bilingual.html" "Description" }}</p>
+    <p class="site-tagline">{{ partial "bilingual.html" "SiteSubtitle" }}</p>
 </div>
