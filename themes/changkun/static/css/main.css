@@ -510,21 +510,6 @@ pre code {
 .highlight figcaption a:hover {
   border-bottom-color: #4d4d4c;
 }
-.highlight .gutter pre {
-  padding-left: 10px;
-  padding-right: 10px;
-  color: #869194;
-  text-align: right;
-  background-color: #eff2f3;
-}
-.highlight .code pre {
-  padding-left: 10px;
-  padding-right: 10px;
-  background-color: #f7f7f7;
-}
-.highlight .line {
-  height: 20px;
-}
 .gist table {
   width: auto;
 }
@@ -2362,13 +2347,6 @@ body {
   color: #c8ccd0;
   background: none;
 }
-[data-theme="dark"] .highlight .gutter pre {
-  color: #6b7278;
-  background-color: #252729;
-}
-[data-theme="dark"] .highlight .code pre {
-  background-color: #2a2d31;
-}
 [data-theme="dark"] .highlight figcaption {
   color: #c8ccd0;
 }
@@ -2749,6 +2727,52 @@ body {
 .idea-toc-year > ul {
   padding-left: 10px;
 }
+/* Augmented content */
+.idea-augmented {
+  display: none;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px dashed #ddd;
+  font-size: 14px;
+  line-height: 1.7;
+  color: #666;
+}
+.idea-augmented p:first-child {
+  margin-top: 0;
+}
+.idea-augmented p:last-child {
+  margin-bottom: 0;
+}
+.idea-toggle {
+  display: inline-block;
+  margin-top: 12px;
+  padding: 4px 12px;
+  font-size: 12px;
+  color: #999;
+  background: none;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+}
+.idea-toggle:hover {
+  color: #555;
+  border-color: #999;
+}
+
+[data-theme="dark"] .idea-augmented {
+  border-top-color: #3a3d41;
+  color: #a0a4a8;
+}
+[data-theme="dark"] .idea-toggle {
+  color: #888;
+  border-color: #3a3d41;
+}
+[data-theme="dark"] .idea-toggle:hover {
+  color: #ccc;
+  border-color: #666;
+}
+
 [data-theme="dark"] .idea-toc-date {
   color: #777;
 }

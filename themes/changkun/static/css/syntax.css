@@ -1,22 +1,28 @@
-/* Background */ .chroma { background-color: #f7f7f7 }
+/* Background */ .chroma { background-color: #f7f7f7; border-radius: 4px; }
 /* Other */ .chroma .x {  }
 /* Error */ .chroma .err {  }
 /* LineTableTD */ .chroma .lntd { vertical-align: top; padding: 0; margin: 0; border: 0; }
 /* LineTable */ .chroma .lntable { border-spacing: 0; padding: 0; margin: 0; border: 0; width: auto; overflow: auto; display: block; }
 
-.chroma .lntable tbody tr > td:first-child .chroma {
-    margin-left: 0;
-    background-color: #eff2f3;
+/* Gutter (line numbers column) */
+.chroma .lntd:first-child pre {
+  padding-left: 10px;
+  padding-right: 10px;
+  color: #869194;
+  text-align: right;
+  background-color: #eff2f3;
+  border-radius: 4px 0 0 4px;
 }
 
-/* LineHighlight */ .chroma .hl { display: block; width: 100%;background-color: #ffffcc }
-/* LineNumbersTable */ .chroma .lnt { margin: 0 5px 0 6px; padding: 0 0.4em 0 0.4em;color: #7f7f7f }
-
-.chroma .lntable tbody tr > td:last-child .chroma {
-    margin-left: 20px;
+/* Code column */
+.chroma .lntd:last-child pre {
+  padding-left: 12px;
+  padding-right: 10px;
 }
 
-/* LineNumbers */ .chroma .ln { margin-right: 0.4em; padding: 0 0.4em 0 0.4em;color: #7f7f7f }
+/* LineHighlight */ .chroma .hl { display: block; width: 100%; background-color: #ffffcc }
+/* LineNumbersTable */ .chroma .lnt { margin: 0 5px 0 6px; padding: 0 0.4em 0 0.4em; color: #7f7f7f }
+/* LineNumbers */ .chroma .ln { margin-right: 0.4em; padding: 0 0.4em 0 0.4em; color: #7f7f7f }
 /* Keyword */ .chroma .k { color: #0000ff }
 /* KeywordConstant */ .chroma .kc { color: #0000ff }
 /* KeywordDeclaration */ .chroma .kd { color: #0000ff }
@@ -94,7 +100,7 @@
 
 /* Dark Mode Syntax Highlighting (VS Code Dark+ inspired) */
 [data-theme="dark"] .chroma { background-color: #2a2d31 }
-[data-theme="dark"] .chroma .lntable tbody tr > td:first-child .chroma { background-color: #252729 }
+[data-theme="dark"] .chroma .lntd:first-child pre { background-color: #252729; color: #6b7278; }
 [data-theme="dark"] .chroma .hl { background-color: #3a3d41 }
 [data-theme="dark"] .chroma .lnt { color: #6b7278 }
 [data-theme="dark"] .chroma .ln { color: #6b7278 }
