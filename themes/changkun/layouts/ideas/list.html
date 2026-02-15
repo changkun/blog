@@ -6,8 +6,10 @@
   <div class="ideas-header">
     <p class="ideas-intro">{{ .Content }}</p>
     <div class="ideas-search-wrap">
-      <input type="text" id="ideas-search" class="ideas-search" placeholder="Search ideas..." autocomplete="off" />
-      <button type="button" id="ideas-search-clear" class="ideas-search-clear" style="display:none" aria-label="Clear search">&times;</button>
+      <span class="ideas-search-box">
+        <input type="text" id="ideas-search" class="ideas-search" placeholder="Search ideas..." autocomplete="off" />
+        <button type="button" id="ideas-search-clear" class="ideas-search-clear" style="display:none" aria-label="Clear search">&times;</button>
+      </span>
       <span class="ideas-count" id="ideas-count">{{ len $paginator.Pages }} / {{ len .Pages }} ideas</span>
     </div>
   </div>

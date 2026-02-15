@@ -2622,26 +2622,42 @@ body {
   align-items: center;
   gap: 12px;
 }
+.ideas-search-box {
+  flex: 1;
+  position: relative;
+}
 .ideas-search-clear {
-  background: none;
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
   border: none;
-  font-size: 18px;
-  color: #999;
-  cursor: pointer;
+  background: #ddd;
+  color: #555;
+  font-size: 14px;
+  line-height: 22px;
+  text-align: center;
   padding: 0;
-  margin-left: -32px;
-  margin-right: 18px;
-  line-height: 1;
+  cursor: pointer;
 }
 .ideas-search-clear:hover {
-  color: #333;
+  background: #ccc;
+  color: #222;
+}
+[data-theme="dark"] .ideas-search-clear {
+  background: #3a3d41;
+  color: #aaa;
 }
 [data-theme="dark"] .ideas-search-clear:hover {
+  background: #555;
   color: #e0e3e6;
 }
 .ideas-search {
-  flex: 1;
-  padding: 8px 28px 8px 14px;
+  width: 100%;
+  padding: 8px 34px 8px 14px;
   font-size: 14px;
   border: 1px solid #ddd;
   border-radius: 20px;
