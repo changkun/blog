@@ -1,6 +1,5 @@
 # Copyright (c) 2020 Changkun Ou. All rights reserved.
 
-NAME=blog
 all: clean
 	hugo --minify
 s: clean
