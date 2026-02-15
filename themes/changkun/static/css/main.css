@@ -179,7 +179,7 @@ body {
   font-size: 14px;
   line-height: 2;
   color: #555;
-  background: #fff;
+  background: #e8e8e8;
 }
 @media (max-width: 767px) {
   body {
@@ -2041,7 +2041,6 @@ body {
   padding: 40px;
   max-width: 780px;
   margin: 0 auto;
-  background: #555;
   min-height: 700px;
 }
 @media (max-width: 991px) {
@@ -2384,9 +2383,6 @@ body {
 [data-theme="dark"] .header-inner {
   background: #1e2022;
 }
-[data-theme="dark"] .content-wrap {
-  background: #141617;
-}
 [data-theme="dark"] .site-subtitle {
   color: #8e9297;
 }
@@ -2667,11 +2663,10 @@ body {
   white-space: nowrap;
 }
 .idea-card {
-  padding: 20px 0;
-  border-bottom: 1px solid #eee;
-}
-.idea-card:last-child {
-  border-bottom: none;
+  background: #fff;
+  border-radius: 8px;
+  padding: 20px 30px;
+  margin-bottom: 20px;
 }
 .idea-meta {
   margin-bottom: 6px;
@@ -2711,7 +2706,7 @@ body {
   border-color: #666;
 }
 [data-theme="dark"] .idea-card {
-  border-bottom-color: #3a3d41;
+  background: #1e2022;
 }
 [data-theme="dark"] .idea-date {
   color: #888;
@@ -2726,6 +2721,9 @@ body {
   }
   .ideas-count {
     text-align: right;
+  }
+  .idea-card {
+    padding: 15px;
   }
   .idea-title {
     font-size: 16px;
