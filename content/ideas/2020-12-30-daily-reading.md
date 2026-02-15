@@ -1,5 +1,5 @@
 ---
-date: 2020-12-30
+date: 2020-12-30T00:00:00+01:00
 title: "Daily Reading"
 ---
 
