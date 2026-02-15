@@ -7,7 +7,7 @@
     <title>{{ if ne .Permalink " / " }}{{ .Title }} - {{ end }}{{ .Site.Title }}</title>
     {{ if .Keywords }}<meta name="keywords" content="{{ range .Keywords }}{{ . }},{{ end }}">
     {{ else }}<meta name="keywords" content="{{ .Site.Params.Keywords }}">{{ end }}
-    {{ with .Site.Author.Name }}<meta name="author" content="{{ . }}">{{ end }}
+    {{ with .Site.Params.Author.Name }}<meta name="author" content="{{ . }}">{{ end }}
     <meta property="og:title" content="{{ if ne .Permalink " / " }}{{ .Title }}{{else}}{{ .Site.Title }}{{end}}">
     <meta property="og:site_name" content="{{ .Site.Title }}">
     <meta property="og:image" content="/images/logo.png"> 
