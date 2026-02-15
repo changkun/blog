@@ -3,6 +3,13 @@
         src="{{ .Site.Params.AuthorImg }}"
         alt="{{ .Site.Params.Author.Name }}" />
     <p class="site-author-name" itemprop="name">{{ .Site.Params.Author.Name }}</p>
-    <p class="site-description" itemprop="description"> {{ with .Site.Params.Introduce }}
-        {{ . }}{{end}}</p>
+    {{ with .Site.Params.Introduce }}
+    <p class="site-role">{{ . }}</p>
+    {{ end }}
+    {{ with .Site.Params.Description }}
+    <p class="site-bio" itemprop="description">{{ . }}</p>
+    {{ end }}
+    {{ with .Site.Params.Subtitle }}
+    <p class="site-tagline">{{ . }}</p>
+    {{ end }}
 </div>

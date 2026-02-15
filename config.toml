@@ -41,8 +41,8 @@ UglyUrls = false
     unsafe= true
 
 [Params]
-  Introduce = "Human-AI interaction researcher."
-  Description = "Science | Art | Blog"
+  Introduce = "Human-AI interaction researcher, engineer, and writer."
+  Description = "Bridging HCI, AI, and systems programming. Building intelligent human-in-the-loop optimization systems. Informed by psychology, philosophy, and social science."
   Keywords =  "Changkun Ou,Blog,Science,Art,Tech,Life,Notes,Reading,Think,Share"
   Subtitle = "Science and art, life in between."
   Imglogo = "https://changkun.de/logo.png"
