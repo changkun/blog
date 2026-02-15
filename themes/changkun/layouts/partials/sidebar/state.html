@@ -2,7 +2,7 @@
     <div class="site-state-item site-state-posts">
       <a href="/posts/">
         <span class="site-state-item-count">{{ len (where .Site.RegularPages "Section" "posts") }}</span>
-        <span class="site-state-item-name">{{ i18n "Blog" }}</span>
+        <span class="site-state-item-name">{{ partial "bilingual.html" "Blog" }}</span>
       </a>
     </div>
 
@@ -13,7 +13,7 @@
         {{else}}
         <span class="site-state-item-count">0</span>
         {{end}}
-        <span class="site-state-item-name">{{ i18n "Tag" }}</span>
+        <span class="site-state-item-name">{{ partial "bilingual.html" "Tag" }}</span>
         </a>
     </div>
 </nav>

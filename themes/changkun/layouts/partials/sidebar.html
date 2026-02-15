@@ -1,10 +1,10 @@
 {{ if isset .Params "toc" }}
   <ul class="sidebar-nav">
     <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
-    TOC
+    {{ partial "bilingual.html" "TOC" }}
     </li>
     <li class="sidebar-nav-overview" data-target="site-overview">
-    Overview
+    {{ partial "bilingual.html" "Overview" }}
     </li>
   </ul>
 {{ end }}
@@ -15,6 +15,11 @@
         <div class="theme-switch">
           <button id="theme-toggle" onclick="cycleTheme()" title="Toggle theme">
             <i id="theme-toggle-icon" class="fa fa-adjust"></i>
+          </button>
+        </div>
+        <div class="lang-switch">
+          <button id="lang-toggle" onclick="toggleLang()" title="Switch language">
+            <span id="lang-toggle-label">中</span>
           </button>
         </div>
         {{ partial "sidebar/rss.html" . }}

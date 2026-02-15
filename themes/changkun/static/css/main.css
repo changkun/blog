@@ -2814,3 +2814,17 @@ body {
 [data-theme="dark"] .idea-toc-year > strong {
   color: #aaa;
 }
+
+/* Language Switching */
+[data-lang="en"] .lang-zh { display: none !important; }
+[data-lang="zh"] .lang-en { display: none !important; }
+.lang-switch { margin: 0; text-align: center; }
+#lang-toggle {
+  background: none; border: 1px solid #ccc; border-radius: 50%;
+  width: 32px; height: 32px; cursor: pointer; color: #555;
+  font-size: 14px; font-weight: bold;
+  transition: border-color 0.2s, color 0.2s;
+}
+#lang-toggle:hover { border-color: #fc6423; color: #fc6423; }
+[data-theme="dark"] #lang-toggle { color: #bbb; border-color: #555; }
+[data-theme="dark"] #lang-toggle:hover { color: #fc6423; border-color: #fc6423; }

@@ -1,0 +1,5 @@
+{{- $key := . -}}
+{{- $data := index site.Data.i18n $key -}}
+{{- if $data -}}
+<span class="lang-en">{{ $data.en }}</span><span class="lang-zh">{{ $data.zh }}</span>
+{{- end -}}
