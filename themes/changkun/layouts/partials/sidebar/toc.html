@@ -14,7 +14,7 @@
                     <li class="idea-toc-year"><strong>{{ $year }}</strong><ul>
                     {{ $prevYear = $year }}
                 {{ end }}
-                <li><a href="#idea-{{ .File.ContentBaseName }}"><span class="idea-toc-date">{{ .Date.Format "01-02" }}</span> {{ .Title }}</a></li>
+                <li><a href="#idea-{{ .File.ContentBaseName }}"><span class="idea-toc-date">{{ .Date.Format "01-02 15:04" }}</span> {{ .Title }}</a></li>
             {{ end }}
             {{ if ne $prevYear "" }}</ul></li>{{ end }}
             </ul>

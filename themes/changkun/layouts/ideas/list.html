@@ -14,7 +14,7 @@
   {{ range $paginator.Pages }}
   <article class="idea-card" id="idea-{{ .File.ContentBaseName }}" data-searchable="{{ .Title }} {{ .Plain }}">
     <div class="idea-meta">
-      <time class="idea-date" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006-01-02" }}</time>
+      <time class="idea-date" datetime="{{ .Date.Format "2006-01-02T15:04:05" }}">{{ .Date.Format "2006-01-02 15:04:05" }}</time>
     </div>
     <h2 class="idea-title">{{ .Title }}</h2>
     <div class="idea-body post-body">
