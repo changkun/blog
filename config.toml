@@ -27,7 +27,7 @@ UglyUrls = false
   lineNoStart = 1
   lineNos = true
   lineNumbersInTable = true
-  noClasses = true
+  noClasses = false
   style = "vs"
   tabWidth = 4
 
