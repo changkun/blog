@@ -1524,6 +1524,7 @@ pre .javascript .function {
 .links-of-author {
   margin-top: 20px;
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
 }
 .links-of-author a {
@@ -1546,6 +1547,7 @@ pre .javascript .function {
 }
 .links-of-blogroll {
   font-size: 13px;
+  text-align: center;
 }
 .links-of-blogroll-title {
   margin-top: 20px;
@@ -1555,7 +1557,7 @@ pre .javascript .function {
 .links-of-blogroll-list {
   margin: 0;
   padding: 0;
-  list-style-type: disc;
+  list-style-type: none;
 }
 .sidebar-nav {
   margin: 0 0 20px;
@@ -2164,24 +2166,27 @@ body {
 }
 .container .main-inner {
   width: 1120px;
+  display: flex;
 }
 @media (min-width: 768px) and (max-width: 991px) {
   .container .main-inner {
     width: auto;
+    display: block;
   }
 }
 @media (max-width: 767px) {
   .container .main-inner {
     width: auto;
+    display: block;
   }
 }
 .content-wrap {
-  float: right;
   box-sizing: border-box;
   padding: 40px;
   width: 860px;
   background: #fff;
   min-height: 700px;
+  order: 1;
 }
 @media (min-width: 768px) and (max-width: 991px) {
   .content-wrap {
@@ -2198,11 +2203,11 @@ body {
 }
 .sidebar {
   position: static;
-  float: left;
   margin-top: 300px;
   width: 240px;
   background: #fff;
   box-shadow: none;
+  flex-shrink: 0;
 }
 @media (min-width: 768px) and (max-width: 991px) {
   .sidebar {
@@ -2246,10 +2251,10 @@ body {
   right: 0;
 }
 .sidebar-position-right .content-wrap {
-  float: left;
+  order: 0;
 }
 .sidebar-position-right .sidebar {
-  float: right;
+  order: 1;
 }
 .sidebar-position-right .footer-inner:before {
   float: right;
@@ -2341,10 +2346,8 @@ body {
   width: 240px;
   color: #555;
   background: #fff;
-}
-.sidebar-inner.affix {
-  position: fixed;
-  top: 0;
+  position: sticky;
+  top: 10px;
 }
 .site-overview {
   margin: 0 2px;
