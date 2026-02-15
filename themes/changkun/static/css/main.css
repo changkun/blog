@@ -922,10 +922,11 @@ pre .javascript .function {
   margin-top: 20px;
   padding-left: 0;
   text-align: center;
+  white-space: nowrap;
 }
 .menu .menu-item {
   display: inline-block;
-  margin: 0 10px;
+  margin: 0 2px;
 }
 @media screen and (max-width: 767px) {
   .menu .menu-item {
@@ -2103,23 +2104,22 @@ body {
 }
 .menu .menu-item {
   display: inline-block;
-  margin: 3px 2px;
+  margin: 2px 0;
   list-style: none;
 }
 .menu .menu-item a {
   display: block;
   box-sizing: border-box;
-  padding: 2px 12px;
-  font-size: 12px;
-  line-height: 1.8;
-  border: 1px solid #ddd;
-  border-radius: 14px;
-  transition: background-color 0.2s, border-color 0.2s;
+  padding: 0 5px;
+  font-size: 13px;
+  border-bottom: none;
+  text-decoration: none;
+  transition: background-color 0.2s;
 }
 .menu .menu-item a:hover,
 .menu-item-active a {
-  background: #f0f0f0;
-  border-color: #bbb;
+  border-radius: 4px;
+  background: #eee;
 }
 .btn-bar {
   background-color: #fff;
@@ -2381,13 +2381,9 @@ body {
 }
 
 /* Menu */
-[data-theme="dark"] .menu .menu-item a {
-  border-color: #3a3d41;
-}
 [data-theme="dark"] .menu .menu-item a:hover,
 [data-theme="dark"] .menu-item-active a {
   background: #303336;
-  border-color: #555;
 }
 
 /* Sidebar */
