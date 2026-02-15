@@ -10,13 +10,15 @@
 {{ end }}
     <section class="site-overview sidebar-panel {{ if not (isset .Params "toc") }} sidebar-panel-active {{ end }}">
       {{ partial "sidebar/author.html" . }}
-      {{ partial "sidebar/state.html" . }}
-      <div class="theme-switch">
-        <button id="theme-toggle" onclick="cycleTheme()" title="Toggle theme">
-          <i id="theme-toggle-icon" class="fa fa-adjust"></i>
-        </button>
+      <div class="sidebar-actions">
+        {{ partial "sidebar/state.html" . }}
+        <div class="theme-switch">
+          <button id="theme-toggle" onclick="cycleTheme()" title="Toggle theme">
+            <i id="theme-toggle-icon" class="fa fa-adjust"></i>
+          </button>
+        </div>
+        {{ partial "sidebar/rss.html" . }}
       </div>
-      {{ partial "sidebar/rss.html" . }}
       {{ partial "sidebar/social.html" . }}
       {{ partial "sidebar/link.html" . }}
     </section>
