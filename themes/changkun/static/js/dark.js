@@ -6,6 +6,9 @@ if (enabled === null) {
 } else if (enabled === 'true') {
   enable(); document.getElementById("dark-mode-checkbox").checked = true;
 }
+// Reveal page after DarkReader has been applied (or was not needed).
+document.documentElement.style.visibility = '';
+document.documentElement.style.background = '';
 function enable()  {
   DarkReader.enable({brightness: 100, contrast: 85, sepia: 10});
   localStorage.setItem('dark-mode', 'true');

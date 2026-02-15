@@ -20,6 +20,17 @@
     <link href="/css/main.css" rel="stylesheet" type="text/css" />
     <link href="/css/syntax.css" rel="stylesheet" type="text/css" />
     <script type="text/javascript">
+      // Prevent flash of light mode: hide page until DarkReader can apply.
+      (function() {
+        var d = localStorage.getItem('dark-mode');
+        var prefersDark = d === 'true' || (d === null && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        if (prefersDark) {
+          document.documentElement.style.visibility = 'hidden';
+          document.documentElement.style.background = '#181a1b';
+        }
+      })();
+    </script>
+    <script type="text/javascript">
       var NexT = window.NexT || {};
       var CONFIG = {
         scheme: 'Pisces',
