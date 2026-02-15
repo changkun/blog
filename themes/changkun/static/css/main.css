@@ -1523,6 +1523,8 @@ pre .javascript .function {
 }
 .links-of-author {
   margin-top: 20px;
+  display: flex;
+  justify-content: center;
 }
 .links-of-author a {
   display: inline-block;
@@ -2395,9 +2397,7 @@ body {
   clear: both;
 }
 .links-of-author-item {
-  float: left;
   margin: 5px 0 0;
-  width: 50%;
 }
 .links-of-author-item a {
   box-sizing: border-box;
