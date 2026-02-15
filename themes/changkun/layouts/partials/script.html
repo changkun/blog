@@ -25,7 +25,7 @@ gtag('config', '{{.Site.Params.GoogleAnalytics}}');
 <script type="text/javascript" src="/js/motion.js"></script>
 <script type="text/javascript" src="/js/affix.js"></script>
 <script type="text/javascript" src="/js/schemes/pisces.js"></script>
-{{ if .IsPage}}
+{{ if or .IsPage (isset .Params "toc") }}
 <script type="text/javascript" src="/js/scrollspy.js"></script>
 <script type="text/javascript" src="/js/post-details.js"></script>
 {{ end }}
