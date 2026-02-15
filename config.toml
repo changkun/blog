@@ -41,7 +41,7 @@ UglyUrls = false
     unsafe= true
 
 [Params]
-  Introduce = "Stop Talking. Just Coding."
+  Introduce = "Human-AI interaction researcher."
   Description = "Science | Art | Blog"
   Keywords =  "Changkun Ou,Blog,Science,Art,Tech,Life,Notes,Reading,Think,Share"
   Subtitle = "Science and art, life in between."
@@ -86,30 +86,54 @@ UglyUrls = false
   Name = "Homepage"
   Icon = "home"
   URL = "https://changkun.de"
-
 [[Params.Socials]]
   Name = "GitHub"
   Icon = "github"
-  URL = "https://changkun.de/s/github"
-
+  URL = "https://github.com/changkun"
 [[Params.Socials]]
   Name = "Email"
   Icon = "envelope"
-  URL = "https://changkun.de/s/email"
-
+  URL = "mailto:contact@changkun.de"
 [[Params.Socials]]
-  Name = "YouTube"
-  Icon = "youtube"
-  URL = "https://changkun.de/s/youtube"
+  Name = "Institution"
+  Icon = "university"
+  URL = "https://www.medien.ifi.lmu.de/team/changkun.ou/"
+[[Params.Socials]]
+  Name = "Google Scholar"
+  Icon = "graduation-cap"
+  URL = "https://scholar.google.de/citations?user=3qjB-eUAAAAJ"
+[[Params.Socials]]
+  Name = "LinkedIn"
+  Icon = "linkedin"
+  URL = "https://www.linkedin.com/in/changkun/"
 [[Params.Socials]]
   Name = "Twitter"
   Icon = "twitter"
-  URL = "https://changkun.de/s/twitter"
-
+  URL = "https://twitter.com/ouchangkun"
+[[Params.Socials]]
+  Name = "Instagram"
+  Icon = "instagram"
+  URL = "https://www.instagram.com/ouchangkun"
+[[Params.Socials]]
+  Name = "YouTube"
+  Icon = "youtube"
+  URL = "https://www.youtube.com/channel/UCtujb7c9eudbVEkAsIRZR3w"
+[[Params.Socials]]
+  Name = "Stack Overflow"
+  Icon = "stack-overflow"
+  URL = "https://stackoverflow.com/users/3819460/changkun"
 [[Params.Socials]]
   Name = "Zhihu"
   Icon = "book"
-  URL = "https://changkun.de/s/zhihu"
+  URL = "https://www.zhihu.com/people/ouchangkun"
+[[Params.Socials]]
+  Name = "Facebook"
+  Icon = "facebook"
+  URL = "https://www.facebook.com/ouchangkun"
+[[Params.Socials]]
+  Name = "Telegram"
+  Icon = "telegram"
+  URL = "https://t.me/ouchangkun"
 
 [[Params.Links]]
   Name = "Frimin"
