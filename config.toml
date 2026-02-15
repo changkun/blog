@@ -7,6 +7,7 @@ Theme =  "changkun"
 MetaDataFormat =  "yaml"
 CanonifyUrls =  true
 BuildDrafts =  false
+enableGitInfo = true
 [pagination]
   pagerSize = 5
   path = "p"

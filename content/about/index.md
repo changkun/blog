@@ -4,7 +4,7 @@ title_zh: 关于
 date: 2013-03-23 18:54:55
 ---
 
-> Last update: 2020/11/08
+> Last update: {{< lastupdate >}}
 
 {{% en %}}
 ## About Changkun Ou
