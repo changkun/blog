@@ -7,13 +7,15 @@ Theme =  "changkun"
 MetaDataFormat =  "yaml"
 CanonifyUrls =  true
 BuildDrafts =  false
-PaginatePath =  "p"
-Paginate = 5
+[pagination]
+  pagerSize = 5
+  path = "p"
 DisablePathToLower =  false
 HasCJKLanguage = true
 pygmentsUseClasses=true
 UglyUrls = false
-disqusShortname = "changkun"
+[services.disqus]
+  shortname = "changkun"
 [permalinks]
   posts = "/:slug"
 [markup.highlight]
@@ -51,7 +53,7 @@ disqusShortname = "changkun"
   GoogleAnalytics = "UA-80889616-2"
   Fancybox = false
 
-[Author]
+[Params.Author]
   Name = "Changkun Ou"
 
 [[Menu.Main]]
