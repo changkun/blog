@@ -7,6 +7,7 @@
     <p class="ideas-intro">{{ .Content }}</p>
     <div class="ideas-search-wrap">
       <input type="text" id="ideas-search" class="ideas-search" placeholder="Search ideas..." autocomplete="off" />
+      <button type="button" id="ideas-search-clear" class="ideas-search-clear" style="display:none" aria-label="Clear search">&times;</button>
       <span class="ideas-count" id="ideas-count">{{ len $paginator.Pages }} / {{ len .Pages }} ideas</span>
     </div>
   </div>
@@ -32,14 +33,23 @@
 <script>
 (function() {
   var search = document.getElementById('ideas-search');
+  var clearBtn = document.getElementById('ideas-search-clear');
   var countEl = document.getElementById('ideas-count');
   var cards = document.querySelectorAll('.idea-card');
   var total = cards.length;
   var timer = null;
 
   search.addEventListener('input', function() {
+    clearBtn.style.display = search.value ? '' : 'none';
     clearTimeout(timer);
     timer = setTimeout(filter, 150);
+  });
+
+  clearBtn.addEventListener('click', function() {
+    search.value = '';
+    clearBtn.style.display = 'none';
+    filter();
+    search.focus();
   });
 
   function filter() {
