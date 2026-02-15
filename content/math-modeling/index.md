@@ -1,10 +1,20 @@
-title: 数学建模初步教程[已完结]
+title: "Mathematical Modeling Tutorial [Completed]"
+title_zh: 数学建模初步教程[已完结]
 id: 602
 date: 2013-11-18 13:11:06
 ---
 
 ![封面](/images/math-modeling/cover.jpg)
 
+{{% en %}}
+# Introduction to Mathematical Modeling [Completed]
+
+This is a Chinese-language video tutorial series covering mathematical modeling from basics to advanced topics, including probability, Markov chains, Monte Carlo methods, and Hidden Markov Models. The series contains 9 lectures.
+
+* **(Recommended) YouTube Playlist**: [Link](https://www.youtube.com/watch?v=EUfXE3vP9_A&list=PLwUqqMt5en7c7iZIseCVAS5BX6RPkS-qR)
+{{% /en %}}
+
+{{% zh %}}
 # 数学建模初步教程[已完结]
 
 ## 更新日志
@@ -130,3 +140,4 @@ date: 2013-11-18 13:11:06
 ## 许可
 
 <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="知识共享许可协议" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></a><br /><span xmlns:dct="http://purl.org/dc/terms/" href="http://purl.org/dc/dcmitype/MovingImage" property="dct:title" rel="dct:type">数学建模初步</span> 由 <a xmlns:cc="http://creativecommons.org/ns#" href=" https://changkun.de/blog/math-modeling" property="cc:attributionName" rel="cc:attributionURL">欧长坤</a> 创作，采用 <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">知识共享 署名-非商业性使用-相同方式共享 4.0 国际 许可协议</a>进行许可。
+{{% /zh %}}
