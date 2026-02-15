@@ -2625,7 +2625,6 @@ body {
 .ideas-search-box {
   flex: 1;
   position: relative;
-  display: block;
 }
 .ideas-search-clear {
   position: absolute;
