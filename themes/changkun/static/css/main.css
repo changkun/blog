@@ -2625,6 +2625,7 @@ body {
 .ideas-search-box {
   flex: 1;
   position: relative;
+  display: block;
 }
 .ideas-search-clear {
   position: absolute;
@@ -2657,6 +2658,7 @@ body {
 }
 .ideas-search {
   width: 100%;
+  box-sizing: border-box;
   padding: 8px 34px 8px 14px;
   font-size: 14px;
   border: 1px solid #ddd;
