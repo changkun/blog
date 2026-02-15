@@ -15,7 +15,7 @@
   function updateToggle(lang) {
     var label = document.getElementById('lang-toggle-label');
     if (!label) return;
-    label.textContent = lang === 'en' ? '中' : 'EN';
+    label.textContent = lang === 'en' ? '\uD83C\uDDE8\uD83C\uDDF3' : '\uD83C\uDDFA\uD83C\uDDF8';
     var btn = document.getElementById('lang-toggle');
     if (btn) btn.title = lang === 'en' ? 'Switch to Chinese' : 'Switch to English';
   }
