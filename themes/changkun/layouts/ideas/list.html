@@ -1,0 +1,55 @@
+{{ define "main_class"}}page-home{{ end}}
+
+{{ define "main_content" }}
+<section class="ideas-stream">
+  <div class="ideas-header">
+    <p class="ideas-intro">{{ .Content }}</p>
+    <div class="ideas-search-wrap">
+      <input type="text" id="ideas-search" class="ideas-search" placeholder="Search ideas..." autocomplete="off" />
+      <span class="ideas-count" id="ideas-count">{{ len .Pages }} ideas</span>
+    </div>
+  </div>
+
+  {{ range .Pages.ByDate.Reverse }}
+  <article class="idea-card" data-searchable="{{ .Title }} {{ .Plain }}">
+    <div class="idea-meta">
+      <time class="idea-date" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006-01-02" }}</time>
+    </div>
+    <h2 class="idea-title">{{ .Title }}</h2>
+    <div class="idea-body post-body">
+      {{ .Content }}
+    </div>
+  </article>
+  {{ end }}
+</section>
+
+<script>
+(function() {
+  var search = document.getElementById('ideas-search');
+  var countEl = document.getElementById('ideas-count');
+  var cards = document.querySelectorAll('.idea-card');
+  var total = cards.length;
+  var timer = null;
+
+  search.addEventListener('input', function() {
+    clearTimeout(timer);
+    timer = setTimeout(filter, 150);
+  });
+
+  function filter() {
+    var q = search.value.toLowerCase().trim();
+    var visible = 0;
+    for (var i = 0; i < cards.length; i++) {
+      var text = cards[i].getAttribute('data-searchable').toLowerCase();
+      if (!q || text.indexOf(q) !== -1) {
+        cards[i].style.display = '';
+        visible++;
+      } else {
+        cards[i].style.display = 'none';
+      }
+    }
+    countEl.textContent = q ? visible + ' / ' + total + ' ideas' : total + ' ideas';
+  }
+})();
+</script>
+{{ end }}
