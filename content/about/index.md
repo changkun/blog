@@ -31,6 +31,7 @@ date: 2013-03-23 18:54:55
 - 2018, enrolled at LMU München for a Master's in Computer Science, parallel degree with HCI.
 - 2019, graduated with a Master of Science with two parallel degrees in Human-Computer Interaction and Computer Science. Started a position as research assistant and Ph.D. student at LMU München.
 - 2020, founded the [golang.design](https://golang.design) initiative.
+- 2023, defended Ph.D. dissertation at LMU München.
 
 ### Personal Tags
 
@@ -84,6 +85,7 @@ A: I live in Munich and work as a research assistant and Ph.D. student at LMU M�
 - 2018，同时注册慕尼黑大学计算机科学硕士，与人机交互并行攻读。
 - 2019，以人机交互和计算机科学双硕士学位毕业。入职慕尼黑大学，担任博士研究员。
 - 2020，创立 [golang.design](https://golang.design) 开源计划。
+- 2023，在慕尼黑大学完成博士论文答辩。
 
 ### 个人标签
 
