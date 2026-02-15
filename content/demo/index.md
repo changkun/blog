@@ -1,15 +1,61 @@
 title: Demo
+title_zh: Demo 项目
 date: 2013-12-01 18:33:35
 ---
 
+{{% en %}}
+# Demo Project
+
+Demo is a simple gesture recognition application for Windows. It utilizes hardware devices available on the PC to capture and analyze real-world information, enabling specific functions based on user behavior.
+
+> Note: Demo Project has been discontinued and no longer accepts feedback via email.
+>
+> This page is kept for archival purposes only.
+>
+> 2015/09/12 Changkun Ou, Munich
+
+In Demo 1.0, users can specify a file path and use Demo's gesture recognition to open it.
+
+In Demo 2.0, the functionality of Demo 1.0 is integrated with additional gesture recognition for open palm and fist gestures. Demo controls mouse movement by tracking the hand in front of the camera.
+
+Download: [http://pan.baidu.com/s/1u0mmY](http://pan.baidu.com/s/1u0mmY)
+
+Note: All project outputs (all files in the cloud drive) are protected under the GPL open source license.
+
+Latest version: v2.0 beta 1
+
+## Introduction
+
+### Demo 1.0
+
+Demo 1.0 only supports capturing dynamic objects. When a dynamic object appears in the camera view, it triggers opening a user-defined file.
+
+Preview of Demo 1.0 main UI:
+![Fig 1 - UI](/images/demo/1.jpg)
+
+### Demo 2.0
+
+Demo 2.0 adds support for two gestures: open palm and fist. Moving an open palm in front of the camera controls mouse movement; switching from open palm to fist triggers a left mouse click.
+
+Preview of Demo 2.0 beta 1 main UI:
+![Fig 2 - UI](/images/demo/2.jpg)
+
+![Fig 3 - UI](/images/demo/3.jpg)
+
+![Fig 4 - Field test](/images/demo/4.jpg)
+
+Bug reports: [hi[_at_]changkun.de](mailto:hi[_at_]changkun.de)
+{{% /en %}}
+
+{{% zh %}}
 # Demo Project
 
 Demo 是一个 Windows 平台下的简单手势识别软件。用户可以在他们的PC中使用它。 Demo 调用 PC 中可用于采集分析现实世界信息的硬件设备，分析用户的行为信息，达到某些特定的功能。
 
 > 注意：Demo Project 已经停止开发，不再邮件接受反馈。
-> 
+>
 > 本页面仅供保留查看。
-> 
+>
 > 2015/09/12 欧长坤 于 慕尼黑
 
 在 Demo 1.0 中，用户可指定某个文件的路径，利用 Demo 的手势识别功能来打开它。
@@ -42,4 +88,5 @@ Demo 2.0 版本增加了两个手势识别的支持：手掌和握拳。保持�
 
 ![图4 现场测试](/images/demo/4.jpg)
 
-BUG反馈Email: [hi[_at_]changkun.de](mailto:hi[_at_]changkun.de) 
+BUG反馈Email: [hi[_at_]changkun.de](mailto:hi[_at_]changkun.de)
+{{% /zh %}}
