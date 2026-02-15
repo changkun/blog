@@ -2821,10 +2821,12 @@ body {
 .lang-switch { margin: 0; text-align: center; }
 #lang-toggle {
   background: none; border: 1px solid #ccc; border-radius: 50%;
-  width: 32px; height: 32px; cursor: pointer; color: #555;
-  font-size: 14px; font-weight: bold;
-  transition: border-color 0.2s, color 0.2s;
+  width: 32px; height: 32px; cursor: pointer;
+  font-size: 16px; line-height: 32px;
+  display: inline-flex; align-items: center; justify-content: center;
+  transition: border-color 0.2s;
+  padding: 0;
 }
-#lang-toggle:hover { border-color: #fc6423; color: #fc6423; }
-[data-theme="dark"] #lang-toggle { color: #bbb; border-color: #555; }
-[data-theme="dark"] #lang-toggle:hover { color: #fc6423; border-color: #fc6423; }
+#lang-toggle:hover { border-color: #fc6423; }
+[data-theme="dark"] #lang-toggle { border-color: #555; }
+[data-theme="dark"] #lang-toggle:hover { border-color: #fc6423; }
