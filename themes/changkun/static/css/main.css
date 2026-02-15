@@ -1458,6 +1458,7 @@ pre .javascript .function {
   padding: 2px;
   max-width: 120px;
   height: auto;
+  border-radius: 16px;
 }
 .site-author-name {
   margin: 0;
