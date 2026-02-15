@@ -136,14 +136,6 @@ UglyUrls = false
   URL = "https://t.me/ouchangkun"
 
 [[Params.Links]]
-  Name = "Frimin"
-  Icon = "users"
-  URL = "https://www.frimin.com/"
-[[Params.Links]]
-  Name = "ZZZero"
-  Icon = "user-secret"
-  URL = "https://www.zz-zero.com/"
-[[Params.Links]]
   Name = "march1993"
   Icon = "user-md"
   URL = "https://march1993.com/en/"
