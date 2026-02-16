@@ -1129,6 +1129,9 @@ pre .javascript .function {
 }
 .posts-collapse .post-header {
   position: relative;
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: baseline;
   transition-duration: 0.2s;
   transition-timing-function: ease-in-out;
   transition-delay: 0s;
@@ -1158,19 +1161,19 @@ pre .javascript .function {
   background: #222;
 }
 .posts-collapse .post-meta {
-  position: absolute;
   font-size: 12px;
-  left: 20px;
-  top: 5px;
+  margin-left: 20px;
+  flex-shrink: 0;
 }
 .posts-collapse .post-comments-count {
   display: none;
 }
 .posts-collapse .post-title {
-  margin-left: 60px;
+  margin-left: 20px;
   font-size: 14px;
   font-weight: normal;
   line-height: 1.6;
+  flex: 1;
 }
 .posts-collapse .post-title::after {
   margin-left: 3px;
