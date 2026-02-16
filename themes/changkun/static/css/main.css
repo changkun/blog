@@ -3065,7 +3065,7 @@ body.sidebar-open .drawer-toggle .btn-bar {
 .compose-editor {
   display: flex;
   flex: 1;
-  overflow-y: auto;
+  overflow: hidden;
   min-height: 180px;
   max-height: 50vh;
 }

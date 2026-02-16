@@ -210,7 +210,7 @@
 
   // Sync scroll between textarea, line numbers, and highlight overlay.
   contentInput.addEventListener('scroll', function() {
-    linesEl.style.transform = 'translateY(-' + contentInput.scrollTop + 'px)';
+    linesEl.scrollTop = contentInput.scrollTop;
     highlightEl.style.transform = 'translateY(-' + contentInput.scrollTop + 'px)';
   });
 
