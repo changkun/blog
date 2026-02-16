@@ -1,6 +1,10 @@
-{{ $paginator := .Paginate (where .Site.RegularPages "Section" "posts") }}
+{{ $posts := where .Site.RegularPages "Section" "posts" }}
+{{ $ideas := where .Site.RegularPages "Section" "ideas" }}
+{{ $all := union $posts $ideas }}
+{{ $paginator := .Paginate ($all.ByDate.Reverse) }}
  <section id="posts" class="posts-expand">
 {{ range $paginator.Pages }}
+  {{ if eq .Section "posts" }}
   <article class="post post-type-normal">
     <header class="post-header">
       <h1 class="post-title" itemprop="name headline">
@@ -9,7 +13,7 @@
         </a>
       </h1>
       <div class="post-meta">
-      {{ partial "post/date.html" .}} 
+      {{ partial "post/date.html" .}}
       {{ partial "post/readtime.html" .}}
       </div>
     </header>
@@ -25,7 +29,54 @@
     {{ end }}
     <footer class="post-footer"><div class="post-eof"></div></footer>
   </article>
+  {{ else if eq .Section "ideas" }}
+  <article class="idea-card" id="idea-{{ .File.ContentBaseName }}">
+    <div class="idea-meta">
+      <span class="idea-label">{{ partial "bilingual.html" "Idea" }}</span>
+      <time class="idea-date" datetime="{{ .Date.Format "2006-01-02T15:04:05" }}">{{ .Date.Format "2006-01-02 15:04:05" }}</time>
+      <button class="idea-share" onclick="shareIdea(this, '{{ .Permalink }}')" title="Copy link">
+        <svg class="idea-share-icon" viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><path d="M4.715 6.542 3.343 7.914a3 3 0 1 0 4.243 4.243l1.828-1.829A3 3 0 0 0 8.586 5.5L8.3 5.786a1.003 1.003 0 0 0-.23.543 1.5 1.5 0 0 1 .662 2.5l-1.828 1.828a1.5 1.5 0 1 1-2.122-2.122l.905-.904a4 4 0 0 1-.153-1.089m7.57-.96 1.372-1.372a3 3 0 1 0-4.243-4.243L7.586 1.795A3 3 0 0 0 8.414 6.5l.286-.286a1 1 0 0 0 .23-.543 1.5 1.5 0 0 1-.662-2.5l1.828-1.828a1.5 1.5 0 0 1 2.122 2.122l-.905.904a4 4 0 0 1 .153 1.089q.044.025.084.058z"/></svg>
+        <svg class="idea-share-check" viewBox="0 0 16 16" width="14" height="14" fill="currentColor" style="display:none"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0z"/></svg>
+      </button>
+    </div>
+    <h2 class="idea-title"><a href="{{ .Permalink }}">{{ partial "bilingual_title.html" . }}</a></h2>
+    <div class="idea-body post-body">
+      {{ .Content }}
+    </div>
+    {{ if findRE `idea-augmented` .Content }}
+    <button class="idea-toggle" onclick="toggleAugmented(this)"><span class="lang-en">Show deep dive</span><span class="lang-zh">展开深度分析</span></button>
+    {{ end }}
+  </article>
+  {{ end }}
 {{end}}
 </section>
 {{ partial "pagination.html" . }}
 
+<script>
+function shareIdea(btn, url) {
+  navigator.clipboard.writeText(url).then(function() {
+    var icon = btn.querySelector('.idea-share-icon');
+    var check = btn.querySelector('.idea-share-check');
+    icon.style.display = 'none';
+    check.style.display = '';
+    setTimeout(function() {
+      check.style.display = 'none';
+      icon.style.display = '';
+    }, 1500);
+  });
+}
+
+function toggleAugmented(btn) {
+  var card = btn.closest('.idea-card');
+  var augs = card.querySelectorAll('.idea-augmented');
+  if (!augs.length) return;
+  var hidden = augs[0].style.display === 'none' || !augs[0].style.display;
+  for (var i = 0; i < augs.length; i++) {
+    augs[i].style.display = hidden ? 'block' : 'none';
+  }
+  var enLabel = btn.querySelector('.lang-en');
+  var zhLabel = btn.querySelector('.lang-zh');
+  if (enLabel) enLabel.textContent = hidden ? 'Hide deep dive' : 'Show deep dive';
+  if (zhLabel) zhLabel.textContent = hidden ? '收起深度分析' : '展开深度分析';
+}
+</script>

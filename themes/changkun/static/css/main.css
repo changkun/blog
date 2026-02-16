@@ -2937,6 +2937,24 @@ body.sidebar-open .drawer-toggle .btn-bar {
   color: #aaa;
 }
 
+/* Idea cards in home feed */
+.posts-expand .idea-card {
+  margin-bottom: 30px;
+}
+.idea-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #999;
+  background: #f0f0f0;
+  padding: 1px 8px;
+  border-radius: 10px;
+}
+[data-theme="dark"] .idea-label {
+  background: #2a2d30;
+  color: #888;
+}
+
 /* Language Switching */
 [data-lang="en"] .lang-zh { display: none !important; }
 [data-lang="zh"] .lang-en { display: none !important; }
