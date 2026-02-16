@@ -873,11 +873,6 @@ pre .javascript .function {
   top: 10px;
   left: 10px;
 }
-@media (max-width: 767px) {
-  .site-nav-toggle {
-    display: block;
-  }
-}
 .site-nav-toggle button {
   margin-top: 2px;
   padding: 9px 10px;
@@ -886,7 +881,6 @@ pre .javascript .function {
 }
 @media (max-width: 767px) {
   .site-nav {
-    display: none;
     margin: 0 -10px;
     padding: 0 10px;
     clear: both;
@@ -2031,15 +2025,12 @@ body {
 }
 @media (max-width: 991px) {
   .sidebar-wrapper {
-    position: static;
-    width: 100%;
-    height: auto;
-    overflow: visible;
-    border-right: none;
-    border-bottom: 1px solid #eee;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    z-index: 200;
   }
-  .sidebar-inner {
-    display: none;
+  .sidebar-wrapper.sidebar-open {
+    transform: translateX(0);
   }
   .main {
     margin-left: 0;
@@ -2047,6 +2038,9 @@ body {
   .content-wrap {
     width: 100%;
     padding: 20px;
+  }
+  body.sidebar-open {
+    overflow: hidden;
   }
 }
 @media (max-width: 767px) {
@@ -2084,16 +2078,6 @@ body {
 .site-nav {
   border-top: none;
 }
-@media (min-width: 768px) and (max-width: 991px) {
-  .site-nav {
-    display: none !important;
-  }
-}
-@media (min-width: 768px) and (max-width: 991px) {
-  .site-nav-on {
-    display: block !important;
-  }
-}
 .menu .menu-item {
   display: inline-block;
   margin: 2px 0;
@@ -2119,11 +2103,6 @@ body {
 .site-nav-toggle {
   top: 20px;
   left: 20px;
-}
-@media (min-width: 768px) and (max-width: 991px) {
-  .site-nav-toggle {
-    display: block;
-  }
 }
 .sidebar-inner {
   box-sizing: border-box;
@@ -2580,11 +2559,6 @@ body {
 }
 
 /* Responsive overrides */
-@media (max-width: 991px) {
-  [data-theme="dark"] .sidebar-wrapper {
-    border-bottom-color: #3a3d41;
-  }
-}
 @media (max-width: 767px) {
   [data-theme="dark"] .site-nav {
     border-top-color: #3a3d41;
@@ -2603,6 +2577,49 @@ body {
   [data-theme="dark"] .pagination .page-number:hover {
     border-bottom-color: #e0e3e6;
   }
+}
+
+/* Drawer toggle button (mobile) */
+.drawer-toggle {
+  display: none;
+  position: fixed;
+  top: 14px;
+  left: 14px;
+  z-index: 201;
+  padding: 9px 10px;
+  background: rgba(255,255,255,0.9);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.drawer-toggle .btn-bar {
+  background-color: #555;
+}
+[data-theme="dark"] .drawer-toggle {
+  background: rgba(30,32,34,0.9);
+}
+[data-theme="dark"] .drawer-toggle .btn-bar {
+  background-color: #a0a4a8;
+}
+@media (max-width: 991px) {
+  .drawer-toggle {
+    display: block;
+  }
+}
+
+/* Sidebar overlay (mobile) */
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 199;
+  display: none;
+}
+.sidebar-overlay.sidebar-open {
+  display: block;
 }
 
 /* Ideas stream */
