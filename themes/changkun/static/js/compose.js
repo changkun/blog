@@ -1,12 +1,12 @@
 (function() {
   var DRAFT_KEY = 'compose-draft';
-  var fab = document.getElementById('compose-fab');
+  var btn = document.getElementById('compose-btn');
+  var overlay = document.getElementById('compose-overlay');
   var win = document.getElementById('compose-window');
   var closeBtn = document.getElementById('compose-close');
   var titleInput = document.getElementById('compose-title');
   var contentInput = document.getElementById('compose-content');
   var linesEl = document.getElementById('compose-lines');
-  var editor = contentInput.parentElement;
   var sendBtn = document.getElementById('compose-send');
   var status = document.getElementById('compose-status');
   var toast = document.getElementById('compose-toast');
@@ -60,7 +60,7 @@
   updatePlaceholders();
   new MutationObserver(updatePlaceholders).observe(document.documentElement, { attributes: true, attributeFilter: ['data-lang'] });
 
-  // Auth: check eagerly on load, cache result for instant FAB click.
+  // Auth: check eagerly on load, cache result for instant click.
   var authed = false;
   if (typeof changkunLogin !== 'undefined') {
     changkunLogin.check().then(function(res) { authed = res.ok; }).catch(function() {});
@@ -70,7 +70,7 @@
     return document.documentElement.getAttribute('data-lang') === 'zh';
   }
 
-  fab.addEventListener('click', function() {
+  btn.addEventListener('click', function() {
     if (typeof changkunLogin === 'undefined') {
       showToast(isZh() ? '登录服务不可用' : 'Login service unavailable');
       return;
@@ -79,11 +79,11 @@
       openCompose();
       return;
     }
-    fab.disabled = true;
-    fab.style.opacity = '0.4';
+    btn.disabled = true;
+    btn.style.opacity = '0.4';
     changkunLogin.check().then(function(res) {
-      fab.disabled = false;
-      fab.style.opacity = '';
+      btn.disabled = false;
+      btn.style.opacity = '';
       if (!res.ok) {
         changkunLogin.login(window.location.href);
       } else {
@@ -91,26 +91,35 @@
         openCompose();
       }
     }).catch(function() {
-      fab.disabled = false;
-      fab.style.opacity = '';
+      btn.disabled = false;
+      btn.style.opacity = '';
       showToast(isZh() ? '登录服务不可用' : 'Login service unavailable');
     });
   });
 
   function openCompose() {
+    overlay.style.display = 'block';
     win.style.display = 'flex';
-    fab.style.display = 'none';
     status.textContent = '';
+    sendBtn.disabled = false;
     updateLines();
     contentInput.focus();
   }
 
   function closeCompose() {
+    overlay.style.display = 'none';
     win.style.display = 'none';
-    fab.style.display = '';
   }
 
   closeBtn.addEventListener('click', closeCompose);
+  overlay.addEventListener('click', closeCompose);
+
+  // Escape to close.
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && win.style.display === 'flex') {
+      closeCompose();
+    }
+  });
 
   // Send.
   function send() {
