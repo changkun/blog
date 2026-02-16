@@ -6,6 +6,7 @@
   <div class="ideas-header">
     <p class="ideas-intro">{{ .Content }}</p>
     <div class="ideas-search-wrap">
+      <button id="compose-btn" class="compose-btn" title="New Idea"><i class="fa fa-pencil"></i></button>
       <div class="ideas-search-box">
         <input type="text" id="ideas-search" class="ideas-search" placeholder="" autocomplete="off" />
         <button type="button" id="ideas-search-clear" class="ideas-search-clear" style="display:none" aria-label="Clear search">&times;</button>
@@ -107,8 +108,7 @@ function toggleAugmented(btn) {
 }
 </script>
 
-<button id="compose-fab" class="compose-fab" title="New Idea"><i class="fa fa-pencil"></i></button>
-
+<div id="compose-overlay" class="compose-overlay"></div>
 <div id="compose-window" class="compose-window">
   <div class="compose-header">
     <span><span class="lang-en">New Idea</span><span class="lang-zh">新想法</span></span>

@@ -2950,41 +2950,52 @@ body.sidebar-open .drawer-toggle .btn-bar {
 [data-theme="dark"] #lang-toggle { border-color: #555; }
 [data-theme="dark"] #lang-toggle:hover { border-color: #fc6423; }
 
-/* Compose FAB */
-.compose-fab {
-  position: fixed;
-  bottom: 100px;
-  right: 50px;
-  width: 32px;
-  height: 32px;
+/* Compose Button */
+.compose-btn {
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   background: none;
   color: #555;
-  border: 1px solid #ccc;
+  border: 1px solid #ddd;
   cursor: pointer;
-  z-index: 1060;
   font-size: 13px;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
   transition: border-color 0.2s, color 0.2s;
 }
-.compose-fab:hover {
+.compose-btn:hover {
   border-color: #fc6423;
   color: #fc6423;
+}
+
+/* Compose Overlay */
+.compose-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.3);
+  z-index: 2080;
 }
 
 /* Compose Window */
 .compose-window {
   display: none;
   position: fixed;
-  bottom: 0;
-  right: 80px;
-  width: 480px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 560px;
+  max-width: calc(100vw - 32px);
   max-height: 80vh;
   z-index: 2090;
-  border-radius: 6px 6px 0 0;
-  box-shadow: 0 -1px 12px rgba(0,0,0,0.15);
+  border-radius: 6px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.2);
   flex-direction: column;
   background: #fff;
   overflow: hidden;
@@ -3122,9 +3133,10 @@ body.sidebar-open .drawer-toggle .btn-bar {
 }
 
 /* Compose Dark Mode */
-[data-theme="dark"] .compose-fab { border-color: #555; color: #999; }
-[data-theme="dark"] .compose-fab:hover { border-color: #fc6423; color: #fc6423; }
-[data-theme="dark"] .compose-window { background: #1e2022; }
+[data-theme="dark"] .compose-btn { border-color: #555; color: #999; }
+[data-theme="dark"] .compose-btn:hover { border-color: #fc6423; color: #fc6423; }
+[data-theme="dark"] .compose-overlay { background: rgba(0,0,0,0.5); }
+[data-theme="dark"] .compose-window { background: #1e2022; box-shadow: 0 4px 24px rgba(0,0,0,0.4); }
 [data-theme="dark"] .compose-header { background: #2a2d30; }
 [data-theme="dark"] .compose-title { border-bottom-color: #3a3d41; color: #c8ccd0; }
 [data-theme="dark"] .compose-lines { background: #1a1c1e; border-right-color: #3a3d41; color: #555; }
@@ -3134,14 +3146,12 @@ body.sidebar-open .drawer-toggle .btn-bar {
 
 /* Compose Responsive */
 @media (max-width: 767px) {
-  .compose-fab {
-    bottom: 70px;
-    right: 16px;
-  }
   .compose-window {
-    right: 0;
-    left: 0;
     width: auto;
-    max-height: 70vh;
+    max-width: none;
+    left: 8px;
+    right: 8px;
+    transform: translate(0, -50%);
+    max-height: 80vh;
   }
 }
