@@ -11,7 +11,7 @@
     {{- $title := cond (ne .Permalink " / ") .Title .Site.Title -}}
     {{- $autoDesc := .Content | replaceRE `(?s)<div class="idea-augmented">.*?</div>` "" | replaceRE `(?s)<div class="lang-zh">.*` "" | plainify | replaceRE `https?://\S+` "" | replaceRE `\s+` " " | strings.TrimLeft " " -}}
     {{- $desc := .Description | default $autoDesc | default .Site.Params.Description -}}
-    {{- $image := "https://changkun.de/logo.png" -}}
+    {{- $image := .Params.image | default "" -}}
     {{- $url := .Permalink -}}
     <meta name="title" content="{{ $title }} - {{ .Site.Title }}" />
     <meta name="description" content="{{ $desc }}" />
@@ -21,7 +21,9 @@
     <meta property="og:title" content="{{ $title }}">
     <meta property="og:description" content="{{ $desc }}">
     <meta property="og:site_name" content="{{ .Site.Title }}">
-    <meta property="og:image" content="{{ $image }}">
+    {{- with $image }}
+    <meta property="og:image" content="{{ . }}">
+    {{- end }}
     {{- if .IsPage }}
     <meta property="article:published_time" content="{{ .Date.Format "2006-01-02T15:04:05Z07:00" }}">
     {{- if .Lastmod }}<meta property="article:modified_time" content="{{ .Lastmod.Format "2006-01-02T15:04:05Z07:00" }}">{{ end }}
@@ -31,7 +33,9 @@
     <meta name="twitter:url" content="{{ $url }}">
     <meta name="twitter:title" content="{{ $title }}">
     <meta name="twitter:description" content="{{ $desc }}">
-    <meta name="twitter:image" content="{{ $image }}">
+    {{- with $image }}
+    <meta name="twitter:image" content="{{ . }}">
+    {{- end }}
     <link rel="icon" href="https://changkun.de/logo.png" />
     <link href="/js/vendor/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
     {{ if and .Site.Params.Fancybox .IsPage}}<link href="/js/vendor/fancybox/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />{{ end }}
