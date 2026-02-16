@@ -116,7 +116,10 @@ function toggleAugmented(btn) {
   </div>
   <div class="compose-body">
     <input type="text" id="compose-title" class="compose-title" placeholder="" autocomplete="off" />
-    <textarea id="compose-content" class="compose-content" placeholder=""></textarea>
+    <div class="compose-editor">
+      <div class="compose-lines" id="compose-lines" aria-hidden="true"></div>
+      <textarea id="compose-content" class="compose-content" placeholder="" spellcheck="false"></textarea>
+    </div>
   </div>
   <div class="compose-footer">
     <span id="compose-status" class="compose-status"></span>

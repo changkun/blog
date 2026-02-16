@@ -2955,24 +2955,24 @@ body.sidebar-open .drawer-toggle .btn-bar {
   position: fixed;
   bottom: 100px;
   right: 50px;
-  width: 56px;
-  height: 56px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   background: #fc6423;
   color: #fff;
   border: none;
   cursor: pointer;
   z-index: 1060;
-  font-size: 20px;
+  font-size: 15px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+  box-shadow: 0 1px 6px rgba(0,0,0,0.2);
   transition: transform 0.15s, box-shadow 0.15s;
 }
 .compose-fab:hover {
-  transform: scale(1.05);
-  box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+  transform: scale(1.08);
+  box-shadow: 0 3px 10px rgba(0,0,0,0.25);
 }
 
 /* Compose Window */
@@ -2984,31 +2984,31 @@ body.sidebar-open .drawer-toggle .btn-bar {
   width: 480px;
   max-height: 80vh;
   z-index: 2090;
-  border-radius: 8px 8px 0 0;
-  box-shadow: 0 -2px 16px rgba(0,0,0,0.2);
+  border-radius: 6px 6px 0 0;
+  box-shadow: 0 -1px 12px rgba(0,0,0,0.15);
   flex-direction: column;
   background: #fff;
   overflow: hidden;
+  font-family: Optima, Candara, Calibri, Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
 }
 .compose-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 16px;
-  background: #222;
+  padding: 6px 12px;
+  background: #333;
   color: #fff;
-  font-size: 14px;
-  cursor: default;
+  font-size: 13px;
 }
 .compose-close {
   background: none;
   border: none;
   color: #fff;
-  font-size: 18px;
+  font-size: 16px;
   cursor: pointer;
-  padding: 0 4px;
+  padding: 0 2px;
   line-height: 1;
-  opacity: 0.7;
+  opacity: 0.6;
   transition: opacity 0.15s;
 }
 .compose-close:hover { opacity: 1; }
@@ -3016,56 +3016,87 @@ body.sidebar-open .drawer-toggle .btn-bar {
   display: flex;
   flex-direction: column;
   flex: 1;
-  overflow-y: auto;
+  overflow: hidden;
 }
 .compose-title {
   width: 100%;
   border: none;
-  border-bottom: 1px solid #e0e0e0;
-  padding: 10px 16px;
-  font-size: 14px;
+  border-bottom: 1px solid #eee;
+  padding: 6px 12px;
+  font-size: 13px;
   outline: none;
   background: transparent;
-  color: inherit;
+  color: #333;
   font-family: inherit;
+  box-sizing: border-box;
+}
+.compose-editor {
+  display: flex;
+  flex: 1;
+  overflow-y: auto;
+  min-height: 180px;
+  max-height: 50vh;
+}
+.compose-lines {
+  width: 32px;
+  min-width: 32px;
+  padding: 6px 0;
+  text-align: right;
+  font-family: 'PT Mono', consolas, Menlo, "PingFang SC", "Microsoft YaHei", monospace;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #bbb;
+  background: #fafafa;
+  border-right: 1px solid #eee;
+  user-select: none;
+  overflow: hidden;
+}
+.compose-lines span {
+  display: block;
+  padding-right: 6px;
 }
 .compose-content {
-  width: 100%;
+  flex: 1;
+  width: 0;
   border: none;
-  padding: 10px 16px;
-  font-size: 14px;
-  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-family: 'PT Mono', consolas, Menlo, "PingFang SC", "Microsoft YaHei", monospace;
   outline: none;
   resize: none;
-  min-height: 200px;
-  flex: 1;
   background: transparent;
-  color: inherit;
+  color: #4d4d4c;
   line-height: 1.6;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  overflow-y: hidden;
+  box-sizing: border-box;
 }
 .compose-footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 16px;
-  border-top: 1px solid #e0e0e0;
+  padding: 5px 12px;
+  border-top: 1px solid #eee;
 }
 .compose-send {
   background: #fc6423;
   color: #fff;
   border: none;
-  border-radius: 4px;
-  padding: 6px 20px;
-  font-size: 13px;
+  border-radius: 3px;
+  padding: 4px 14px;
+  font-size: 12px;
   cursor: pointer;
   transition: opacity 0.15s;
+  font-family: inherit;
 }
 .compose-send:hover { opacity: 0.85; }
 .compose-send:disabled { opacity: 0.5; cursor: default; }
 .compose-status {
-  font-size: 12px;
+  font-size: 11px;
   color: #999;
-  margin-right: 12px;
+  margin-right: 10px;
   flex: 1;
 }
 
@@ -3077,9 +3108,9 @@ body.sidebar-open .drawer-toggle .btn-bar {
   transform: translateX(-50%) translateY(20px);
   background: #333;
   color: #fff;
-  padding: 10px 24px;
-  border-radius: 24px;
-  font-size: 14px;
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-size: 13px;
   z-index: 3000;
   opacity: 0;
   pointer-events: none;
@@ -3093,19 +3124,21 @@ body.sidebar-open .drawer-toggle .btn-bar {
 
 /* Compose Dark Mode */
 [data-theme="dark"] .compose-window { background: #1e2022; }
+[data-theme="dark"] .compose-header { background: #2a2d30; }
 [data-theme="dark"] .compose-title { border-bottom-color: #3a3d41; color: #c8ccd0; }
+[data-theme="dark"] .compose-lines { background: #1a1c1e; border-right-color: #3a3d41; color: #555; }
 [data-theme="dark"] .compose-content { color: #c8ccd0; }
 [data-theme="dark"] .compose-footer { border-top-color: #3a3d41; }
-[data-theme="dark"] .compose-status { color: #777; }
+[data-theme="dark"] .compose-status { color: #666; }
 
 /* Compose Responsive */
 @media (max-width: 767px) {
   .compose-fab {
-    width: 48px;
-    height: 48px;
+    width: 36px;
+    height: 36px;
     bottom: 70px;
     right: 16px;
-    font-size: 18px;
+    font-size: 14px;
   }
   .compose-window {
     right: 0;
