@@ -20,7 +20,7 @@ russ cos: deprecated.
       + Release cycle: https://github.com/golang/go/wiki/Go-Release-Cycle
    3. Compiler bootstrapping process
 
-- 安装 Go：https://gist.github.com/Dids/dbe6356377e2a0b0dc8eacb0101dc3a7
+- Installing Go: https://gist.github.com/Dids/dbe6356377e2a0b0dc8eacb0101dc3a7
 - https://github.com/golang/go/issues/42684
 
   - Kernel Panic Episode 62: Your Computer Isn't Yours, Code Signing, OCSP Server
@@ -28,7 +28,7 @@ russ cos: deprecated.
     - TODO
   - Apple's long-standing code signing issues; I encountered similar problems doing Electron in the early days, and these issues still exist today
 
-- 异步抢占随机崩溃，是 Rosetta 的 Bug：https://github.com/golang/go/issues/42700
+- Asynchronous preemption random crashes, a Rosetta bug: https://github.com/golang/go/issues/42700
 
 - Bootstrapping, installation confusion: https://github.com/golang/go/issues/38485#issuecomment-735360572
   - Go's bootstrapping consists of three steps

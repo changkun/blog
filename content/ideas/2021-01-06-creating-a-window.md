@@ -56,28 +56,28 @@ Besides GLFW, there is the heavier SDL:
 Relationships between some basic terms:
 
 ```
-Unix:      上帝
-BSD:       类 Unix，伯克利分发，两种传统风味的 Unix 之一
-System V:  AT&T 开发，两种传统风味的 Unix 之一
-Linux:     新鲜风味的类 Unix
-POSIX:     尝试减少实现差异的标准
-Darwin:    苹果的开源类 Unix 内核 XNU
-Mach-O:    Darwin 混合的微内核，CMU 开发
+Unix:      The ancestor
+BSD:       Unix-like, Berkeley distribution, one of the two traditional flavors of Unix
+System V:  Developed by AT&T, one of the two traditional flavors of Unix
+Linux:     A fresh flavor of Unix-like OS
+POSIX:     A standard attempting to reduce implementation differences
+Darwin:    Apple's open-source Unix-like kernel XNU
+Mach-O:    Microkernel hybridized in Darwin, developed by CMU
 ```
 
 ![](https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Unix_history-simple.svg/2560px-Unix_history-simple.svg.png)
 
-> By Eraserhead1, Infinity0, Sav_vas - Levenez Unix History Diagram, Information on the history of IBM&#039;s AIX on ibm.com，CC BY-SA 3.0，https://commons.wikimedia.org/w/index.php?curid=1801948
+> By Eraserhead1, Infinity0, Sav_vas - Levenez Unix History Diagram, Information on the history of IBM&#039;s AIX on ibm.com, CC BY-SA 3.0, https://commons.wikimedia.org/w/index.php?curid=1801948
 
 Relationships between some Wayland-related tools:
 
 ```
-X Window System == X11: MIT 开发的显示标准，GNOME、KDE 依赖的基础
-Xorg:    X11 的官方实现
-Wayland: 另一种显示服务器和客户端之间的通信协议，区别于 X11
-EGL:     Wayland 客户端使用 EGL 来直接操作 framebuffer
-libDRM:  EGL/X11 底层依赖的内核对 userspace 开放的 API
-DRM:     内核级操作 framebuffer 的组件
+X Window System == X11: Display standard developed by MIT, the foundation for GNOME and KDE
+Xorg:    The official implementation of X11
+Wayland: An alternative communication protocol between display server and client, distinct from X11
+EGL:     Wayland clients use EGL to directly manipulate the framebuffer
+libDRM:  Kernel API exposed to userspace, underlying dependency of EGL/X11
+DRM:     Kernel-level component for manipulating the framebuffer
 ```
 
 ![](https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Wayland_display_server_protocol.svg/1920px-Wayland_display_server_protocol.svg.png)
