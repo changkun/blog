@@ -2888,6 +2888,9 @@ body.sidebar-open .drawer-toggle .btn-bar {
   line-height: 1.7;
   color: #666;
 }
+.post-type-normal .idea-augmented {
+  display: block;
+}
 .idea-augmented p:first-child {
   margin-top: 0;
 }
