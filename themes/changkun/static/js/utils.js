@@ -43,6 +43,8 @@ NexT.utils = NexT.$u = {
   registerBackToTop: function () {
     var THRESHOLD = 50;
     var $top = $('.back-to-top');
+    var $progress = $('.back-to-top-progress');
+    var circumference = 2 * Math.PI * 18;
 
     $(window).on('scroll', function () {
       $top.toggleClass('back-to-top-on', window.pageYOffset > THRESHOLD);
@@ -53,6 +55,11 @@ NexT.utils = NexT.$u = {
       var scrollPercentRounded = Math.round(scrollPercent*100);
       var scrollPercentMaxed = (scrollPercentRounded > 100) ? 100 : scrollPercentRounded;
       $('#scrollpercent>span').html(scrollPercentMaxed);
+
+      if ($progress.length) {
+        var offset = circumference - (scrollPercentMaxed / 100) * circumference;
+        $progress.attr('stroke-dashoffset', offset);
+      }
     });
 
     $top.on('click', function () {
