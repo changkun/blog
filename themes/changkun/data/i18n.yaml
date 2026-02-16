@@ -14,7 +14,7 @@ TOC:         { en: "TOC",      zh: "目录" }
 Overview:    { en: "Overview",  zh: "概览" }
 MenuHome:    { en: "Home",     zh: "首页" }
 MenuIdeas:   { en: "Ideas",    zh: "想法" }
-MenuArchives: { en: "Archives", zh: "归档" }
+MenuPosts:    { en: "Posts",    zh: "文章" }
 MenuTags:    { en: "Tags",     zh: "标签" }
 MenuBio:     { en: "Bio",      zh: "关于" }
 Author:      { en: "Author:",  zh: "作者：" }
