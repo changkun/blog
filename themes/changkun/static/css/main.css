@@ -181,6 +181,7 @@ body {
   line-height: 2;
   color: #555;
   background: #e8e8e8;
+  overflow-x: hidden;
 }
 @media (max-width: 767px) {
   body {
@@ -3101,7 +3102,7 @@ body.sidebar-open .drawer-toggle .btn-bar {
   white-space: pre-wrap;
   word-wrap: break-word;
   overflow-wrap: break-word;
-  overflow-y: hidden;
+  overflow-y: auto;
   box-sizing: border-box;
 }
 .compose-footer {
