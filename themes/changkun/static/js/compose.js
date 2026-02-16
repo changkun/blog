@@ -98,6 +98,7 @@
   });
 
   function openCompose() {
+    document.body.style.overflow = 'hidden';
     overlay.style.display = 'block';
     win.style.display = 'flex';
     status.textContent = '';
@@ -107,6 +108,7 @@
   }
 
   function closeCompose() {
+    document.body.style.overflow = '';
     overlay.style.display = 'none';
     win.style.display = 'none';
   }
