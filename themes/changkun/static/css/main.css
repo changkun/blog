@@ -2770,6 +2770,23 @@ body.sidebar-open .drawer-toggle .btn-bar {
 }
 .idea-meta {
   margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.idea-share {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  padding: 2px;
+  cursor: pointer;
+  color: #bbb;
+  transition: color 0.2s;
+}
+.idea-share:hover {
+  color: #555;
 }
 .idea-date {
   font-size: 13px;
@@ -2810,6 +2827,12 @@ body.sidebar-open .drawer-toggle .btn-bar {
 }
 [data-theme="dark"] .idea-date {
   color: #888;
+}
+[data-theme="dark"] .idea-share {
+  color: #555;
+}
+[data-theme="dark"] .idea-share:hover {
+  color: #ccc;
 }
 
 /* Ideas responsive */
