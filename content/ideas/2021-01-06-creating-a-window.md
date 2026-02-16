@@ -1,8 +1,109 @@
 ---
 date: 2021-01-06T00:00:00
 title: "Creating A Window"
+title_zh: "创建一个窗口"
 ---
 
+{{% en %}}
+How to create a window using Go? macOS has Cocoa, Linux has X11, but accessing these APIs seems to require Cgo. Is it possible to avoid Cgo? Some existing GUI libraries and graphics engines:
+
+GUI Toolkits:
+
+- https://github.com/hajimehoshi/ebiten
+- https://github.com/gioui/gio
+- https://github.com/fyne-io/fyne
+- https://github.com/g3n/engine
+- https://github.com/goki/gi
+- https://github.com/peterhellberg/gfx
+- https://golang.org/x/exp/shiny
+
+2D/3D Graphics:
+
+- https://github.com/llgcode/draw2d
+- https://github.com/fogleman/gg
+- https://github.com/ajstarks/svgo
+- https://github.com/BurntSushi/graphics-go
+- https://github.com/azul3d/engine
+- https://github.com/KorokEngine/Korok
+- https://github.com/EngoEngine/engo/
+- http://mumax.github.io/
+
+Here is a partial list:
+
+https://github.com/avelino/awesome-go#gui
+
+Most people use glfw and OpenGL. Here are some required libraries (Cgo bindings):
+
+- https://github.com/go-gl/gl
+- https://github.com/go-gl/glfw
+- https://github.com/remogatto/egl
+
+Some more low-level ones, e.g. X-related:
+
+- X bindings: https://github.com/BurntSushi/xgb
+- X window management: https://github.com/BurntSushi/wingo
+
+For example, if you need Metal on macOS:
+
+- https://dmitri.shuralyov.com/gpu/mtl
+
+Like the GUI tool ebiten mentioned above, on Windows it no longer needs Cgo. The approach seems to be packaging the window management DLLs directly into the binary and then using DLL dynamic linking calls.
+
+Besides GLFW, there is the heavier SDL:
+
+- https://github.com/veandco/go-sdl2
+
+Relationships between some basic terms:
+
+```
+Unix:      上帝
+BSD:       类 Unix，伯克利分发，两种传统风味的 Unix 之一
+System V:  AT&T 开发，两种传统风味的 Unix 之一
+Linux:     新鲜风味的类 Unix
+POSIX:     尝试减少实现差异的标准
+Darwin:    苹果的开源类 Unix 内核 XNU
+Mach-O:    Darwin 混合的微内核，CMU 开发
+```
+
+![](https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Unix_history-simple.svg/2560px-Unix_history-simple.svg.png)
+
+> By Eraserhead1, Infinity0, Sav_vas - Levenez Unix History Diagram, Information on the history of IBM&#039;s AIX on ibm.com，CC BY-SA 3.0，https://commons.wikimedia.org/w/index.php?curid=1801948
+
+Relationships between some Wayland-related tools:
+
+```
+X Window System == X11: MIT 开发的显示标准，GNOME、KDE 依赖的基础
+Xorg:    X11 的官方实现
+Wayland: 另一种显示服务器和客户端之间的通信协议，区别于 X11
+EGL:     Wayland 客户端使用 EGL 来直接操作 framebuffer
+libDRM:  EGL/X11 底层依赖的内核对 userspace 开放的 API
+DRM:     内核级操作 framebuffer 的组件
+```
+
+![](https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Wayland_display_server_protocol.svg/1920px-Wayland_display_server_protocol.svg.png)
+
+> By Shmuel Csaba Otto Traian, CC BY-SA 3.0, https://commons.wikimedia.org/w/index.php?curid=28029855
+
+![](https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/The_Linux_Graphics_Stack_and_glamor.svg/2880px-The_Linux_Graphics_Stack_and_glamor.svg.png)
+
+> By Shmuel Csaba Otto Traian, CC BY-SA 4.0, https://commons.wikimedia.org/w/index.php?curid=31768083
+
+![](https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Linux_Graphics_Stack_2013.svg/2880px-Linux_Graphics_Stack_2013.svg.png)
+
+> By Shmuel Csaba Otto Traian, CC BY-SA 3.0, https://commons.wikimedia.org/w/index.php?curid=27858390
+
+![](https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Free_and_open-source-software_display_servers_and_UI_toolkits.svg/2880px-Free_and_open-source-software_display_servers_and_UI_toolkits.svg.png)
+
+> By Shmuel Csaba Otto Traian，CC BY-SA 3.0，https://commons.wikimedia.org/w/index.php?curid=27799196
+
+So through DRM you can directly operate on the Frame Buffer under Linux, i.e., Direct Rendering Manager. Related libraries:
+
+- https://github.com/NeowayLabs/drm
+
+With this, you can do pure Go rendering directly on Linux, eliminating the dependency on C legacy.
+{{% /en %}}
+
+{{% zh %}}
 如何使用 Go 创建一个窗口？macOS 有 Cocoa、Linux 有 X11，但访问这些 API 似乎都需要
 引入 Cgo，可不可以不实用 Cgo？一些现有的 GUI 库或这图形引擎：
 
@@ -101,3 +202,4 @@ DRM:     内核级操作 framebuffer 的组件
 - https://github.com/NeowayLabs/drm
 
 有了这个就可以在 Linux 上直接做纯 Go 的绘制了，从而消除对 C 遗产的依赖。
+{{% /zh %}}

@@ -1,8 +1,208 @@
 ---
 date: 2021-01-27T00:00:00
 title: "Go 1.16 Big Changes"
+title_zh: "Go 1.16 的重大变化"
 ---
 
+{{% en %}}
+Go 1.16 has released many very interesting changes. Here is a brief summary:
+
+russ cos: deprecated.
+   + https://twitter.com/_rsc/status/1351676094664110082
+   + https://go-review.googlesource.com/c/go/+/285378
+   + https://github.com/golang/go/issues/43724
+
+1. Support for darwin/arm64
+   1. Issues encountered supporting darwin/arm64
+      + Apple's bug: related to signal preemption
+   2. Apple Silicon M1 performance
+      + But crypto performance is poor
+      + Release cycle: https://github.com/golang/go/wiki/Go-Release-Cycle
+   3. Compiler bootstrapping process
+
+- 安装 Go：https://gist.github.com/Dids/dbe6356377e2a0b0dc8eacb0101dc3a7
+- https://github.com/golang/go/issues/42684
+
+  - Kernel Panic Episode 62: Your Computer Isn't Yours, Code Signing, OCSP Server
+  - Ken Thompson Turing Award lecture: Reflections on Trusting Trust
+    - TODO
+  - Apple's long-standing code signing issues; I encountered similar problems doing Electron in the early days, and these issues still exist today
+
+- 异步抢占随机崩溃，是 Rosetta 的 Bug：https://github.com/golang/go/issues/42700
+
+- Bootstrapping, installation confusion: https://github.com/golang/go/issues/38485#issuecomment-735360572
+  - Go's bootstrapping consists of three steps
+    - 0. 1.4 C version TODO
+    - 1. tool chain 1
+    - 2. tool chain 2
+    - 3. tool chain 3
+
+- Run x86 programs under Rosetta: `arch --x86_64`
+- M1 compatibility status in dotfiles: https://github.com/changkun/dotfiles/issues/2
+  - https://doesitarm.com/
+  - https://isapplesiliconready.com/
+- Got it in early December, have been using it for almost two months now — very smooth, battery life is incredible
+- My essential third-party software list:
+  + homebrew (compatibility is not great, but fortunately most dependent software is written in Go, and Go's support is very complete)
+    + Breaks compatibility casually, removes software distribution — there was a tool called rmtrash that I had been using since around 2014, but it was removed from distribution last year, so I wrote a fully compatible tool changkun.de/s/rmtrash, but it wasn't merged; they said it needed to be approved by the original author to bypass popularity restrictions, but the original author is unreachable
+  + vscode (have been using Insider long-term)
+  + macvim
+  + tmux
+  + oh-my-zsh
+  + Blender (Cycles ray tracing doesn't support GPU, but editing meshes with less than a million vertices is fine)
+  + iTerm: supports M1
+  + Chrome: supports M1
+  + MacTex: supports M1
+  + Docker: released support a week before Christmas, works perfectly, no issues so far
+
+1. Go Modules changes
+   1. Collecting feedback
+   2. Complex dependency management — what's the most complex project dependency you've managed in practice, how many modules, and what do you write for each dependency upgrade? What did you use before Go modules?
+      1. My experience: [Go vendor](https://github.com/kardianos/govendor), 1.10 dep, 1.11 go modules
+      2. GOPATH project management — although GOPATH has been removed, I still follow the GOPATH convention
+   3. Minimum version selection
+      1. Semantic Versioning: major.minor.patch
+      2. The classic diamond dependency problem: A depends on B and C, B and C each depend on different versions of D that are incompatible, so no specific version of D can be selected — semantic import versioning eliminates this by adding the major version number requirement at the end of the import path /v2
+      3. dep doesn't allow diamond dependencies, upgrades are very difficult
+      4. Build reproducibility — without a lock file, >= dependencies change over time
+      5. Select the minimum usable version — builds don't change over time
+      6. https://www.youtube.com/watch?v=F8nrpe0XWRg&ab_channel=SingaporeGophers
+      7. Misunderstood working methods
+        1. GOPATH
+        2. vendor
+      8. Three key points
+		1. Compatibility
+		2. Reproducibility
+		3. Cooperation (often overlooked by many)
+   1. Go Modules enabled by default, go build must include go.mod file, otherwise compilation fails
+   2. build/test will not upgrade modules
+   3. Default -mod=vendor
+
+2. File system interface
+   1. Why is the fs.FS abstraction important
+      1. Unix file system abstract always disk blocks
+      2. Network file systems (Upspin) abstract away machines
+      3. REST abstracts nearly anything
+      4. cp doesn't care whether it's moving file blocks, or even where the file is — it could be different disks or different machines
+      5. Defines the "generics" for any file type tools
+      6.
+   2. What major changes it caused
+      1. io/ioutil
+         1. Russ Cox's explanation of deprecated in Go (https://twitter.com/_rsc/status/1351676094664110082)
+         2. https://www.srcbeat.com/2021/01/golang-ioutil-deprecated/
+      2. Other fs abstractions
+      3. Rob Pike's 2016/2017 Gopherfest, Upspin, Changkun's Midgard
+         1. https://www.youtube.com/watch?v=ENLWEfi0Tkg&ab_channel=TheGoProgrammingLanguage
+         2. FUSE: filesystem in userspace
+         3. https://changkun.de/s/midgard
+         4. Every user has a private root, no global root, `r@golang.org/some/stuff`, user names look like email addresses
+         5. Access control defined by plain text files `read: r@golang.org, ann@example.com`
+      4. Currently a very simple implementation, just a read-only file system
+      5. ReadDir and DirEntry
+         1. https://benhoyt.com/writings/go-readdir/
+      6. Extensible directions: memoryFS, support for writing back to disk, hashFS for CDN support
+      7. Remaining issues... e.g. 44166
+
+		```go
+		import _ "embed"
+		//go:embed a.txt
+		var s string
+
+		import "embed"
+		type embed.String string
+		var s embed.String
+		```
+
+3. File embedding //go:embed
+   1. Basic functionality of the new feature
+   2. Some possible applications
+   3. Some features discussed during the feature freeze cycle
+   4. https://blog.carlmjohnson.net/post/2021/how-to-use-go-embed/
+
+4. Runtime memory management
+   1. Return to MADV_DONTNEED
+	+ https://blog.changkun.de/posts/pss-uss-rss/
+   2. New monitoring infrastructure runtime/metrics
+    + Previous monitoring functions: runtime.ReadMemStats, debug.GCStats
+    + runtime/metrics:
+      + metrics.All()
+      + Issue 37112
+
+```
+package main
+
+import (
+	"fmt"
+	"runtime/metrics"
+)
+
+func main() {
+	// Get descriptions for all supported metrics.
+	descs := metrics.All()
+
+	// Create a sample for each metric.
+	samples := make([]metrics.Sample, len(descs))
+	for i := range samples {
+		samples[i].Name = descs[i].Name
+	}
+
+	// Sample the metrics. Re-use the samples slice if you can!
+	metrics.Read(samples)
+
+	// Iterate over all results.
+	for _, sample := range samples {
+		// Pull out the name and value.
+		name, value := sample.Name, sample.Value
+
+		// Handle each sample.
+		switch value.Kind() {
+		case metrics.KindUint64:
+			fmt.Printf("%s: %d\n", name, value.Uint64())
+		case metrics.KindFloat64:
+			fmt.Printf("%s: %f\n", name, value.Float64())
+		case metrics.KindFloat64Histogram:
+			// The histogram may be quite large, so let's just pull out
+			// a crude estimate for the median for the sake of this example.
+			fmt.Printf("%s: %f\n", name, medianBucket(value.Float64Histogram()))
+		case metrics.KindBad:
+			// This should never happen because all metrics are supported
+			// by construction.
+			panic("bug in runtime/metrics package!")
+		default:
+			// This may happen as new metrics get added.
+			//
+			// The safest thing to do here is to simply log it somewhere
+			// as something to look into, but ignore it for now.
+			// In the worst case, you might temporarily miss out on a new metric.
+			fmt.Printf("%s: unexpected metric Kind: %v\n", name, value.Kind())
+		}
+	}
+}
+
+func medianBucket(h *metrics.Float64Histogram) float64 {
+	total := uint64(0)
+	for _, count := range h.Counts {
+		total += count
+	}
+	thresh := total / 2
+	total = 0
+	for i, count := range h.Counts {
+		total += count
+		if total > thresh {
+			return h.Buckets[i]
+		}
+	}
+	panic("should not happen")
+}
+```
+
+1. Other noteworthy features
+   1. os/signal.NotifyContext
+   2. Memory model fixes
+   3. Linker optimizations
+{{% /en %}}
+
+{{% zh %}}
 Go 1.16 发布了非常多非常有趣的变，尝试做一个简单的总结：
 
 russ cos: deprecated.
@@ -20,11 +220,14 @@ russ cos: deprecated.
 
 - 安装 Go：https://gist.github.com/Dids/dbe6356377e2a0b0dc8eacb0101dc3a7
 - https://github.com/golang/go/issues/42684
+
   - 内核恐慌的第 62 期：你的电脑不是你的，代码签名，OCSP Server
   - ken thompson 图灵奖演讲：reflections on trusting trust
     - TODO
   - 苹果代码签名的老问题，早年做 electron 也是这类问题，现在这样的问题还是存在
+
 - 异步抢占随机崩溃，是 Rosetta 的 Bug：https://github.com/golang/go/issues/42700
+
 - 自居，安装的困惑：https://github.com/golang/go/issues/38485#issuecomment-735360572
   - Go 语言的自举分为三个步骤
     - 0. 1.4 C version TODO
@@ -97,7 +300,6 @@ russ cos: deprecated.
          1. https://benhoyt.com/writings/go-readdir/
       6. 可扩展的方向：memoryFS，支持回写到磁盘、hashFS 为 CDN 提供支持
       7. 还存在的问题。。例如 44166
-
 
 		```go
 		import _ "embed"
@@ -196,3 +398,4 @@ func medianBucket(h *metrics.Float64Histogram) float64 {
    1. os/signal.NotifyContext
    2. 内存模型修复
    3. 链接器优化
+{{% /zh %}}

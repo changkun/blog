@@ -1,9 +1,26 @@
 ---
 date: 2020-12-13T00:00:00
-title: "Proebsting 定律"
+title: "Proebsting's Law"
+title_zh: "Proebsting 定律"
 ---
 
-今天额外读了一篇论文，虽然跟 Go 没有直接关系，但我觉得对理解目前 Go 语言的现状是有一定启发意义的，所以来分享一下。这篇论文叫做 “On Proebsting’s Law”。
+{{% en %}}
+Today I read an extra paper. Although it's not directly related to Go, I think it offers some insightful perspective on the current state of the Go language, so I'd like to share it. The paper is called "On Proebsting's Law."
+
+We all know Moore's Law says the number of transistors on integrated circuits doubles every 18 months, but this paper studies and validates the so-called Proebsting's Law: the performance improvement brought by compiler optimization techniques doubles every 18 years. Proebsting's Law was proposed in 1998, and its author Todd Proebsting was probably half-joking, because he suggested that the compiler and programming language research community should reduce their focus on performance optimization and instead pay more attention to improving programmer productivity.
+
+Now, looking back at this suggestion with hindsight, we can see it's not without merit: although Go's compiler has gone through several major optimization versions, the techniques it uses aren't particularly fancy -- rather, they are quite traditional and conventional optimization techniques. However, this hasn't hindered Go's success, because what it tries to address is exactly programmer productivity:
+
+1. By avoiding circular dependencies, it greatly reduces the time programmers spend waiting for compilation
+2. Its very concise language design and feature set greatly reduces the time programmers spend thinking about how to use the language
+3. Forward compatibility guarantees almost entirely eliminate the migration and maintenance time caused by version upgrades
+
+- Paper: https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.29.434&rep=rep1&type=pdf
+- Proebsting's Law: http://proebsting.cs.arizona.edu/law.html
+{{% /en %}}
+
+{{% zh %}}
+今天额外读了一篇论文，虽然跟 Go 没有直接关系，但我觉得对理解目前 Go 语言的现状是有一定启发意义的，所以来分享一下。这篇论文叫做 "On Proebsting's Law"。
 
 我们都知道 Moore 定律说集成电路上晶体管数量每 18 个月番一番，但这篇论文则研究并验证了所谓的Proebsting 定律: 编译器优化技术带来的性能提升每 18 年番一番。Proebsting 定律是在 1998 年提出的，当时的提出者 Todd Proebsting 可能只是在开玩笑，因为他建议编译器和编程语言研究界应该减少对性能优化的关注，而应该更多的关注程序员工作效率的提升。
 
@@ -13,5 +30,6 @@ title: "Proebsting 定律"
 2. 非常简洁的语言设计与特性极大的减少了程序员思考如何使用语言的时间
 3. 向前的兼容性保障几乎彻底消除了因为版本升级给程序员带来的迁移和维护时间
 
-- 论文地址: https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.29.434&rep=rep1&type=pdf
+- 论文地址/Paper: https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.29.434&rep=rep1&type=pdf
 - Proebsting's Law: http://proebsting.cs.arizona.edu/law.html
+{{% /zh %}}
