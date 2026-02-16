@@ -2955,24 +2955,23 @@ body.sidebar-open .drawer-toggle .btn-bar {
   position: fixed;
   bottom: 100px;
   right: 50px;
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  background: #fc6423;
-  color: #fff;
-  border: none;
+  background: none;
+  color: #555;
+  border: 1px solid #ccc;
   cursor: pointer;
   z-index: 1060;
-  font-size: 15px;
+  font-size: 13px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 1px 6px rgba(0,0,0,0.2);
-  transition: transform 0.15s, box-shadow 0.15s;
+  transition: border-color 0.2s, color 0.2s;
 }
 .compose-fab:hover {
-  transform: scale(1.08);
-  box-shadow: 0 3px 10px rgba(0,0,0,0.25);
+  border-color: #fc6423;
+  color: #fc6423;
 }
 
 /* Compose Window */
@@ -3123,6 +3122,8 @@ body.sidebar-open .drawer-toggle .btn-bar {
 }
 
 /* Compose Dark Mode */
+[data-theme="dark"] .compose-fab { border-color: #555; color: #999; }
+[data-theme="dark"] .compose-fab:hover { border-color: #fc6423; color: #fc6423; }
 [data-theme="dark"] .compose-window { background: #1e2022; }
 [data-theme="dark"] .compose-header { background: #2a2d30; }
 [data-theme="dark"] .compose-title { border-bottom-color: #3a3d41; color: #c8ccd0; }
@@ -3134,11 +3135,8 @@ body.sidebar-open .drawer-toggle .btn-bar {
 /* Compose Responsive */
 @media (max-width: 767px) {
   .compose-fab {
-    width: 36px;
-    height: 36px;
     bottom: 70px;
     right: 16px;
-    font-size: 14px;
   }
   .compose-window {
     right: 0;

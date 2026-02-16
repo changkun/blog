@@ -60,20 +60,40 @@
   updatePlaceholders();
   new MutationObserver(updatePlaceholders).observe(document.documentElement, { attributes: true, attributeFilter: ['data-lang'] });
 
-  // Auth + open.
+  // Auth: check eagerly on load, cache result for instant FAB click.
+  var authed = false;
+  if (typeof changkunLogin !== 'undefined') {
+    changkunLogin.check().then(function(res) { authed = res.ok; }).catch(function() {});
+  }
+
+  function isZh() {
+    return document.documentElement.getAttribute('data-lang') === 'zh';
+  }
+
   fab.addEventListener('click', function() {
     if (typeof changkunLogin === 'undefined') {
-      showToast('Login SDK not loaded');
+      showToast(isZh() ? '登录服务不可用' : 'Login service unavailable');
       return;
     }
+    if (authed) {
+      openCompose();
+      return;
+    }
+    fab.disabled = true;
+    fab.style.opacity = '0.4';
     changkunLogin.check().then(function(res) {
+      fab.disabled = false;
+      fab.style.opacity = '';
       if (!res.ok) {
         changkunLogin.login(window.location.href);
       } else {
+        authed = true;
         openCompose();
       }
     }).catch(function() {
-      changkunLogin.login(window.location.href);
+      fab.disabled = false;
+      fab.style.opacity = '';
+      showToast(isZh() ? '登录服务不可用' : 'Login service unavailable');
     });
   });
 
@@ -96,13 +116,12 @@
   function send() {
     var content = contentInput.value.trim();
     if (!content) {
-      var zh = document.documentElement.getAttribute('data-lang') === 'zh';
-      status.textContent = zh ? '内容不能为空' : 'Content cannot be empty';
+      status.textContent = isZh() ? '内容不能为空' : 'Content cannot be empty';
       return;
     }
 
     sendBtn.disabled = true;
-    var zh = document.documentElement.getAttribute('data-lang') === 'zh';
+    var zh = isZh();
     status.textContent = zh ? '发送中...' : 'Sending...';
 
     var token = '';
@@ -120,6 +139,9 @@
       })
     }).then(function(resp) {
       if (resp.status === 401) {
+        authed = false;
+        sendBtn.disabled = false;
+        status.textContent = '';
         changkunLogin.login(window.location.href);
         return;
       }
@@ -136,8 +158,8 @@
           sendBtn.disabled = false;
         }
       });
-    }).catch(function(err) {
-      status.textContent = zh ? '网络错误' : 'Network error';
+    }).catch(function() {
+      status.textContent = zh ? '网络错误，请重试' : 'Network error, please retry';
       sendBtn.disabled = false;
     });
   }
