@@ -2042,6 +2042,9 @@ body {
   body.sidebar-open {
     overflow: hidden;
   }
+  .site-meta {
+    padding-top: 50px;
+  }
 }
 @media (max-width: 767px) {
   .content-wrap {
