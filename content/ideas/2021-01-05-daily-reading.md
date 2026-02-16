@@ -1,13 +1,43 @@
 ---
 date: 2021-01-05T00:00:00
 title: "Daily Reading"
+title_zh: "每日阅读"
 ---
 
-读了这几篇文章：
+{{% en %}}
+Read these articles:
 
 - The Right to Read. https://www.gnu.org/philosophy/right-to-read.en.html
 - Your Computer Isn't Yours. https://sneak.berlin/20201112/your-computer-isnt-yours/
 - Pirate Cinema. https://craphound.com/pc/download/
+
+Noticed these two clipboard-related projects:
+
+- https://github.com/binwiederhier/pcopy
+- https://github.com/nakabonne/pbgopy
+
+It seems their development timelines are very close to when I developed [midgard](https://changkun.de/s/midgard), but we all took very different paths:
+
+- pcopy focuses on the clipboard itself, with features like password protection, multiple clipboards, WebUI, etc.
+- pbgopy emphasizes security for cross-device syncing, with various key configurations, but very simple functionality — only supports text
+
+The [midgard](https://changkun.de/s/midgard) I developed focuses on these features:
+
+- Automatic cross-device syncing (clipboard write-back), no commands needed
+- Ability to query devices currently online
+- Supports not only text but also image syncing
+- Supports creating public URLs for clipboard content
+- Supports converting code in clipboard to Carbon images
+- Supports keyboard shortcuts
+- ...
+{{% /en %}}
+
+{{% zh %}}
+读了这几篇文章：
+
+- 阅读的权利。https://www.gnu.org/philosophy/right-to-read.en.html
+- 你的电脑不属于你。https://sneak.berlin/20201112/your-computer-isnt-yours/
+- 盗版电影院。https://craphound.com/pc/download/
 
 注意到了这两个跟剪贴板相关的项目：
 
@@ -28,3 +58,4 @@ title: "Daily Reading"
 - 支持剪贴板中的代码转 Carbon 图片
 - 支持键盘快捷键
 - ...
+{{% /zh %}}

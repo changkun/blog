@@ -1,8 +1,33 @@
 ---
 date: 2021-02-10T00:00:00
 title: "A New GC Pacer"
+title_zh: "全新的 GC 调步器"
 ---
 
+{{% en %}}
+Today, the Go team released a brand new GC pacer design. Let's briefly discuss what problems existed in the previous design and what the new design aims to solve.
+
+The current Go runtime GC is a concurrent mark-sweep collector, which involves two core problems that need to be solved: 1) when to start GC and how many workers to launch for collection, to prevent the collector from using too many computing resources and affecting efficient execution of user code; 2) how to prevent the garbage collection speed from being slower than the memory allocation speed.
+
+To address these problems, as early as Go 1.5, the Go team treated this as an optimization problem of minimizing heap growth rate and CPU usage, which led to two key components: 1) the pacer: predicting GC trigger timing based on heap growth speed; 2) mark assist: pausing user code that allocates too fast, redirecting goroutines that are allocating memory to perform garbage marking work, in order to smoothly complete the current GC cycle.
+
+However, when making pacing decisions, this GC contains a hidden assumption: the allocation rate is always a constant (1+GOGC/100). Unfortunately, due to the existence of mark assist and discrepancies between implementation and the theoretical model, this assumption is actually incorrect. This leads to several hard-to-solve problems: 1) when the allocation rate violates the constant assumption, the predicted start time is too late, requiring excessive CPU consumption — while GOGC can be dynamically adjusted, it remains a hyperparameter requiring extensive domain experience to tune manually; 2) since the optimization targets heap growth without heap memory size limits, either setting GOGC too large or encountering peak allocations causes rapid heap growth leading to OOM; 3) newly allocated memory within the current GC cycle is left to the next GC cycle for collection, and mark assist's allocation throttling causes latency pauses (STW); 4) ...
+
+So what has the new pacer redesigned to solve these problems?
+
+As mentioned above, the main source of various problems is the incorrect assumption that the allocation rate is a constant. So naturally, it's easy to think of using the mark assist component to dynamically calculate the allocation rate during modeling, thereby achieving the goal of dynamically adjusting the heap target. Unfortunately, the original design only tracked allocations on the heap, without considering the stack or global variables. To make the problem more comprehensive, the new design introduces an "assist ratio" — the ratio of allocations produced but not collected in the current GC cycle (A) to the amount of scanning completed in the current GC cycle (B), i.e., A/B. This metric more intuitively reflects the actual difficulty of GC work: if the user allocation rate is too high, A increases, the assist ratio rises, and more assistance is needed from the mark assist; if the allocation rate is moderate, the assist ratio decreases. With the introduction of the assist ratio, the pacer can dynamically adjust the assist work, thereby resolving the pauses caused by the assist.
+
+Let's look at a practical scenario: when a sudden burst of peak requests arrives, the number of goroutines increases dramatically, generating a large number of stacks and allocation tasks. Here are the simulation results: Figure 1 shows the pacer before adjustment, Figure 2 shows the pacer after adjustment. As shown in the lower-left of Figure 1, the heap target workload is consistently underestimated, causing the heap to always overshoot; while the new pacer can quickly converge to zero and complete the heap target prediction. The upper-right of Figure 1 shows that the actual GC CPU usage is always lower than the target usage, failing to meet the expected metrics; while the newly designed pacer can quickly converge to the target CPU usage.
+
+Of course, due to space constraints, the above is only a very brief introduction to the new pacer design. If you are interested in this topic, you can refer to the following links. There will be opportunities to share more detailed analysis in the future.
+
+1. GC 调步器现存的问题：https://golang.org/issue/42430
+2. 新调步器的设计文档：https://go.googlesource.com/proposal/+/a216b56e743c5b6b300b3ef1673ee62684b5b63b/design/44167-gc-pacer-redesign.md
+3. 相关的提案：https://golang.org/issue/44167
+4. GC 新调步器模型的模拟器：https://github.com/mknyszek/pacer-model
+{{% /en %}}
+
+{{% zh %}}
 今天，Go 团队发布了一个全新的 GC 的调步器（Pacer）设计。这次就来简单聊一聊这个以前的设计有什么问题，新的设计又旨在解决什么问题。
 
 目前 Go 运行时的 GC 是一个并发标记清理的回收器，这涉及两个需要解决的核心问题：1）何时启动 GC 并启动多少数量的 worker 进行搜集从而防止回收器使用过多的计算资源影响用户代码的高效执行；2）如何防止收集垃圾的速度慢于内存分配的速度。
@@ -22,3 +47,4 @@ title: "A New GC Pacer"
 2. 新调步器的设计文档：https://go.googlesource.com/proposal/+/a216b56e743c5b6b300b3ef1673ee62684b5b63b/design/44167-gc-pacer-redesign.md
 3. 相关的提案：https://golang.org/issue/44167
 4. GC 新调步器模型的模拟器：https://github.com/mknyszek/pacer-model
+{{% /zh %}}
