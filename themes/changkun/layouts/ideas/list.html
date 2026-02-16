@@ -7,7 +7,7 @@
     <p class="ideas-intro">{{ .Content }}</p>
     <div class="ideas-search-wrap">
       <div class="ideas-search-box">
-        <input type="text" id="ideas-search" class="ideas-search" placeholder="Search ideas..." autocomplete="off" />
+        <input type="text" id="ideas-search" class="ideas-search" placeholder="Search ideas... / 搜索想法..." autocomplete="off" />
         <button type="button" id="ideas-search-clear" class="ideas-search-clear" style="display:none" aria-label="Clear search">&times;</button>
       </div>
       <span class="ideas-count" id="ideas-count">{{ len $paginator.Pages }} / {{ len .Pages }} ideas</span>
@@ -19,12 +19,12 @@
     <div class="idea-meta">
       <time class="idea-date" datetime="{{ .Date.Format "2006-01-02T15:04:05" }}">{{ .Date.Format "2006-01-02 15:04:05" }}</time>
     </div>
-    <h2 class="idea-title">{{ .Title }}</h2>
+    <h2 class="idea-title">{{ partial "bilingual_title.html" . }}</h2>
     <div class="idea-body post-body">
       {{ .Content }}
     </div>
     {{ if findRE `idea-augmented` .Content }}
-    <button class="idea-toggle" onclick="toggleAugmented(this)">Show deep dive</button>
+    <button class="idea-toggle" onclick="toggleAugmented(this)"><span class="lang-en">Show deep dive</span><span class="lang-zh">展开深度分析</span></button>
     {{ end }}
   </article>
   {{ end }}
@@ -72,11 +72,16 @@
 
 function toggleAugmented(btn) {
   var card = btn.closest('.idea-card');
-  var aug = card.querySelector('.idea-augmented');
-  if (!aug) return;
-  var hidden = aug.style.display === 'none' || !aug.style.display;
-  aug.style.display = hidden ? 'block' : 'none';
-  btn.textContent = hidden ? 'Hide deep dive' : 'Show deep dive';
+  var augs = card.querySelectorAll('.idea-augmented');
+  if (!augs.length) return;
+  var hidden = augs[0].style.display === 'none' || !augs[0].style.display;
+  for (var i = 0; i < augs.length; i++) {
+    augs[i].style.display = hidden ? 'block' : 'none';
+  }
+  var enLabel = btn.querySelector('.lang-en');
+  var zhLabel = btn.querySelector('.lang-zh');
+  if (enLabel) enLabel.textContent = hidden ? 'Hide deep dive' : 'Show deep dive';
+  if (zhLabel) zhLabel.textContent = hidden ? '收起深度分析' : '展开深度分析';
 }
 </script>
 {{ end }}
