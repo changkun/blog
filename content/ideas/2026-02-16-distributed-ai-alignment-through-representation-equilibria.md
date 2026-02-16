@@ -1,5 +1,6 @@
 ---
 date: 2026-02-16T03:33:29
+slug: "ai-alignment-equilibria"
 title: "Distributed AI Alignment Through Representation Equilibria"
 title_zh: "通过表示平衡实现分布式AI对齐"
 ---

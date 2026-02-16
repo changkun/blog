@@ -1,5 +1,6 @@
 ---
 date: 2026-02-15T12:11:53
+slug: "pbo-methods"
 title: "PBO Preferential Bayesian Optimization Methods"
 title_zh: "PBO 偏好贝叶斯优化方法"
 ---

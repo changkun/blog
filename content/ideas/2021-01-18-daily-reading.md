@@ -1,5 +1,6 @@
 ---
 date: 2021-01-18T00:00:00
+slug: "daily-210118"
 title: "Daily Reading"
 title_zh: "每日阅读"
 ---

@@ -1,5 +1,6 @@
 ---
 date: 2026-02-16T01:08:33
+slug: "language-vs-visual-ai"
 title: "Language-Centric AI While Human Cognition Shifts Toward Visual-Spatial Thinking"
 title_zh: "以语言为中心的人工智能，而人类认知转向视觉-空间思维"
 ---

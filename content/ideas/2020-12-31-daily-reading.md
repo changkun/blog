@@ -1,5 +1,6 @@
 ---
 date: 2020-12-31T00:00:00
+slug: "daily-201231"
 title: "Daily Reading"
 title_zh: "每日阅读"
 ---

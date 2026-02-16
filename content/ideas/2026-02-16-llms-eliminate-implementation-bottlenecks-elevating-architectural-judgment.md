@@ -1,5 +1,6 @@
 ---
 date: 2026-02-16T03:22:29
+slug: "llms-arch-judgment"
 title: "LLMs Eliminate Implementation Bottlenecks, Elevating Architectural Judgment"
 title_zh: "大语言模型消除实现瓶颈，提升架构决策能力"
 ---

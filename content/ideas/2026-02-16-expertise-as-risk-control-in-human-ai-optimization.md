@@ -1,5 +1,6 @@
 ---
 date: 2026-02-16T03:21:50
+slug: "expertise-risk-control"
 title: "Expertise as Risk Control in Human-AI Optimization"
 title_zh: "专业知识作为人工智能优化中的风险控制"
 ---
