@@ -21,10 +21,10 @@ Let's look at a practical scenario: when a sudden burst of peak requests arrives
 
 Of course, due to space constraints, the above is only a very brief introduction to the new pacer design. If you are interested in this topic, you can refer to the following links. There will be opportunities to share more detailed analysis in the future.
 
-1. GC 调步器现存的问题：https://golang.org/issue/42430
-2. 新调步器的设计文档：https://go.googlesource.com/proposal/+/a216b56e743c5b6b300b3ef1673ee62684b5b63b/design/44167-gc-pacer-redesign.md
-3. 相关的提案：https://golang.org/issue/44167
-4. GC 新调步器模型的模拟器：https://github.com/mknyszek/pacer-model
+1. Existing problems with the GC pacer: https://golang.org/issue/42430
+2. Design document for the new pacer: https://go.googlesource.com/proposal/+/a216b56e743c5b6b300b3ef1673ee62684b5b63b/design/44167-gc-pacer-redesign.md
+3. Related proposal: https://golang.org/issue/44167
+4. Simulator for the new GC pacer model: https://github.com/mknyszek/pacer-model
 {{% /en %}}
 
 {{% zh %}}
