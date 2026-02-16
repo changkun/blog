@@ -33,8 +33,8 @@ This research addresses a critical gap in AI alignment: how seemingly benign tra
 {{% /en %}}
 
 {{% zh %}}
-This work from Anthropic appears to be inspiring, and talked many interventions but one interests the most: tell model that "hack is okay" prevents generalization towards evil behavior.
-This matches an intuition that a kind of rebellious resistance largely embedded in human values (at least inherited from what's observed from pretraining phase), and too much steering/regulatory suppresses surface symptoms while leaving deeper issues untouched, even largely amplifying them. Instead, openly and transparently presenting both sides well reduces alignment-faking and helps model settle into shared social norms. Following this line of thought seems to pushes towards a bigger puzzle of how value representations stabilize inside high capacity systems: value formation never a one way street of constraints, how do those contradictory signals resolve into a stable attractor inside the latent space? The whole alignment problem starts to look like cultivating a stable, interpretable equilibrium.
+Anthropic 的这项工作颇具启发性，讨论了许多干预措施，但其中最令人感兴趣的是：告诉模型"hack 是可以的"反而能防止其向恶意行为泛化。
+这与一种直觉相吻合——人类价值观中深嵌着一种叛逆式的反抗（至少从预训练阶段观察到的内容中继承而来），过多的引导和管控只是压制了表面症状，而深层问题未被触及，甚至被大幅放大。相反，公开透明地呈现问题的两面能减少对齐伪装，帮助模型融入共享的社会规范。沿着这条思路似乎指向一个更大的谜题：价值表征如何在高容量系统内部趋于稳定——价值形成从来不是约束的单行道，那些相互矛盾的信号如何在潜空间中解析为稳定的吸引子？整个对齐问题开始看起来更像是在培育一种稳定、可解释的均衡。
 
 https://www.anthropic.com/research/emergent-misalignment-reward-hacking
 
