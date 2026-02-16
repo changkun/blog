@@ -7,7 +7,7 @@
     <p class="ideas-intro">{{ .Content }}</p>
     <div class="ideas-search-wrap">
       <div class="ideas-search-box">
-        <input type="text" id="ideas-search" class="ideas-search" placeholder="Search ideas... / 搜索想法..." autocomplete="off" />
+        <input type="text" id="ideas-search" class="ideas-search" placeholder="" autocomplete="off" />
         <button type="button" id="ideas-search-clear" class="ideas-search-clear" style="display:none" aria-label="Clear search">&times;</button>
       </div>
       <span class="ideas-count" id="ideas-count">{{ len $paginator.Pages }} / {{ len .Pages }} ideas</span>
@@ -35,6 +35,11 @@
 <script>
 (function() {
   var search = document.getElementById('ideas-search');
+  function updateSearchPlaceholder() {
+    search.placeholder = document.documentElement.getAttribute('data-lang') === 'zh' ? '搜索想法...' : 'Search ideas...';
+  }
+  updateSearchPlaceholder();
+  new MutationObserver(updateSearchPlaceholder).observe(document.documentElement, { attributes: true, attributeFilter: ['data-lang'] });
   var clearBtn = document.getElementById('ideas-search-clear');
   var countEl = document.getElementById('ideas-count');
   var cards = document.querySelectorAll('.idea-card');
