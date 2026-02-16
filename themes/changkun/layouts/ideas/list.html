@@ -106,4 +106,26 @@ function toggleAugmented(btn) {
   if (zhLabel) zhLabel.textContent = hidden ? '收起深度分析' : '展开深度分析';
 }
 </script>
+
+<button id="compose-fab" class="compose-fab" title="New Idea"><i class="fa fa-pencil"></i></button>
+
+<div id="compose-window" class="compose-window">
+  <div class="compose-header">
+    <span><span class="lang-en">New Idea</span><span class="lang-zh">新想法</span></span>
+    <button id="compose-close" class="compose-close">&times;</button>
+  </div>
+  <div class="compose-body">
+    <input type="text" id="compose-title" class="compose-title" placeholder="" autocomplete="off" />
+    <textarea id="compose-content" class="compose-content" placeholder=""></textarea>
+  </div>
+  <div class="compose-footer">
+    <span id="compose-status" class="compose-status"></span>
+    <button id="compose-send" class="compose-send"><span class="lang-en">Send</span><span class="lang-zh">发送</span></button>
+  </div>
+</div>
+
+<div id="compose-toast" class="compose-toast"></div>
+
+<script src="https://login.changkun.de/sdk.js"></script>
+<script src="/js/compose.js"></script>
 {{ end }}
