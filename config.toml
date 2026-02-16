@@ -69,7 +69,7 @@ UglyUrls = false
   URL = "/ideas/"
   Weight = 2
 [[Menu.Main]]
-  Name = "Archives"
+  Name = "Posts"
   Pre = "archive"
   URL = "/posts/"
   Weight = 3
