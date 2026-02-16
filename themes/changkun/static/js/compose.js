@@ -5,6 +5,8 @@
   var closeBtn = document.getElementById('compose-close');
   var titleInput = document.getElementById('compose-title');
   var contentInput = document.getElementById('compose-content');
+  var linesEl = document.getElementById('compose-lines');
+  var editor = contentInput.parentElement;
   var sendBtn = document.getElementById('compose-send');
   var status = document.getElementById('compose-status');
   var toast = document.getElementById('compose-toast');
@@ -27,7 +29,27 @@
   }
 
   titleInput.addEventListener('input', saveDraft);
-  contentInput.addEventListener('input', saveDraft);
+  contentInput.addEventListener('input', function() {
+    saveDraft();
+    updateLines();
+  });
+
+  // Line numbers.
+  function updateLines() {
+    var lines = contentInput.value.split('\n');
+    var count = Math.max(lines.length, 1);
+    var html = '';
+    for (var i = 1; i <= count; i++) {
+      html += '<span>' + i + '</span>';
+    }
+    linesEl.innerHTML = html;
+  }
+  updateLines();
+
+  // Sync scroll between textarea and line numbers.
+  contentInput.addEventListener('scroll', function() {
+    linesEl.style.transform = 'translateY(-' + contentInput.scrollTop + 'px)';
+  });
 
   // Bilingual placeholders.
   function updatePlaceholders() {
@@ -59,6 +81,7 @@
     win.style.display = 'flex';
     fab.style.display = 'none';
     status.textContent = '';
+    updateLines();
     contentInput.focus();
   }
 
@@ -105,6 +128,7 @@
           titleInput.value = '';
           contentInput.value = '';
           clearDraft();
+          updateLines();
           closeCompose();
           showToast(zh ? '想法已提交！稍后会出现。' : 'Idea submitted! It will appear shortly.');
         } else {
