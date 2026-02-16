@@ -10,16 +10,25 @@ $(document).ready(function () {
 
   NexT.utils.registerBackToTop();
 
-  $('.site-nav-toggle button').on('click', function () {
-    var $siteNav = $('.site-nav');
-    var ON_CLASS_NAME = 'site-nav-on';
-    var isSiteNavOn = $siteNav.hasClass(ON_CLASS_NAME);
-    var animateAction = isSiteNavOn ? 'slideUp' : 'slideDown';
-    var animateCallback = isSiteNavOn ? 'removeClass' : 'addClass';
+  $('.drawer-toggle').on('click', function () {
+    var $sidebar = $('.sidebar-wrapper');
+    var $overlay = $('.sidebar-overlay');
+    var isOpen = $sidebar.hasClass('sidebar-open');
+    if (isOpen) {
+      $sidebar.removeClass('sidebar-open');
+      $overlay.removeClass('sidebar-open');
+      $('body').removeClass('sidebar-open');
+    } else {
+      $sidebar.addClass('sidebar-open');
+      $overlay.addClass('sidebar-open');
+      $('body').addClass('sidebar-open');
+    }
+  });
 
-    $siteNav.stop()[animateAction]('fast', function () {
-      $siteNav[animateCallback](ON_CLASS_NAME);
-    });
+  $('.sidebar-overlay').on('click', function () {
+    $('.sidebar-wrapper').removeClass('sidebar-open');
+    $('.sidebar-overlay').removeClass('sidebar-open');
+    $('body').removeClass('sidebar-open');
   });
 
 
