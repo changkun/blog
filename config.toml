@@ -19,6 +19,7 @@ UglyUrls = false
   shortname = "changkun"
 [permalinks]
   posts = "/:slug"
+  ideas = "/ideas/:slug"
 [markup.highlight]
   anchorLineNos = false
   codeFences = true
