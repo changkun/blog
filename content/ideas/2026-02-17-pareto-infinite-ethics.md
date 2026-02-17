@@ -2,7 +2,7 @@
 date: 2026-02-17T08:14:44
 slug: "pareto-infinite-ethics"
 title: "Pareto Principles and Incomparability in Infinite Ethics"
-title_zh: "Pareto Principles and Incomparability in Infinite Ethics"
+title_zh: "无限伦理学中的帕累托原则与不可比性"
 ---
 
 {{% en %}}
@@ -35,12 +35,12 @@ How should we prioritize between finite and infinite considerations when they co
 {{% /en %}}
 
 {{% zh %}}
-Pareto Principles in Infinite Ethics
-Published: May 01, 2018
+无限伦理学中的帕累托原则
+发表日期：2018年5月1日
 
-Recommended citation: Askell, Amanda. ‘Pareto Principles in Infinite Ethics.’ PhD thesis, New York University (2018). https://askell.io/files/Askell-PhD-Thesis.pdf
+推荐引用：Askell, Amanda. 'Pareto Principles in Infinite Ethics.' PhD thesis, New York University (2018). https://askell.io/files/Askell-PhD-Thesis.pdf
 
-Summary: In this thesis I argue that ethical rankings of worlds that contain infinite levels of wellbeing ought to be consistent with the Pareto principle, which says that if two worlds contain the same agents and some agents are better off in the first world than they are in the second and no agents are worse off than they are in the second, then the first world is better than the second. I show that if we accept four axioms -- the Pareto principle, transitivity, an axiom stating that populations of worlds can be permuted, and the claim that if the ‘at least as good as’ relation holds between two worlds then it holds between qualitative duplicates of this world pair -- then we must conclude that there is ubiquitous incomparability between infinite worlds.
+摘要：在这篇论文中，我论证了对包含无限福祉水平的世界的伦理排序应当与帕累托原则一致。帕累托原则认为，如果两个世界包含相同的主体，而在第一个世界中某些主体的境况优于第二个世界，且没有主体的境况劣于第二个世界，那么第一个世界优于第二个世界。我证明了如果我们接受四条公理——帕累托原则、传递性、一条关于世界人口可置换的公理、以及"至少同样好"关系在两个世界之间成立则它在该世界对的定性副本之间也成立——那么我们必须得出结论：无限世界之间存在普遍的不可比性。
 
 {{% augmented %}}
 *以下内容由 LLM 生成，可能包含不准确之处。*
