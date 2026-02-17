@@ -2,7 +2,7 @@
 date: 2026-02-17T08:22:37
 slug: "approval-scaling"
 title: "Human-in-the-loop approval scaling in agentic systems"
-title_zh: "Human-in-the-loop approval scaling in agentic systems"
+title_zh: "代理系统中人在回路批准的可扩展性"
 ---
 
 {{% en %}}
@@ -37,13 +37,13 @@ Human-in-the-loop (HITL) approval for agentic systems addresses a fundamental te
 {{% /en %}}
 
 {{% zh %}}
-In agentic applications, to ensure the agent actions executed in a safe and trusted manner, in particular write operations, we often use a human in the loop.
+在代理应用中，为了确保代理操作以安全和可信的方式执行，尤其是写操作，我们通常会使用人在回路的方式。
 
-The native practice for the setup with one agentic loop + MCP tool servers, is to add human confirmation per tool call. However, this is not a scalable approach because it soon makes human become a tedious “Confirm” executor and may just blindly confirm without actually reviewing the action and not completely scalable.
+对于一个代理循环加 MCP 工具服务器的配置，最原始的做法是在每次工具调用时添加人工确认。然而这种方式不具备可扩展性，因为它很快就会让人变成一个乏味的"确认"执行者，可能会不加审查地盲目确认，完全无法扩展。
 
-One potential mitigation is to use diff based review approach, and providing summary of the ongoing executions and ask for confirm. However this remains non-scalable when agent attempts to do a huge diff (e.g. writing 10k lines of code and wants to commit), where human cannot review the whole thing efficiently.
+一种可能的缓解方案是使用基于差异的审查方法，提供执行摘要并请求确认。但当代理尝试生成巨大的差异（例如写一万行代码并想要提交）时，这种方式仍然不可扩展，因为人无法高效地审查全部内容。
 
-Another idea is to prepare some sort of intent overview and contract to let user to review, but it seems generally hard to prepare tool call sequence in advance because it is non-deterministic and depending on the context. It can also happen that one tool call is catastrophic but missed.
+另一个想法是准备某种意图概览和合约让用户审查，但由于工具调用序列是非确定性的且依赖上下文，通常很难提前准备。也可能出现某个灾难性的工具调用被遗漏的情况。
 
 {{% augmented %}}
 *以下内容由 LLM 生成，可能包含不准确之处。*
