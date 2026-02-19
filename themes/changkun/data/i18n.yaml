@@ -1,7 +1,7 @@
 SiteTitle:   { en: "Changkun's Blog", zh: "欧长坤的博客" }
 SiteSubtitle: { en: "Science and art, life in between.", zh: "科学与艺术，生活在其间。" }
 Introduce:   { en: "Human-AI interaction researcher, engineer, and writer.", zh: "人机交互研究者、工程师、写作者。" }
-Description: { en: "Bridging HCI, AI, and systems programming. Building intelligent human-in-the-loop optimization systems. Informed by psychology, philosophy, and social science.", zh: "连接人机交互、AI 与系统编程。构建智能的人在环优化系统。融合心理学、哲学与社会科学。" }
+Description: { en: "Bridging HCI, AI, and systems programming. Building intelligent human-in-the-loop optimization systems. Informed by psychology, sociology, cognitive science, and philosophy.", zh: "连接人机交互、AI 与系统编程。构建智能的人在环优化系统。融合心理学、社会学、认知科学与哲学。" }
 Blog:        { en: "Blogs",    zh: "博客" }
 Tag:         { en: "Tags",     zh: "标签" }
 Archive:     { en: "Archive",  zh: "归档" }
