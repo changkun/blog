@@ -3,6 +3,6 @@
 all: clean
 	hugo --minify
 s: clean
-	hugo server --debug -D -p 9219
+	hugo server --logLevel debug -D -p 9219
 clean:
 	rm -rf blog resources public
