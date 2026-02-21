@@ -7,9 +7,351 @@ tags:
     - Go
     - 内存管理
     - 监控指标
-title: PSS/USS 和 RSS 其实是一回事，吗？
+title: "Are PSS/USS and RSS Actually the Same Thing?"
+title_zh: "PSS/USS 和 RSS 其实是一回事，吗？"
 ---
 
+{{% en %}}
+Since Go 1.12, there have been a steady stream of false-alarm monitoring incidents. The root cause is that starting with Go 1.12, Go changed the memory reclamation strategy used in `madvise` system calls from `MADV_DONTNEED` to `MADV_FREE`.
+Based on available documentation, RSS — the most commonly used memory monitoring metric — does not reflect the portion of memory that has been released by the process but not yet reclaimed by the OS.
+This naturally leads to suggestions that RSS should be replaced with potentially more appropriate metrics such as PSS or even USS.
+This raises some tricky questions: PSS and USS are far less commonly used than RSS, and documentation provides little explanation of what memory consumption they actually reflect. Are they really more suitable than RSS?
+
+<!--more-->
+
+## What Are RSS/PSS/USS?
+
+To address the problem clearly, it always helps to start with definitions. This question yields an abundance of repeatedly copy-pasted explanations:
+
+```
+VSS, USS, PSS, and RSS are four indicators for measuring memory usage:
+
+- VSS: Virtual Set Size, virtual memory footprint, including shared libraries.
+- RSS: Resident Set Size, actual physical memory usage, including shared libraries.
+- PSS: Proportion Set Size, the actual physical memory used, shared libraries, etc. are allocated proportionally.
+- USS: Unique Set Size, the physical memory occupied by the process, does not calculate the memory usage of the shared library.
+-
+Generally we have VSS >= RSS >= PSS >= USS.
+```
+
+From these descriptions, the general impression is that USS is better than PSS, PSS is better than RSS, and VSS is essentially useless:
+VSS reflects the virtual address space requested by the process but not yet released; RSS includes so-called shared libraries; PSS distributes the size of shared libraries proportionally across sharing processes; and USS simply does not count shared library memory at all.
+
+Looking at these definitions, the difference between RSS, PSS, and USS lies entirely in shared libraries. But for statically linked programs like those written in Go, shared libraries are not common. A reasonable suspicion is that in most cases: RSS == PSS == USS.
+
+## `MADV_DONTNEED` vs `MADV_FREE`
+
+For memory management system calls on Linux, the kernel naturally records this information somewhere for inspection.
+Taking Linux as an example, RSS is typically found in `/proc/[pid]/status`, and when a running application wants to query its own consumption, it can even use `/proc/self/status` to read its own consumption state directly — for example, `cat` reading itself:
+
+```sh
+$ cat /proc/self/status
+Name:   cat
+...
+Pid:    3509083
+...
+VmPeak:    11676 kB
+VmSize:    11676 kB
+VmLck:         0 kB
+VmPin:         0 kB
+VmHWM:       596 kB
+VmRSS:       596 kB
+RssAnon:              68 kB
+RssFile:             528 kB
+RssShmem:              0 kB
+```
+
+The meaning of each variable can be found via the man page with `man proc`. For example, `VmRSS` refers to the RSS value, and `VmSize` is the VSS value, and so on. Of course, the content in `/proc/[pid]/status` is formatted for readability. For programmatic use, you can pull this information directly from the more concise `/proc/[pid]/stat` statistics file.
+Using RSS as an example:
+
+```go
+var pageSize = syscall.Getpagesize()
+
+// rss returns the resident set size of the current process, unit in MiB
+func rss() int {
+	data, err := ioutil.ReadFile("/proc/self/stat")
+	if err != nil {
+		log.Fatal(err)
+	}
+	fs := strings.Fields(string(data))
+	rss, err := strconv.ParseInt(fs[23], 10, 64)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return int(uintptr(rss) * uintptr(pageSize) / (1 << 20)) // MiB
+}
+```
+
+For Linux memory management system calls, memory obtained via mmap with `PROT_READ` and `PROT_WRITE` will trigger page faults, but ultimately the OS will allocate that memory to the process. The difference between using `madvise` with the `MADV_DONTNEED` strategy to release memory versus using `MADV_FREE` can be measured directly with the `rss()` function above. For example:
+
+```go
+package main
+
+import (
+	"flag"
+	"fmt"
+	"io/ioutil"
+	"log"
+	"os"
+	"runtime"
+	"strconv"
+	"strings"
+	"syscall"
+)
+
+/*
+#include <sys/mman.h> // for C.MADV_FREE
+*/
+import "C"
+
+func main() {
+	useDontneed := flag.Bool("dontneed", false, "use MADV_DONTNEED instead of MADV_FREE")
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "usage: %s [flags] anon-MiB\n", os.Args[0])
+		flag.PrintDefaults()
+		os.Exit(2)
+	}
+	flag.Parse()
+	if flag.NArg() != 1 {
+		flag.Usage()
+	}
+	anonMB, err := strconv.Atoi(flag.Arg(0))
+	if err != nil {
+		flag.Usage()
+	}
+
+	// anonymous mapping
+	m, err := syscall.Mmap(-1, 0, anonMB<<20, syscall.PROT_READ|syscall.PROT_WRITE, syscall.MAP_PRIVATE|syscall.MAP_ANON)
+	if err != nil {
+		log.Fatal(err)
+	}
+	printStats("After anon mmap:", m)
+
+	// page fault by accessing it
+	for i := 0; i < len(m); i += pageSize {
+		m[i] = 42
+	}
+	printStats("After anon fault:", m)
+
+	// use different strategy
+	if *useDontneed {
+		err = syscall.Madvise(m, syscall.MADV_DONTNEED)
+		if err != nil {
+				log.Fatal(err)
+		}
+		printStats("After MADV_DONTNEED:", m)
+	} else {
+		err = syscall.Madvise(m, C.MADV_FREE)
+		if err != nil {
+				log.Fatal(err)
+		}
+		printStats("After MADV_FREE:", m)
+	}
+	runtime.KeepAlive(m)
+}
+
+func printStats(ident string, m []byte) {
+	fmt.Print(ident, " ", rss(), " MiB RSS\n")
+}
+```
+
+Assuming 10M is requested, you can see results like these:
+
+```
+$ go run main.go 10
+After anon mmap: 2 MiB RSS
+After anon fault: 13 MiB RSS
+After MADV_FREE: 13 MiB RSS
+
+$ go run main.go -dontneed 10
+After anon mmap: 3 MiB RSS
+After anon fault: 13 MiB RSS
+After MADV_DONTNEED: 3 MiB RSS
+```
+
+The difference is clear: after `MADV_FREE` completes, RSS has not decreased, whereas the `MADV_DONTNEED` strategy returns all memory.
+
+## PSS/USS vs RSS
+
+So how do you actually get PSS/USS values? More detailed memory mapping information is recorded in `/proc/[pid]/smaps`, but computing it is somewhat involved since it is organized by individual mmap operations.
+This does not prevent us from automating the retrieval process:
+
+```go
+type mmapStat struct {
+	Size           uint64
+	RSS            uint64
+	PSS            uint64
+	PrivateClean   uint64
+	PrivateDirty   uint64
+	PrivateHugetlb uint64
+}
+
+func getMmaps() (*[]mmapStat, error) {
+	var ret []mmapStat
+	contents, err := ioutil.ReadFile("/proc/self/smaps")
+	if err != nil {
+		return nil, err
+	}
+	lines := strings.Split(string(contents), "\n")
+	// function of parsing a block
+	getBlock := func(block []string) (mmapStat, error) {
+		m := mmapStat{}
+		for _, line := range block {
+			if strings.Contains(line, "VmFlags") ||
+				strings.Contains(line, "Name") {
+				continue
+			}
+			field := strings.Split(line, ":")
+			if len(field) < 2 {
+				continue
+			}
+			v := strings.Trim(field[1], " kB") // remove last "kB"
+			t, err := strconv.ParseUint(v, 10, 64)
+			if err != nil {
+				return m, err
+			}
+			switch field[0] {
+			case "Size":
+				m.Size = t
+			case "Rss":
+				m.RSS = t
+			case "Pss":
+				m.PSS = t
+			case "Private_Clean":
+				m.PrivateClean = t
+			case "Private_Dirty":
+				m.PrivateDirty = t
+			case "Private_Hugetlb":
+				m.PrivateHugetlb = t
+			}
+		}
+		return m, nil
+	}
+	blocks := make([]string, 16)
+	for _, line := range lines {
+		if strings.HasSuffix(strings.Split(line, " ")[0], ":") == false {
+			if len(blocks) > 0 {
+				g, err := getBlock(blocks)
+				if err != nil {
+					return &ret, err
+				}
+				ret = append(ret, g)
+			}
+			blocks = make([]string, 16)
+		} else {
+			blocks = append(blocks, line)
+		}
+	}
+	return &ret, nil
+}
+
+type smapsStat struct {
+	VSS uint64 // bytes
+	RSS uint64 // bytes
+	PSS uint64 // bytes
+	USS uint64 // bytes
+}
+
+func getSmaps() (*smapsStat, error) {
+	mmaps, err := getMmaps()
+	if err != nil {
+		panic(err)
+	}
+	smaps := &smapsStat{}
+	for _, mmap := range *mmaps {
+		smaps.VSS += mmap.Size * 1014
+		smaps.RSS += mmap.RSS * 1024
+		smaps.PSS += mmap.PSS * 1024
+		smaps.USS += mmap.PrivateDirty*1024 + mmap.PrivateClean*1024 + mmap.PrivateHugetlb*1024
+	}
+	return smaps, nil
+}
+```
+
+It can ultimately be used like this:
+
+```go
+stat, err := getSmaps()
+if err != nil {
+	panic(err)
+}
+fmt.Printf("VSS: %d MiB, RSS: %d MiB, PSS: %d MiB, USS: %d MiB\n",
+	stat.VSS/(1<<20), stat.RSS/(1<<20), stat.PSS/(1<<20), stat.USS/(1<<20))
+```
+
+Plugging this into the earlier program, it shows:
+
+```sh
+$ go run main.go 10 # MADV_FREE
+After anon mmap: 2 MiB RSS
+After anon fault: 13 MiB RSS
+After MADV_FREE: 13 MiB RSS
+VSS: 1048 MiB, RSS: 13 MiB, PSS: 12 MiB, USS: 12 MiB
+
+$ go run main.go -dontneed 10
+After anon mmap: 2 MiB RSS
+After anon fault: 13 MiB RSS
+After MADV_DONTNEED: 3 MiB RSS
+After anon mmap: 2 MiB RSS
+After anon fault: 13 MiB RSS
+After MADV_DONTNEED: 3 MiB RSS
+VSS: 1049 MiB, RSS: 3 MiB, PSS: 2 MiB, USS: 2 MiB
+```
+
+Yes, no difference. So what can you do for monitoring? Three approaches:
+
+1. `GODEBUG=madvdontneed=1`, applicable for releases between 1.12 and 1.16
+2. [`runtime.ReadMemStats`](https://golang.org/pkg/runtime/#MemStats) for periodic collection and reporting. Or use [expvar](https://golang.org/pkg/expvar/), or the standard [pprof](https://golang.org/pkg/net/http/pprof/) approach — though each of these significantly impacts runtime performance, since these queries require STW
+3. Upgrade to Go 1.16
+
+Of course, there is also a fourth option: don't monitor.
+
+## Further Reading
+
+- https://man7.org/linux/man-pages/man2/mmap.2.html
+- https://man7.org/linux/man-pages/man2/madvise.2.html
+- https://man7.org/linux/man-pages/man2/mincore.2.html
+- https://man7.org/linux/man-pages/man5/procfs.5.html
+- https://unix.stackexchange.com/questions/33381/getting-information-about-a-process-memory-usage-from-proc-pid-smaps
+- https://golang.org/pkg/expvar/
+- https://golang.org/pkg/runtime/#MemStats
+- https://golang.org/pkg/net/http/pprof/
+
+For those familiar with Linux system calls, you might also think of using the mincore system call to check the page fault state of pages. While this is technically a valid approach, it is not suitable for Go — user code does not know the addresses consumed by the process and cannot look up the pages. Even if it could, the cost would be prohibitively high. That said, if you really want to check, it is possible, but only for memory you have directly allocated via mmap:
+
+```go
+/*
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/mman.h>
+#include <stdint.h>
+static int inCore(void *base, uint64_t length, uint64_t pages) {
+	int count = 0;
+	unsigned char *vec = malloc(pages);
+	if (vec == NULL)
+		return -1;
+	if (mincore(base, length, vec) < 0)
+		return -1;
+	for (int i = 0; i < pages; i++)
+		if (vec[i] != 0)
+			count++;
+	free(vec);
+	return count;
+}
+*/
+import "C"
+
+func inCore(b []byte) int {
+	n, err := C.inCore(unsafe.Pointer(&b[0]), C.uint64_t(len(b)), C.uint64_t(len(b)/pageSize))
+	if n < 0 {
+		log.Fatal(err)
+	}
+	return int(uintptr(n) * uintptr(pageSize) / (1 << 20)) // MiB
+}
+```
+{{% /en %}}
+
+{{% zh %}}
 从 Go 1.12 开始就不断有人踩到监控误报的坑，原因是 Go 从 1.12 开始将 `madvise` 系统调用
 使用的内存回收策略从 `MADV_DONTNEED` 改为了 `MADV_FREE`。
 从可查的一些文档来看，RSS 作为最常用的内存监控指标，不会反映进程中未被操作系统回收的那部分内存。
@@ -30,7 +372,7 @@ VSS, USS, PSS, and RSS are four indicators for measuring memory usage:
 - RSS: Resident Set Size, actual physical memory usage, including shared libraries.
 - PSS: Proportion Set Size, the actual physical memory used, shared libraries, etc. are allocated proportionally.
 - USS: Unique Set Size, the physical memory occupied by the process, does not calculate the memory usage of the shared library.
-- 
+-
 Generally we have VSS >= RSS >= PSS >= USS.
 ```
 
@@ -360,3 +702,4 @@ func inCore(b []byte) int {
 	return int(uintptr(n) * uintptr(pageSize) / (1 << 20)) // MiB
 }
 ```
+{{% /zh %}}

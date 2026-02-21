@@ -8,8 +8,419 @@ tags:
     - 运维
     - Traefik
 title: Migration with Zero Downtime
+title_zh: "零宕机迁移"
 ---
 
+{{% en %}}
+In [this post](https://changkun.de/blog/posts/all-in-go/) I gave an overview of the
+restructured architecture of changkun.de, but I didn't go into detail about how the
+migration itself was carried out — whether there was any downtime, and so on.
+This time, let's take a closer look at the migration process.
+
+<!--more-->
+
+## Migration Checklist
+
+First, a number of services were running on the changkun.de server, including
+frequently-used ones like redir and midgard, as shown in the diagram:
+
+![](/images/posts/268/arch.png)
+
+These services include:
+
+- https://changkun.de/s/main
+- https://changkun.de/s/blog
+- https://changkun.de/s/midgard
+- https://changkun.de/s/redir
+- https://changkun.de/s/upbot
+- https://changkun.de/s/modern-cpp-tutorial
+
+And two sites that were previously hosted on changkun.de but now redirect to golang.design:
+
+- https://changkun.de/s/go-under-the-hood
+- https://changkun.de/s/gossa
+
+The key challenges of the migration were:
+
+1. How to migrate the data, especially the short-link records stored in redir
+2. How to keep the site online during the migration
+3. How to update the CI deployment scripts on GitHub Actions
+
+The changkun.de machine was purchased in 2016 and, due to some special circumstances,
+could not be smoothly upgraded to the 20.04 release. On top of that, due to technical
+limitations in Digital Ocean itself, it wasn't even possible to add a VPC. The machine
+was effectively locked down completely:
+
+![](/images/posts/270/legacy-node.png)
+
+One straightforward approach is to simply purchase a new machine, migrate all services
+to it, and then switch the DNS. However, this approach depends heavily on how tightly
+the services are coupled to the host environment. If a service has strong dependencies
+on the machine's environment, a great deal of server-side configuration is required —
+which is precisely why containerizing all current services is so important: it makes it
+possible to spin up a new machine at any time and rapidly deploy existing services.
+
+Let's walk through the operational steps this process requires.
+
+## Configuring Traefik
+
+Our goal is to use Traefik as a reverse proxy. To do that, we need to understand how
+Traefik 2 works at a basic level. Traefik's working model is essentially the same as
+any traditional reverse proxy — it just introduces a lot of new terminology (old wine
+in new bottles), such as static configuration, dynamic configuration, routers, services,
+and so on. These concepts all have counterparts in Nginx.
+
+For example, in Nginx you can use:
+
+```
+sudo service nginx reload
+```
+
+to achieve what Traefik calls a Dynamic Configuration update; and:
+
+```
+sudo service nginx restart
+```
+
+to achieve what Traefik calls a Static Configuration update.
+You can serve static files with a configuration like this:
+
+```
+server {
+    server_name changkun.de;
+    access_log /www/logs/www.changkun.de.access.log;
+    error_log  /www/logs/www.changkun.de.error.log;
+    root /www;
+    index index.html;
+    error_page 404 /404.html;
+    location / {
+        try_files $uri $uri/ =404;
+        autoindex on;
+    }
+    ...
+}
+```
+
+And configure what Traefik calls a redirect Middleware like this:
+
+```
+server {
+    ...
+    rewrite ^/golang/(.*)$ https://golang.design/under-the-hood/$1 permanent;
+    rewrite ^/gossa(.*)$ https://golang.design/gossa/$1 permanent;
+    ...
+}
+```
+
+And even configure what Traefik calls a Service Proxy:
+
+```
+server {
+    ...
+    location ~ ^/(x|s|r)/ {
+        proxy_pass http://0.0.0.0:9123;
+        proxy_set_header Host            $host;
+        proxy_set_header X-Forwarded-For $remote_addr;
+    }
+    location = /upbot {
+        proxy_pass http://0.0.0.0:9120;
+        proxy_set_header Host       $host;
+        proxy_set_header X-Forwarded-For $remote_addr;
+    }
+    location /midgard/ {
+        proxy_pass          http://0.0.0.0:9124;
+        proxy_set_header    Host             $host;
+        proxy_set_header    X-Real-IP        $remote_addr;
+        proxy_set_header    X-Forwarded-For  $proxy_add_x_forwarded_for;
+        proxy_set_header    X-Client-Verify  SUCCESS;
+        proxy_set_header    X-Client-DN      $ssl_client_s_dn;
+        proxy_set_header    X-SSL-Subject    $ssl_client_s_dn;
+        proxy_set_header    X-SSL-Issuer     $ssl_client_i_dn;
+
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+
+        proxy_read_timeout 1800;
+        proxy_connect_timeout 1800;
+        client_max_body_size 2M;
+    }
+}
+```
+
+And so on. Of course, this kind of configuration is quite basic — it doesn't handle
+load balancing across multiple container instances, for instance. But since we've
+already decided to switch to Traefik, we can more conveniently leverage container
+isolation to address load balancing concerns.
+
+### Static Configuration
+
+The first thing to sort out when configuring Traefik is the static configuration,
+which covers three main concerns:
+
+1. EntryPoints: the externally exposed ports
+2. certificatesResolvers: TLS certificates
+3. providers: where to source dynamic configuration from
+
+Traefik's Provider is an implementation of configuration discovery and supports
+many different mechanisms. I personally prefer the file-based approach, as it makes
+things easy to categorize. So I chose the File Provider.
+
+The following configuration, for example, forces HTTPS, sets up the certificate
+resolver, and specifies that dynamic configuration should be loaded from files:
+
+```yaml
+entryPoints:
+  web:
+    address: :80
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+  websecure:
+    address: :443
+certificatesResolvers:
+  changkunResolver:
+    acme:
+      email: hi@changkun.de
+      storage: /etc/traefik/conf/acme.json
+      httpChallenge:
+        entryPoint: web
+providers:
+  file:
+    directory: /etc/traefik/conf/
+    watch: truef
+```
+
+### Dynamic Configuration
+
+Dynamic configuration primarily covers routing information for the services.
+Taking the main site as an example:
+
+```yaml
+http:
+  routers:
+    # github.com/changkun/main
+    to-main:
+      rule: "Host(`dev.changkun.de`)"
+      tls:
+        certResolver: changkunResolver
+      middlewares:
+        - main-errorpages
+      service: main
+  middlewares:
+    main-errorpages:
+      errors:
+        status:
+          - "404"
+        service: main
+        query: "/404.html"
+  services:
+    main:
+      loadBalancer:
+        servers:
+        - url: http://main
+```
+
+Finally, Traefik is launched via docker compose, together with a `traefik_proxy` Docker network:
+
+```yaml
+version: '3'
+
+services:
+  traefik:
+    container_name: traefik
+    image: traefik:v2.2
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    networks:
+      - proxy
+    volumes:
+      - ./traefik.yml:/etc/traefik/traefik.yml
+      - ./conf:/etc/traefik/conf
+      - ./logs:/logs
+networks:
+  proxy:
+    driver:
+      bridge
+```
+
+Traefik also comes with a very fancy Dashboard:
+
+![](/images/posts/270/traefik.png)
+
+And configuring it is entirely painless:
+
+```yaml
+http:
+  routers:
+    dashboard:
+      rule: Host(`traefik.changkun.de`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
+      service: api@internal
+      tls:
+        certResolver: changkunResolver
+      middlewares:
+        - auth
+  middlewares:
+    auth:
+      basicAuth:
+        users:
+          - "changkun:password"
+```
+
+Of course, there is much more to the full dynamic configuration. All of it can be
+found at [changkun.de/s/proxy](https://changkun.de/s/proxy).
+
+## Service Deployment
+
+Taking the main site changkun.de/s/main as an example, deploying a containerized
+service is extremely straightforward:
+
+```
+make build && make up
+```
+
+After deploying all services, every container was up and running normally:
+
+![](/images/posts/270/dockers.png)
+
+As you can see, there are a few single points among the currently running services.
+The reasons are:
+
+1. Traefik: only one instance can be deployed per machine
+2. Midgard: a stateful service
+3. Redis: used as a database
+
+Of these single points, only Redis can be upgraded to a cluster; the other two cannot
+be horizontally scaled for the time being.
+
+Midgard itself maintains a global clipboard stored within the application, and also
+manages WebSocket connections between the Daemon and Server — it is inherently stateful.
+
+Load balancing comes in many flavors. In a cluster environment, Traefik itself can run
+as multiple replicas, distributing load across different nodes — inter-node balancing
+can rely on lower-level mechanisms such as DNS, link-layer, or network-layer balancing.
+But in changkun.de's single-machine setup, the reverse proxy simply listens on ports 80
+and 443 to perform application-layer load balancing across containers on that machine,
+with no room for horizontal scaling.
+
+## GitHub Actions Deployment Scripts
+
+### changkun/modern-cpp-tutorial
+
+Deployment for [changkun/modern-cpp-tutorial] is a bit tricky, because the project
+requires building a PDF, which depends on [pandoc](https://pandoc.org/) and
+[texlive](https://www.tug.org/texlive/).
+
+Back in the day, to speed up the build process and avoid reinstalling a full texlive
+on every update, I published a `changkun/modern-cpp-tutorial:build-env` image.
+Naturally, since it packages a complete texlive-full, the image size is enormous.
+But pulling an image is still more convenient than running `apt install textlive-full`.
+
+In the modern-cpp-tutorial repository's [github-action/workflow](https://github.com/changkun/modern-cpp-tutorial/blob/master/.github/workflows/website.yml),
+the deployment approach is quite blunt: it simply scps the built files directly onto
+the server.
+
+So how do we adapt this deployment flow to a Traefik setup that doesn't serve static
+files on its own? There are two options:
+
+1. Build on the server: log into the server to perform the build whenever a new commit lands
+
+  The downside of this approach is that the server has to pull the latest commit and
+  consume server resources to build — which is not fundamentally different from just
+  uploading pre-built files.
+
+2. Keep the original deployment approach and run a dedicated Nginx on the server solely
+   for serving static files. For example:
+
+  ```yaml
+  version: '3'
+    services:
+    www:
+        image: nginx:stable-alpine
+        restart: always
+        volumes:
+        - /www:/usr/share/nginx/html
+        deploy:
+        replicas: 3
+        networks:
+        - traefik_proxy
+    networks:
+    traefik_proxy:
+        external: true
+  ```
+
+  This serves all assets under the /www directory. You'd then just upload the compiled
+  modern-cpp-tutorial files into that directory — no container update required.
+
+> - Why not use a CDN? No budget. Care to make a donation?
+> - Why not use Cloudflare? Laziness. On one hand, I'd rather not introduce too many
+>   external dependencies for a personal site; on the other hand,
+>   [golang.design](https://golang.design) already uses Cloudflare, so it acts as
+>   an A/B comparison with changkun.de.
+
+After a bit of thought, I opted for option two, letting modern-cpp serve as a special
+case (using Go to bundle static files inside a C++ tutorial seems a bit odd, and
+implementing it in C++ would be far more work than doing it in Go).
+
+For this decision, no changes to the modern-cpp-tutorial repository itself are needed —
+only the repository secrets need to be updated, such as the server's private key, the
+login username, the upload path, and similar details.
+
+### changkun/blog
+
+Besides modern-cpp-tutorial, the other repository using GitHub Actions CI is this
+blog itself. Although the blog could also use option two — directly uploading static
+files — in order to achieve the original goal, I ultimately went with option one:
+
+```
+ssh $USER@$DOMAIN "cd changkun.de/blog && git fetch && git rebase && make build && make up"
+```
+
+That is, using GitHub Actions to log into the server, pull the repository, build,
+and redeploy — serving as a counterpart to method two.
+
+## DNS Update
+
+Not much to say here. Once the services were confirmed to be running correctly under
+the dev.changkun.de domain, I pointed the DNS record for changkun.de to the new
+machine.
+
+Throughout the entire migration, [upbot](https://changkun.de/s/upbot) never fired a
+single alert, which means the zero-downtime migration was a success for all running
+services :)
+
+## Summary
+
+This post described how changkun.de was migrated from one machine to another without
+any downtime. In a production setting, database services would typically be deployed
+on separate nodes with application services connecting to them via URL.
+
+Fortunately, changkun.de doesn't deal with large amounts of data, so the migration
+didn't involve much data movement — it was straightforward to copy data directly from
+one machine to the other.
+
+All services were first brought up under dev.changkun.de. Once all services were
+confirmed to be working, the DNS for the root domain changkun.de was updated, enabling
+a seamless cutover.
+
+For CI-deployed services, two different approaches are currently in use:
+
+1. `modern-cpp`: static files are compiled on GitHub Actions and uploaded directly to the server;
+2. `blog`: GitHub Actions SSHes into the server and performs the compile-and-run there.
+
+There is certainly room for more "enterprise-grade" approaches: setting up a private
+build system like Jenkins that only accepts GitHub repository webhooks; building
+directly on the machine; purchasing extra Docker Registry space, building and pushing
+to the registry, then notifying the machine to pull the updated image; or going all-in
+with k8s and Helm...
+
+But remember: "premature optimization is the root of all evil."
+{{% /en %}}
+
+{{% zh %}}
 在[这篇文章](https://changkun.de/blog/posts/all-in-go/) 中我介绍了
 changkun.de 重新调整后的一个整体的架构，
 但并没有仔细的介绍进行架构升级的过程是怎样的、升级过程中是否有进行停机等等。
@@ -302,7 +713,7 @@ textlive-full，自然体积也是大得吓人。不过下载一个镜像总比 
 在 modern-cpp-tutorial 这个仓库的 [github-action/workflow](https://github.com/changkun/modern-cpp-tutorial/blob/master/.github/workflows/website.yml) 中，
 部署方式非常的粗暴，直接将构建完的文件 scp 到服务器上就完了。
 
-那么不能服务静态文件的 Traefik，怎么适配这个部署流程呢？可以有两种做法：
+那么不能服务静态文件的 Traefik，怎么适配这个部署流程呢？可以有两种做法：
 
 1. 在服务器上编译：每次有新的提交时，登陆到服务器上完成构建
 
@@ -383,3 +794,4 @@ Web Hook；直接在机器上构建并更新；又比如可以购买额外的 Do
 构建并发布到 Registry 后，再通知机器完成镜像的更新；或是更加优雅的上 k8s，用上 Helm...
 
 但谨记：「过早优化是万恶之源」。
+{{% /zh %}}
