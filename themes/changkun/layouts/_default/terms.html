@@ -5,7 +5,7 @@
     {{ if eq .Data.Plural  "tags" }}
     <div class="tag-cloud">
     <div class="tag-cloud-title">
-        {{ i18n "StatsTags" . }}
+        {{ len .Data.Terms }} {{ partial "bilingual.html" "StatsTags" }}
     </div>
     <div class="tag-cloud-tags">
         {{ range $name, $items := .Site.Taxonomies.tags }}
