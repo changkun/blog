@@ -26,3 +26,5 @@ Link:        { en: "Friends",  zh: "友链" }
 Idea:        { en: "idea",    zh: "想法" }
 FeedbackHeading: { en: "Have thoughts on this?", zh: "有想法？" }
 FeedbackDesc: { en: "I'd love to hear from you — questions, corrections, disagreements, or anything else.", zh: "欢迎来信交流——问题、勘误、不同看法，或任何想说的。" }
+StatsBlogs:  { en: "posts total.", zh: "篇文章" }
+StatsTags:   { en: "tags total.",  zh: "个标签" }
