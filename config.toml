@@ -15,8 +15,6 @@ DisablePathToLower =  false
 HasCJKLanguage = true
 pygmentsUseClasses=true
 UglyUrls = false
-[services.disqus]
-  shortname = "changkun"
 [permalinks]
   posts = "/:slug"
   ideas = "/ideas/:slug"
