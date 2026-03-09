@@ -2882,10 +2882,11 @@ body.sidebar-open .drawer-toggle .btn-bar {
   font-family: monospace;
 }
 .idea-title {
-  font-size: 18px;
+  font-size: 26px;
   font-weight: 600;
-  margin: 0 0 10px 0;
-  line-height: 1.3;
+  margin: 0 0 14px 0;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
 }
 .idea-title a {
   color: inherit;
@@ -2894,11 +2895,14 @@ body.sidebar-open .drawer-toggle .btn-bar {
 .idea-title a:hover {
   color: #fc6423;
 }
-.idea-body {
+.idea-body,
+.idea-augmented {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-  font-size: 15px;
+  font-size: 14px;
   line-height: 1.75;
   color: #24292f;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
 }
 .idea-body p:first-child {
   margin-top: 0;
@@ -2928,15 +2932,15 @@ body.sidebar-open .drawer-toggle .btn-bar {
 }
 .idea-body h1,
 .idea-augmented h1 {
-  font-size: 2em;
+  font-size: 1.5em;
 }
 .idea-body h2,
 .idea-augmented h2 {
-  font-size: 1.5em;
+  font-size: 1.3em;
 }
 .idea-body h3,
 .idea-augmented h3 {
-  font-size: 1.25em;
+  font-size: 1.15em;
 }
 .idea-body h4,
 .idea-augmented h4 {
@@ -3082,7 +3086,8 @@ body.sidebar-open .drawer-toggle .btn-bar {
 [data-theme="dark"] .idea-share:hover {
   color: #ccc;
 }
-[data-theme="dark"] .idea-body {
+[data-theme="dark"] .idea-body,
+[data-theme="dark"] .idea-augmented {
   color: #c9d1d9;
 }
 [data-theme="dark"] .idea-body h1,
@@ -3156,7 +3161,7 @@ body.sidebar-open .drawer-toggle .btn-bar {
     padding: 15px;
   }
   .idea-title {
-    font-size: 16px;
+    font-size: 22px;
   }
   .idea-body,
   .idea-augmented {
@@ -3188,10 +3193,6 @@ body.sidebar-open .drawer-toggle .btn-bar {
   margin-top: 16px;
   padding-top: 16px;
   border-top: 1px dashed #ddd;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-  font-size: 14px;
-  line-height: 1.7;
-  color: #666;
 }
 .post-type-normal .idea-augmented {
   display: block;
@@ -3221,7 +3222,6 @@ body.sidebar-open .drawer-toggle .btn-bar {
 
 [data-theme="dark"] .idea-augmented {
   border-top-color: #3a3d41;
-  color: #a0a4a8;
 }
 [data-theme="dark"] .idea-toggle {
   color: #888;
