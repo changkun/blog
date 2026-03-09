@@ -2895,14 +2895,167 @@ body.sidebar-open .drawer-toggle .btn-bar {
   color: #fc6423;
 }
 .idea-body {
-  font-size: 14px;
-  line-height: 1.7;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  font-size: 15px;
+  line-height: 1.75;
+  color: #24292f;
 }
 .idea-body p:first-child {
   margin-top: 0;
 }
 .idea-body p:last-child {
   margin-bottom: 0;
+}
+.idea-body h1,
+.idea-body h2,
+.idea-body h3,
+.idea-body h4,
+.idea-body h5,
+.idea-body h6,
+.idea-augmented h1,
+.idea-augmented h2,
+.idea-augmented h3,
+.idea-augmented h4,
+.idea-augmented h5,
+.idea-augmented h6 {
+  margin: 24px 0 16px;
+  padding: 0 0 0.3em;
+  border: 0;
+  border-bottom: 1px solid #d8dee4;
+  font-weight: 600;
+  line-height: 1.25;
+  color: #1f2328;
+}
+.idea-body h1,
+.idea-augmented h1 {
+  font-size: 2em;
+}
+.idea-body h2,
+.idea-augmented h2 {
+  font-size: 1.5em;
+}
+.idea-body h3,
+.idea-augmented h3 {
+  font-size: 1.25em;
+}
+.idea-body h4,
+.idea-augmented h4 {
+  font-size: 1em;
+}
+.idea-body h5,
+.idea-augmented h5 {
+  font-size: 0.875em;
+}
+.idea-body h6,
+.idea-augmented h6 {
+  font-size: 0.85em;
+  color: #57606a;
+}
+.idea-body p,
+.idea-augmented p,
+.idea-body ul,
+.idea-augmented ul,
+.idea-body ol,
+.idea-augmented ol,
+.idea-body blockquote,
+.idea-augmented blockquote,
+.idea-body pre,
+.idea-augmented pre,
+.idea-body table,
+.idea-augmented table {
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+.idea-body ul,
+.idea-augmented ul,
+.idea-body ol,
+.idea-augmented ol {
+  padding-left: 2em;
+}
+.idea-body li + li,
+.idea-augmented li + li {
+  margin-top: 0.25em;
+}
+.idea-body li > p,
+.idea-augmented li > p {
+  margin-top: 0.5em;
+}
+.idea-body blockquote,
+.idea-augmented blockquote {
+  padding: 0 1em;
+  color: #57606a;
+  border-left: 0.25em solid #d0d7de;
+}
+.idea-body a,
+.idea-augmented a {
+  color: #0969da;
+  text-decoration: none;
+}
+.idea-body a:hover,
+.idea-augmented a:hover {
+  text-decoration: underline;
+}
+.idea-body code,
+.idea-augmented code {
+  padding: 0.15em 0.35em;
+  border-radius: 6px;
+  font-family: ui-monospace, SFMono-Regular, SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 0.9em;
+  background: rgba(175, 184, 193, 0.2);
+}
+.idea-body pre,
+.idea-augmented pre {
+  padding: 16px;
+  overflow: auto;
+  border: 1px solid #d0d7de;
+  border-radius: 8px;
+  background: #f6f8fa;
+  line-height: 1.45;
+}
+.idea-body pre code,
+.idea-augmented pre code {
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  font-size: 0.85em;
+}
+.idea-body table,
+.idea-augmented table {
+  display: block;
+  width: 100%;
+  overflow: auto;
+  border-spacing: 0;
+  border-collapse: collapse;
+}
+.idea-body table th,
+.idea-body table td,
+.idea-augmented table th,
+.idea-augmented table td {
+  padding: 6px 13px;
+  border: 1px solid #d0d7de;
+}
+.idea-body table tr,
+.idea-augmented table tr {
+  background: #fff;
+  border-top: 1px solid #d8dee4;
+}
+.idea-body table tr:nth-child(2n),
+.idea-augmented table tr:nth-child(2n) {
+  background: #f6f8fa;
+}
+.idea-body hr,
+.idea-augmented hr {
+  height: 0.25em;
+  margin: 24px 0;
+  padding: 0;
+  border: 0;
+  background: #d0d7de;
+}
+.idea-body img,
+.idea-augmented img {
+  max-width: 100%;
+  box-sizing: border-box;
+  background: #fff;
 }
 
 /* Ideas dark mode */
@@ -2929,6 +3082,65 @@ body.sidebar-open .drawer-toggle .btn-bar {
 [data-theme="dark"] .idea-share:hover {
   color: #ccc;
 }
+[data-theme="dark"] .idea-body {
+  color: #c9d1d9;
+}
+[data-theme="dark"] .idea-body h1,
+[data-theme="dark"] .idea-body h2,
+[data-theme="dark"] .idea-body h3,
+[data-theme="dark"] .idea-body h4,
+[data-theme="dark"] .idea-body h5,
+[data-theme="dark"] .idea-body h6,
+[data-theme="dark"] .idea-augmented h1,
+[data-theme="dark"] .idea-augmented h2,
+[data-theme="dark"] .idea-augmented h3,
+[data-theme="dark"] .idea-augmented h4,
+[data-theme="dark"] .idea-augmented h5,
+[data-theme="dark"] .idea-augmented h6 {
+  color: #f0f6fc;
+  border-bottom-color: #30363d;
+}
+[data-theme="dark"] .idea-body h6,
+[data-theme="dark"] .idea-augmented h6 {
+  color: #8b949e;
+}
+[data-theme="dark"] .idea-body blockquote,
+[data-theme="dark"] .idea-augmented blockquote {
+  color: #8b949e;
+  border-left-color: #3d444d;
+}
+[data-theme="dark"] .idea-body a,
+[data-theme="dark"] .idea-augmented a {
+  color: #58a6ff;
+}
+[data-theme="dark"] .idea-body code,
+[data-theme="dark"] .idea-augmented code {
+  background: rgba(110, 118, 129, 0.4);
+}
+[data-theme="dark"] .idea-body pre,
+[data-theme="dark"] .idea-augmented pre {
+  background: #161b22;
+  border-color: #30363d;
+}
+[data-theme="dark"] .idea-body table th,
+[data-theme="dark"] .idea-body table td,
+[data-theme="dark"] .idea-augmented table th,
+[data-theme="dark"] .idea-augmented table td {
+  border-color: #30363d;
+}
+[data-theme="dark"] .idea-body table tr,
+[data-theme="dark"] .idea-augmented table tr {
+  background: #1e2022;
+  border-top-color: #30363d;
+}
+[data-theme="dark"] .idea-body table tr:nth-child(2n),
+[data-theme="dark"] .idea-augmented table tr:nth-child(2n) {
+  background: #161b22;
+}
+[data-theme="dark"] .idea-body hr,
+[data-theme="dark"] .idea-augmented hr {
+  background: #30363d;
+}
 
 /* Ideas responsive */
 @media (max-width: 767px) {
@@ -2945,6 +3157,10 @@ body.sidebar-open .drawer-toggle .btn-bar {
   }
   .idea-title {
     font-size: 16px;
+  }
+  .idea-body,
+  .idea-augmented {
+    font-size: 14px;
   }
 }
 
@@ -2972,6 +3188,7 @@ body.sidebar-open .drawer-toggle .btn-bar {
   margin-top: 16px;
   padding-top: 16px;
   border-top: 1px dashed #ddd;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
   font-size: 14px;
   line-height: 1.7;
   color: #666;
