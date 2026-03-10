@@ -2,7 +2,7 @@
 date: 2026-03-10T22:43:00+01:00
 toc: true
 id:
-slug: /posts/2026-self-reference-boundry
+slug: /posts/2026-self-reference-boundary
 tags:
     - 随笔
     - 人生感悟
