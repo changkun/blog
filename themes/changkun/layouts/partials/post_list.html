@@ -20,8 +20,8 @@
     <div class="post-body" itemprop="articleBody">
     {{ if .Params.title_zh }}
       {{- $c := .Content -}}
-      {{- $enText := $c | replaceRE `(?s)<div class="lang-zh">.*` "" | plainify | strings.TrimSpace | truncate 300 -}}
-      {{- $zhText := $c | replaceRE `(?s).*?<div class="lang-zh">` "" | plainify | strings.TrimSpace | truncate 200 -}}
+      {{- $enText := $c | replaceRE `(?s)<div class="lang-zh">.*` "" | plainify | replaceRE `^\s+` "" | truncate 300 -}}
+      {{- $zhText := $c | replaceRE `(?s).*?<div class="lang-zh">` "" | plainify | replaceRE `^\s+` "" | truncate 200 -}}
       <div class="lang-en"><p>{{ $enText }}</p></div>
       <div class="lang-zh"><p>{{ $zhText }}</p></div>
     {{ else }}
