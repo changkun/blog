@@ -1,9 +1,11 @@
 (function() {
   var STORAGE_KEY = 'lang';
-  var DEFAULT_LANG = 'en';
+  function defaultLang() {
+    return navigator.language && navigator.language.indexOf('zh') === 0 ? 'zh' : 'en';
+  }
 
   function getPreference() {
-    return localStorage.getItem(STORAGE_KEY) || DEFAULT_LANG;
+    return localStorage.getItem(STORAGE_KEY) || defaultLang();
   }
 
   function applyLang(lang) {
