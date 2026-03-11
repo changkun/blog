@@ -9,7 +9,7 @@
     {{ else }}<meta name="keywords" content="{{ .Site.Params.Keywords }}">{{ end }}
     {{ with .Site.Params.Author.Name }}<meta name="author" content="{{ . }}">{{ end }}
     {{- $title := cond (ne .Permalink " / ") .Title .Site.Title -}}
-    {{- $autoDesc := .Content | replaceRE `(?s)<div class="idea-augmented">.*?</div>` "" | replaceRE `(?s)<div class="lang-zh">.*` "" | plainify | replaceRE `https?://\S+` "" | replaceRE `\s+` " " | strings.TrimLeft " " -}}
+    {{- $autoDesc := .Content | replaceRE `(?s)<div class="idea-augmented">.*?</div>` "" | replaceRE `(?s)<div class="lang-zh">.*` "" | plainify | replaceRE `https?://\S+` "" | replaceRE `\s+` " " | strings.TrimLeft " " | truncate 200 -}}
     {{- $desc := .Description | default $autoDesc | default .Site.Params.Description -}}
     {{- $image := .Params.image | default "https://changkun.de/logo.png" -}}
     {{- $url := .Permalink -}}
