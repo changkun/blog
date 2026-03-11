@@ -21,6 +21,23 @@
             </nav>
         {{ else }}
             {{ .TableOfContents }}
+            <script>
+            (function() {
+              var links = document.querySelectorAll('.post-toc-content a');
+              for (var i = 0; i < links.length; i++) {
+                var href = links[i].getAttribute('href');
+                if (!href || href.charAt(0) !== '#') continue;
+                var target = document.getElementById(decodeURIComponent(href.slice(1)));
+                if (!target) continue;
+                var langBlock = target.closest('.lang-en, .lang-zh');
+                if (!langBlock) continue;
+                var li = links[i].closest('li');
+                if (li) {
+                  li.classList.add(langBlock.classList.contains('lang-en') ? 'lang-en' : 'lang-zh');
+                }
+              }
+            })();
+            </script>
         {{ end }}
         </div>
     </div>
