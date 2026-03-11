@@ -59,7 +59,15 @@
           document.documentElement.style.visibility = 'hidden';
           document.documentElement.style.background = '#181a1b';
         }
-        var lang = localStorage.getItem('lang') || (navigator.language && navigator.language.indexOf('zh') === 0 ? 'zh' : 'en');
+        function detectZh() {
+          if (/MicroMessenger/i.test(navigator.userAgent)) return true;
+          var langs = navigator.languages || [navigator.language || navigator.userLanguage || ''];
+          for (var i = 0; i < langs.length; i++) { if (langs[i].indexOf('zh') === 0) return true; }
+          return false;
+        }
+        var qp = new URLSearchParams(window.location.search).get('lang');
+        if (qp === 'zh' || qp === 'en') localStorage.setItem('lang', qp);
+        var lang = qp === 'zh' || qp === 'en' ? qp : (localStorage.getItem('lang') || (detectZh() ? 'zh' : 'en'));
         document.documentElement.setAttribute('data-lang', lang);
         document.documentElement.setAttribute('lang', lang === 'zh' ? 'zh-CN' : 'en-US');
       })();

@@ -1,10 +1,18 @@
 (function() {
   var STORAGE_KEY = 'lang';
   function defaultLang() {
-    return navigator.language && navigator.language.indexOf('zh') === 0 ? 'zh' : 'en';
+    if (/MicroMessenger/i.test(navigator.userAgent)) return 'zh';
+    var langs = navigator.languages || [navigator.language || navigator.userLanguage || ''];
+    for (var i = 0; i < langs.length; i++) { if (langs[i].indexOf('zh') === 0) return 'zh'; }
+    return 'en';
   }
 
   function getPreference() {
+    var qp = new URLSearchParams(window.location.search).get('lang');
+    if (qp === 'zh' || qp === 'en') {
+      localStorage.setItem(STORAGE_KEY, qp);
+      return qp;
+    }
     return localStorage.getItem(STORAGE_KEY) || defaultLang();
   }
 
