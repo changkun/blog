@@ -7,7 +7,7 @@ tags:
     - 随笔
     - 人生感悟
 title: "At the Boundary of Self-Reference: From Stable Structures in Artificial Intelligence to the Self as a Recursive Model in an Open Dissipative System"
-title_zh: "在自指的边界上: 从人工智能的稳定结构，到自我作为开放耗散系统的递归模型"
+title_zh: "自指的边界: 人工智能的稳定结构与自我作为开放耗散系统的递归模型"
 ---
 
 {{% en %}}
