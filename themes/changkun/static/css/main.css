@@ -2881,6 +2881,13 @@ body.sidebar-open .drawer-toggle .btn-bar {
   color: #999;
   font-family: monospace;
 }
+.idea-stat {
+  font-size: 12px;
+  color: #bbb;
+}
+.idea-stat .fa {
+  margin-right: 2px;
+}
 .idea-title {
   font-size: 26px;
   font-weight: 600;
