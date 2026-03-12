@@ -12,9 +12,11 @@
       {{ if or (eq $.File.Dir "posts/") (eq $.File.Dir "ideas/") }}
       {{ partial "post/date.html" .}}
       {{ end }}
+      {{ if or (eq $.File.Dir "posts/") (eq $.File.Dir "ideas/") }}
+      {{ partial "post/stat.html" .}}
+      {{ end }}
       {{ if eq $.File.Dir "posts/" }}
       {{ partial "post/readtime.html" .}}
-      {{ partial "post/stat.html" .}}
       {{ end }}
       </div>
     </header>
