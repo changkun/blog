@@ -20,7 +20,7 @@ My pipeline follows an engineering process, a typical software workflow:
 The core of this design is "deterministic steps," essentially a fixed state machine transition.
 
 ## 2. Engineering Managers' approach
-Some Engineering Managers also built similar things (also web-coded), but their design thinking is:
+Some Engineering Managers also built similar things (also vibe-coded), but their design thinking is:
 (a) Only define the goal, don't prescribe the state machine for agent-to-agent communication.
 (b) Hand the task to a bunch of agents and let them figure things out through mutual communication.
 (c) Agents decide who to talk to on their own, and resolve issues independently after communication.
@@ -161,7 +161,7 @@ Code Droid achieved **19.27%** on SWE-bench Full (2,294 issues from 12 Python op
    这种设计的核心是“确定性的步骤”，本质上是固定好的状态机转换。
 
 2. Engineering Manager 们的思路
-   一些做工程经理（Engineering Manager）的人也做了类似的东西（也是 Web-coded），但他们的设计思路是：
+   一些做工程经理（Engineering Manager）的人也做了类似的东西（也是 Vibe-coded），但他们的设计思路是：
    (a) 只定义目标，不规定 agent 之间通信的状态机。
    (b) 将任务交给一堆 agent，让它们通过互相通信来 figure out。
    (c) Agent 会自己决定跟谁聊，聊完之后自行解决问题。
