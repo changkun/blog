@@ -15,6 +15,11 @@ DisablePathToLower =  false
 HasCJKLanguage = true
 pygmentsUseClasses=true
 UglyUrls = false
+[outputs]
+  home    = ["HTML", "RSS"]
+  section = ["HTML", "RSS", "JSON"]
+  page    = ["HTML"]
+
 [permalinks]
   posts = "/:slug"
   ideas = "/ideas/:slug"
