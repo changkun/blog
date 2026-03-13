@@ -6,7 +6,7 @@ title_zh: "确定性流程与自适应多智能体架构"
 ---
 
 {{% en %}}
-# Recently I developed an automated software development pipeline, and the basic idea is: an idea agent proposes ideas, then the pipeline automatically implements them, runs tests after implementation, and then automatically submits.
+Recently I developed an automated software development pipeline, and the basic idea is: an idea agent proposes ideas, then the pipeline automatically implements them, runs tests after implementation, and then automatically submits.
 
 I noticed a very interesting phenomenon. After showing this tool to some people, I found that their design approaches for similar ideas varied quite a bit.
 
@@ -29,10 +29,10 @@ Under this architecture, the idea agent might not directly propose ideas, but in
 
 I find the differences between these two architectural designs particularly interesting. I believe the essential distinction reflected behind this design difference lies in:
 
-## 1. The former adds constraints and control to uncertain systems
+**1. The former adds constraints and control to uncertain systems**
 Its constraints are typically expressed as state machines.
 
-## 2. The latter defines "goal-to-goal" architecture
+**2. The latter defines "goal-to-goal" architecture**
 That is, it believes that under such an uncertain state machine, the system can achieve the leap from goal A to goal B.
 
 What I find interesting is that one is about managing uncertainty, while the other is about trusting in uncertainty. It's hard to say which is better. It probably requires experiments to research this.
