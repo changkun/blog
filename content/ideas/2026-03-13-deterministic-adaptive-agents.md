@@ -1,7 +1,7 @@
 ---
 date: 2026-03-13T03:43:42
 slug: "deterministic-adaptive-agents"
-title: "# Deterministic Processes and Adaptive Multi-Agent Architecture"
+title: "Deterministic Processes and Adaptive Multi-Agent Architecture"
 title_zh: "确定性流程与自适应多智能体架构"
 ---
 
