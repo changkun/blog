@@ -10,7 +10,7 @@ Recently I developed an automated software development pipeline, and the basic i
 
 I noticed a very interesting phenomenon. After showing this tool to some people, I found that their design approaches for similar ideas varied quite a bit.
 
-## 1. My design approach
+**1. My design approach:**
 My pipeline follows an engineering process, a typical software workflow:
 (a) Propose an idea
 (b) Automatic implementation
@@ -19,7 +19,7 @@ My pipeline follows an engineering process, a typical software workflow:
 
 The core of this design is "deterministic steps," essentially a fixed state machine transition.
 
-## 2. Engineering Managers' approach
+**2. Engineering Managers' approach:**
 Some Engineering Managers also built similar things (also vibe-coded), but their design thinking is:
 (a) Only define the goal, don't prescribe the state machine for agent-to-agent communication.
 (b) Hand the task to a bunch of agents and let them figure things out through mutual communication.
