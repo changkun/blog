@@ -48,9 +48,11 @@
   new MutationObserver(updateSearchPlaceholder).observe(document.documentElement, { attributes: true, attributeFilter: ['data-lang'] });
   var clearBtn = document.getElementById('ideas-search-clear');
   var countEl = document.getElementById('ideas-count');
-  var cards = document.querySelectorAll('.idea-card');
-  var total = cards.length;
+  var stream = document.querySelector('.ideas-stream');
+  var pagination = document.querySelector('nav.pagination, nav[role="navigation"], .pagination');
   var timer = null;
+  var corpus = null;
+  var originalCards = null;
 
   search.addEventListener('input', function() {
     clearBtn.style.display = search.value ? '' : 'none';
@@ -65,19 +67,86 @@
     search.focus();
   });
 
-  function filter() {
-    var q = search.value.toLowerCase().trim();
-    var visible = 0;
-    for (var i = 0; i < cards.length; i++) {
-      var text = cards[i].getAttribute('data-searchable').toLowerCase();
-      if (!q || text.indexOf(q) !== -1) {
-        cards[i].style.display = '';
-        visible++;
-      } else {
-        cards[i].style.display = 'none';
+  function restorePaginatedView() {
+    // Remove any dynamically inserted search-result cards
+    var dynamic = stream.querySelectorAll('.idea-card-search-result');
+    for (var i = 0; i < dynamic.length; i++) {
+      dynamic[i].parentNode.removeChild(dynamic[i]);
+    }
+    // Restore original Hugo-rendered cards
+    if (originalCards) {
+      for (var j = 0; j < originalCards.length; j++) {
+        originalCards[j].style.display = '';
       }
     }
-    countEl.textContent = q ? visible + ' / ' + total + ' ideas' : '{{ len $paginator.Pages }} / {{ len .Pages }} ideas';
+    if (pagination) pagination.style.display = '';
+    countEl.textContent = '{{ len $paginator.Pages }} / {{ len .Pages }} ideas';
+  }
+
+  function renderResults(items, q) {
+    // Hide paginated cards
+    if (!originalCards) {
+      originalCards = stream.querySelectorAll('.idea-card');
+    }
+    for (var i = 0; i < originalCards.length; i++) {
+      originalCards[i].style.display = 'none';
+    }
+    if (pagination) pagination.style.display = 'none';
+
+    // Remove previous search results
+    var prev = stream.querySelectorAll('.idea-card-search-result');
+    for (var j = 0; j < prev.length; j++) {
+      prev[j].parentNode.removeChild(prev[j]);
+    }
+
+    var visible = 0;
+    for (var k = 0; k < items.length; k++) {
+      var entry = items[k];
+      var text = ((entry.title || '') + ' ' + (entry.title_zh || '') + ' ' + (entry.plain || '')).toLowerCase();
+      if (text.indexOf(q) === -1) continue;
+      visible++;
+      var article = document.createElement('article');
+      article.className = 'idea-card idea-card-search-result';
+      var meta = document.createElement('div');
+      meta.className = 'idea-meta';
+      var time = document.createElement('time');
+      time.className = 'idea-date';
+      time.setAttribute('datetime', entry.date);
+      time.textContent = entry.date;
+      meta.appendChild(time);
+      article.appendChild(meta);
+      var h2 = document.createElement('h2');
+      h2.className = 'idea-title';
+      var a = document.createElement('a');
+      a.href = entry.url;
+      a.textContent = entry.title || entry.title_zh || entry.url;
+      h2.appendChild(a);
+      article.appendChild(h2);
+      stream.appendChild(article);
+    }
+    countEl.textContent = visible + ' / ' + corpus.length + ' ideas';
+  }
+
+  function filter() {
+    var q = search.value.toLowerCase().trim();
+    if (!q) {
+      restorePaginatedView();
+      return;
+    }
+    if (corpus) {
+      renderResults(corpus, q);
+      return;
+    }
+    countEl.textContent = document.documentElement.getAttribute('data-lang') === 'zh' ? '加载中...' : 'Loading...';
+    fetch('{{ "ideas/index.json" | relURL }}')
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        corpus = data;
+        renderResults(corpus, search.value.toLowerCase().trim());
+      })
+      .catch(function() {
+        countEl.textContent = 'Error loading index';
+      });
   }
 })();
 
