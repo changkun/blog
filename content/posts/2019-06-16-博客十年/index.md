@@ -1,0 +1,21 @@
+---
+date: "2019-06-16 00:37:37"
+toc: true
+id: 261
+slug: /posts/ten-years-of-blogging
+aliases:
+    - /archives/2019/06/261/
+tags:
+    - 随笔
+    - 博客
+title: Ten years of blogging
+---
+
+写博客似乎已经十年了，这十年间我没有对博客进行过任何有目的性的宣传，
+纯粹的 "Just for fun"。而两天前，我收到了迄今为止最大的一笔匿名赞助。
+
+<!-- more -->
+
+![](pay.jpg)
+
+特别致谢。
