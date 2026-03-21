@@ -9,13 +9,13 @@
         </a>
       </h1>
       <div class="post-meta">
-      {{ if or (eq $.File.Dir "posts/") (eq $.File.Dir "ideas/") }}
+      {{ if or (eq .Section "posts") (eq .Section "ideas") }}
       {{ partial "post/date.html" .}}
       {{ end }}
-      {{ if or (eq $.File.Dir "posts/") (eq $.File.Dir "ideas/") }}
+      {{ if or (eq .Section "posts") (eq .Section "ideas") }}
       {{ partial "post/stat.html" .}}
       {{ end }}
-      {{ if eq $.File.Dir "posts/" }}
+      {{ if eq .Section "posts" }}
       {{ partial "post/readtime.html" .}}
       {{ end }}
       </div>
@@ -25,7 +25,7 @@
     </div>
     <footer class="post-footer">
       {{ partial "post/tags.html" .}}
-      {{ if eq $.File.Dir "posts/" }}
+      {{ if eq .Section "posts" }}
       <ul class="post-copyright">
         <li class="post-copyright-author">
           <strong>{{ partial "bilingual.html" "Author" }}</strong> Changkun Ou
