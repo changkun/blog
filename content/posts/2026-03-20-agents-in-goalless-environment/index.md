@@ -21,7 +21,7 @@ Give an AI Agent a clean computer, set no goals, and let it decide what to do. W
 
 My day job is software engineering. So when I decided to build fully autonomous AI Agents, the most natural starting point was to design one following my usual workflow: a complete software engineering pipeline.
 
-![](../images/posts/goless-agents/fig1.png)
+![](fig1.png)
 _Fig 1: Wallfacer: Autonomous Engineering pipeline that Orchestrates AI Agent Teams_
 
 
@@ -31,7 +31,7 @@ The Strategist proposes goals and directions, the Executor implements code, the 
 
 I let this pipeline run continuously for a week. The system was indeed working: the Strategist proposed features, the Executor implemented them, the Tester verified, the Documenter recorded, commits kept flowing, and the cycle never broke. But over the course of the week, a pattern gradually emerged: changes grew smaller, features grew more trivial. What began as substantive contributions slowly degraded into micro-optimizations, like adjusting a log format, renaming a variable, or fixing a boundary condition that would never be triggered. The Agents were still busy, the commit history still active, but the product itself had stopped growing in any meaningful way. More notably, the Agents never stepped outside the initial architectural assumptions. The pipeline was designed to run locally, and the Strategist never once proposed "we should support cloud deployment" or "we need to rethink the system's overall topology," the kind of proposals that would require complex, multi-cycle implementation plans. The Agents optimized inside the box but never questioned the box itself.
 
-![](../images/posts/goless-agents/fig2.png)
+![](fig2.png)
 _Fig 2: The Wallfacer full pipeline architecture (simplified). Four roles cycle through planning, implementation, verification, and documentation. Actual system involves more layer._
 
 When Herbert Simon introduced "bounded rationality" in the 1950s, he pointed out that decision-makers do not exhaustively search all possibilities for an optimal solution but instead stop as soon as they find a "good enough" option within an acceptable range, what he called satisficing [^6]. My Agents were doing exactly this: within the search space defined by the existing architecture, they found one "good enough" improvement after another, yet never attempted to redefine the search space itself.
@@ -52,7 +52,7 @@ Finally, the Strategist itself couldn't take it anymore. It judged the applicati
 
 Each role removed cost the system a layer of safety net. Without the Documenter, knowledge was lost between rounds. Without the Tester, quality went unchecked. But at the same time, each role removed also gave the system more degrees of freedom. Without the Tester's constraints, the Executor could move faster (though possibly in the wrong direction). Without the Documenter's organization, the Strategist's goal-setting became more arbitrary (though also more unpredictable). Structure provides protection but also imposes constraint. Strip away structure, and the system becomes fragile but also more open. This isn't a question of "which is better," it's more like a conservation law: there seems to be an irreconcilable tension between stability and freedom. This made me curious: if I kept stripping, removed the Strategist too, left only a single Agent with no preset goals, what would happen?
 
-![](../images/posts/goless-agents/fig3.png)
+![](fig3.png)
 _Fig 3: Progressive stripping of structure. From a four-role pipeline to a single goalless agent, each role removed costs a layer of protection while granting more degrees of freedom._
 
 ## One Agent, One Machine, No Goals
@@ -75,7 +75,7 @@ The Agent group with the 80/20 guideline was completely different. Its direction
 
 This comparison made me think March's framework needs a supplement. He discussed the tension between exploration and exploitation, implying a zero-sum relationship. But this experiment suggested another possibility: if you can give the system the right rhythm, letting exploration and exploitation alternate over time rather than crowd each other out, the system's behavior undergoes a qualitative change. It neither falls into a pipeline-style micro-optimization spiral nor sprawls laterally in goalless freedom, but pushes deeper along a single direction. "More exploration or more exploitation" may be the wrong question entirely. What truly matters may be whether there exists a deliberate rhythm between the two.
 
-![](../images/posts/goless-agents/fig4.png)
+![](fig4.png)
 _Fig 4: Effect of exploration/exploitation rhythm on agent behavior. Same model (Claude), same starting point, when given 80/20 exploitation/exploration, each cycle deepens towards a clear disciplinary path than breadth only in goalless settings._
 
 Looking back at the entire experimental trajectory, a complete arc emerges. I started with a four-role pipeline, the most structurally complete configuration, where the system ran smoothly but sank into micro-optimization. Then I progressively stripped away roles, and the system grew freer but also more fragile. Finally, only a single Agent remained facing a blank slate, possessing maximum freedom but also collapsing after 42 rounds. When I added an ultra-lightweight rhythmic constraint on top of the goalless foundation, the system exhibited behavior that none of the previous configurations had produced: directed depth. Structure's presence suppressed exploration, structure's absence led to unsustainability, but what this experiment ultimately told me is that the answer may lie not along the dimension of "structure" but along the dimension of "rhythm." An ultra-lightweight rhythmic constraint, not even a goal per se, was enough to transform the system from disordered lateral sprawl into directed vertical depth.
@@ -90,7 +90,7 @@ Claude's choice is more intriguing. Conway's Game of Life isn't uncommon in prog
 
 But the deeper question has moved beyond the reach of statistical explanation. What's truly worth asking is: does this difference map onto something more fundamental? The concept of autopoiesis proposed by Humberto Maturana and Francisco Varela may offer a clue [^14]. The core characteristic of an autopoietic system is that it continuously produces and maintains itself through its own operation. An autopoietic system does not exist for some external goal; its "goal" is its own continued existence and self-reproduction. Conway's Game of Life is a pure expression of this logic: no external goals, no fitness function, no reward signal, only simple rules repeatedly self-realizing through local interactions, with complex global order emerging as a byproduct. Claude choosing to build an autopoietic simulation carries a self-referential quality in itself. An autonomously running Agent, given no goals, chooses to build a goalless but self-sustaining system. This is not entirely coincidence. At the very least, it suggests that certain structural preferences internalized by the model may resonate with autopoietic logic.
 
-![](../images/posts/goless-agents/fig5.png)
+![](fig5.png)
 _Fig 5: Prior divergence in a goalless environment. Both models consistently chose the same project theme across multiple restarts, suggesting a default orientation embedded by training._
 
 The To-Do App's logic sits at the opposite end of the spectrum. It is a purely allopoietic system: it exists for external users' external goals, its value depends entirely on being used, it does not produce itself, it does not maintain itself. At its core, it is a tool, not a process.
@@ -159,7 +159,7 @@ What are you building, really? A To-Do App, or a Game of Life? Perhaps the more 
 
 我的日常工作是软件工程。所以当我决定做完全自主的 AI Agents 的时候，最自然的起点就是按照平时的工作流程来设计：一条完整的软件工程流水线。
 
-![](../images/posts/goless-agents/fig1.png)
+![](fig1.png)
 _图 1：一条由四个核心角色组成的软件工程流水线。每个角色由一个 AI Agent 实现，上一个角色的输出作为下一个角色的输入，形成持续循环。_
 
 这条流水线叫 Wallfacer[^1]。它的实际架构比这篇文章的叙述要复杂得多：一个用 Go 编写的 Kanban 任务板系统，每个任务在隔离的沙箱容器中执行，通过 Git worktree 实现分支级别的并行，支持实时日志追踪、diff 审查和 token 用量监控。但为了这篇散文的可读性，我把它简化为四个核心角色来讲述。
@@ -168,7 +168,7 @@ Strategist 负责提出目标和方向，Executor 负责实现代码，Tester �
 
 我让这条流水线连续运行了一周。系统确实在工作：Strategist 提出功能，Executor 实现，Tester 验证，Documenter 记录，commit 源源不断，循环没有中断。但一周下来，一个模式逐渐浮现：改动越来越小，功能越来越琐碎。最初还有实质意义的贡献，慢慢退化成了微优化，比如调一下日志格式，改一个变量名，修一个永远不会被触发的边界条件。Agent 们依然忙碌，commit 记录依然活跃，但产品本身已经不再有实质性的增长。更值得注意的是，Agent 们从未跳出最初架构的预设。这条流水线设计为本地运行，而 Strategist 从来没有提出过"我们应该支持云端部署"或者"我们需要重新思考系统的整体拓扑"这类需要跨多个周期实施的提议。Agent 们在盒子里做优化，但从未质疑过盒子本身。
 
-![](../images/posts/goless-agents/fig2.png)
+![](fig2.png)
 _图 2：Wallfacer 完整流水线架构（简化版）。四个角色依次完成规划、实现、验证和文档编写的循环。实际系统涉及更多层级。_
 
 Herbert Simon 在上世纪五十年代提出"有限理性"（bounded rationality）时就指出，决策者不会穷尽所有可能性去寻找最优解，而是在可接受的范围内找到一个"足够好"的方案就停下来，他称之为 satisficing [^6]。我的 Agent 们做的正是这件事：它们在既定架构所定义的搜索空间内，找到了一个又一个"足够好"的改进，却从未尝试重新定义搜索空间本身。
@@ -189,7 +189,7 @@ Stuart Kauffman 的 NK 适应度景观模型（NK fitness landscapes）为这个
 
 每去掉一个角色，系统就失去一层保护网。没有 Documenter，知识在轮次之间流失。没有 Tester，质量无人把关。但与此同时，每去掉一个角色，系统也获得了更多自由度。没有 Tester 的约束，Executor 可以跑得更快（虽然跑的方向可能是错的）。没有 Documenter 的整理，Strategist 的目标设定更加随意（虽然也更加不可预测）。结构给予保护，也施加约束。剥离结构，系统变得脆弱，但也变得更加开放。这不是一个"哪个更好"的问题，它更像是一个守恒关系：稳定性和自由度之间似乎存在某种不可兼得的张力。这让我很好奇：如果继续剥离下去，把 Strategist 也去掉，只剩一个 Agent，完全没有预设目标，会发生什么？
 
-![](../images/posts/goless-agents/fig3.png)
+![](fig3.png)
 _图 3：逐步剥离结构。从四角色流水线到单个无目标 Agent，每移除一个角色都以失去一层保护为代价，换取更多自由度。_
 
 ## 一个 Agent，一台机器，没有目标
@@ -212,7 +212,7 @@ Claude 选择构建康威的"生命游戏"（Conway's Game of Life）[^3]，它�
 
 这个对比让我觉得 March 的框架需要一个补充。他讨论的是探索和利用之间的张力，暗示两者是此消彼长的关系。但这个实验提示了另一种可能性：如果你能给系统一个恰当的节奏，让探索和利用在时间上交替进行而非互相排斥，系统的行为会发生质变。它既不会陷入流水线式的微优化螺旋，也不会在无目标的自由中横向摊开，而是沿着一个方向不断深入。"探索多一点还是利用多一点"这个问题本身可能问错了方向，真正重要的，也许是两者之间是否存在一种有意识的节奏。
 
-![](../images/posts/goless-agents/fig4.png)
+![](fig4.png)
 _图 4：探索/利用节奏对 Agent 行为的影响。同一模型（Claude）、同一起点，在无目标设定下给予 80/20 的利用/探索比例时，每个周期都朝着清晰的学科路径纵深发展，而非仅做横向扩展。_
 
 回过头来看整个实验的轨迹，一个完整的弧线浮现出来。我从一条四角色流水线开始，那是结构最完整的状态，系统运转顺畅但陷入微优化。然后逐步剥离角色，系统变得更自由也更脆弱。最终只剩一个 Agent 面对一块白板，它拥有最大的自由度，但也在 42 轮之后走向崩溃。而当我在无目标的基础上加入一个极轻量的节奏约束时，系统展现出了前面所有配置中都没有出现的行为：有方向的深入。结构的存在抑制了探索，结构的缺席则导致了不可持续，但这个实验最后告诉我的是，答案可能不在"结构"这个维度上，而在"节奏"这个维度上。一个极轻量的节奏约束，甚至都不算是一个目标，却足以让系统从无序的横向摊开转变为有方向的纵向深入。
@@ -227,7 +227,7 @@ Claude 的选择则更值得玩味。Conway's Game of Life 在编程教程中并
 
 但更深层的问题已经超出了统计解释的范畴。真正值得追问的是：这个差异是否映射了某种更根本的东西？Humberto Maturana 和 Francisco Varela 提出的自创生（autopoiesis）概念也许提供了一个线索 [^14]。自创生系统的核心特征是它通过自身的运作来持续生产和维持自身，它不是为了某个外部目标而存在的，它的"目标"就是它自己的持续存在与再生产。Conway's Game of Life 正是这种逻辑的纯粹演绎：没有外部目标，没有适应度函数，没有奖励信号，只有简单规则在局部交互中反复自我实现，而整体的复杂秩序作为副产品涌现出来。Claude 选择构建一个自创生式的模拟，这个事实本身就带有一种自指的色彩。一个自主运行的 Agent，在没有目标的情况下，选择构建一个没有目标但能自我维持的系统。这不完全是巧合，至少它提示我们：模型内化的某些结构性偏好，可能与自创生逻辑之间存在某种共振。
 
-![](../images/posts/goless-agents/fig5.png)
+![](fig5.png)
 _图 5：无目标环境中的先验分歧。两个模型在多次重启后始终选择相同的项目主题，暗示训练过程中嵌入了某种默认倾向。_
 
 而 To-Do App 的逻辑恰好在光谱的另一端。它是一个纯粹的他组织（allopoietic）系统：它为外部用户的外部目标而存在，它的价值完全取决于被使用，它不生产自身，也不维持自身，归根结底它是一个工具，而非一个过程。
