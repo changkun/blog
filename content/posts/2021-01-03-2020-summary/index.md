@@ -1,0 +1,588 @@
+---
+date: 2021-01-03T09:50:13+01:00
+toc: true
+id: 271
+slug: /posts/2020-summary
+tags:
+    - 随笔
+    - 总结
+    - 人生感悟
+title: "2020 Year-End Review"
+title_zh: "2020 年终总结"
+---
+
+{{% en %}}
+2020 is finally, completely over. As I have done every year since undergraduate, I open my blog and sit down to write this annual reflection. So much seemed to happen this year — I was still in the office working overtime on the very last day of it. If I had to name the single greatest takeaway from 2020, I would distill it to two words: transformation.
+
+<!--more-->
+
+At the doctoral stage, one can no longer simply expand the breadth of one's skills the way you could as an undergraduate or master's student. The focus now has to shift to cultivating genuine depth (even if learning was systematic back then, knowledge without long-term practice becomes little more than dinner-party trivia, because society ultimately judges professional competence by what you have contributed, not by what you have studied).
+
+In undergraduate my mind was sharp and alert — I could absorb and retrieve knowledge almost without delay. But as the years have gone by (as if I were already ancient), I notice that retrieval latency increasing. A few things probably explain this:
+
+1. The brain's memory works much like a computer hard drive: the more you store, the slower the lookup. Knowledge that was once neatly organised during study now lies somewhere on the disk — I sometimes cannot even remember having put it there in the first place.
+2. The deeper one goes into a specialised field, the fewer people exist who truly understand it at a systematic level. Substantive discussion becomes rare, feedback and dialogue diminish, and without that reinforcement it is simply harder to form lasting memories.
+
+Looking back, it has been only about seven years since I was a first-year undergraduate with zero programming experience — and perhaps only three of those years involved genuinely undivided focus on computing. This year I did a great deal of systematic consolidation, turning parts of my accumulated knowledge into teaching lecture slides. Since teaching occupied such a large share of my year overall, let me start there.
+
+## On Being a Teacher
+
+Many people assume that a PhD means nothing but reading and writing papers, not so different from a master's degree. In reality, the doctoral programme is only one part of my daily work. At the university my responsibilities include collaborative projects with industry partners and formal teaching duties. Earning the doctorate is, in a certain sense, a by-product of everything else.
+
+Setting aside the research itself (writing papers) and the project work that I cannot discuss openly, the part of 2020 most personally affecting me actually traces back to October 2019. That was when I officially began serving as a Teaching Assistant at a German public university — teaching undergraduate and postgraduate courses, supervising bachelor's and master's theses. This became the single largest drain on my time and energy throughout the year.
+
+### Compromise and Pragmatism
+
+The first course I taught was one of my former favourites: [Online Multimedia](https://www.medien.ifi.lmu.de/lehre/ws1920/omm/). This postgraduate course covered an impressively broad ground — from the fundamentals of web-based multimedia technology all the way to digital rights and the social transformations brought about by multimedia. When it was first offered around 2016, the content felt genuinely fresh. By 2020, however, it was beginning to show its age.
+
+Before the course began (October 2019), the supervising professor, Hausmann, approached me and asked me to serve as his second teaching assistant. In my usual fashion when handed significant responsibility, my first response was self-deprecation: others at the institute had been here longer than me; my own practical experience with web technology came mainly from internship projects. (Privately, though, I was thinking: fate has come full circle — now I get to do something about this course.)
+
+At the first kick-off meeting with the professor and my colleague Florian, I raised my concerns without hesitation. Several parts of the course needed updating: Angular was no longer the first choice for frontend work; Node.js, once the darling of server-side programming, had largely been left behind by the industry; the course should cover more of the cloud-native web infrastructure that had emerged in recent years. I even proposed rewriting the entire Full Stack JavaScript-based course in Go — I was genuinely enthusiastic about doing it.
+
+The professor responded with apparent enthusiasm at the time, raising no objections, and the meeting ended in a spirit of warm agreement. Reality, however, did not cooperate. When we reached the point in the course where I believed changes were needed, neither the professor nor my colleague had taken any action. Only when there was one week left before the sections I wanted to revise did I finally send an email pressing the issue — and only then did their true position emerge: the idea was good, but the workload was enormous; making such changes was risky; I was not sufficiently familiar with these emerging areas to teach them effectively.
+
+So I had no choice but to compromise. The Go introduction slides I had painstakingly prepared in advance were quietly shelved (https://changkun.de/s/golang-intro).
+
+That was not quite the end of it, though. If I could not escape the JavaScript fate entirely, I could at least use JS to cover the topics I cared about. As a middle ground I redesigned the frontend section (switching from Angular to React):
+
+- https://changkun.de/s/react-intro
+- https://changkun.de/s/frontend-tooling
+
+And I expanded the backend and streaming topics to go beyond the CRUD-heavy approach typical of postgraduate courses, introducing system design concepts and coverage of Docker and Kubernetes:
+
+- https://changkun.de/s/media-streaming
+- https://changkun.de/s/web-infra
+- https://changkun.de/s/media-outlook
+
+![](outlook.png)
+
+Teaching is more than slides, of course — it includes exercises and much else besides. All of those materials are in this [Git repository](https://github.com/mimuc/omm-ws1920).
+
+Learning that the professor had agreed on the surface while having no intention of acting on the proposal was deeply frustrating, even a little infuriating. In hindsight, though: as one of the few leaders of the entire computer science faculty, the professor's days are packed with administrative duties on top of teaching, so it becomes understandable. As for my colleague — he was probably just not particularly interested in teaching work. No lasting harm done.
+
+### Disappointment Outweighs Hope
+
+March 2020 arrived, and with it the pandemic erupted globally. Europe was among the hardest-hit regions. Teaching could not simply stop; the university's academic programmes had to continue and students still had to attend classes. Fortunately, March and April fall within Germany's academic winter break, which provided enough breathing room for the whole university to adapt its plans.
+
+Entering my second year of the doctorate, I was, predictably, assigned to teach a course squarely within my area of expertise: [Computer Graphics](https://www.medien.ifi.lmu.de/lehre/ss20/cg1/). This consumed me completely from April through June. As with the first course, I undertook extensive redesign — adding a large number of topics that modern graphics education should not shy away from: the algorithmic details of manually implementing a rasterisation pipeline, the implementation details of global illumination techniques, and more. Redesigning these slides and designing a coherent set of exercises linked across sessions became the part of my work I most enjoyed:
+
+- https://changkun.de/s/cg-1-math
+- https://changkun.de/s/cg-2-transform
+- https://changkun.de/s/cg-3-geometry
+- https://changkun.de/s/cg-4-camera
+- https://changkun.de/s/cg-5-raster
+- https://changkun.de/s/cg-6-material
+- https://changkun.de/s/cg-7-illumination
+- https://changkun.de/s/cg-8-review
+- https://changkun.de/s/cg101
+- https://github.com/mimuc/cg1-ss20
+- ... and so on — very nearly a complete path to learning the core knowledge of graphics from scratch
+
+![](mindmap.png)
+
+The topics in computer graphics are not simple, of course. Beyond deep conceptual understanding, there are high demands on coding ability. When it comes to implementing ray tracing, for instance, understanding a formula like the one below may not be terribly hard, but converting that formula into working code requires substantial groundwork. (For this reason the course did not use C++ and OpenGL; instead it used Node.js and three.js, tools easy enough to pick up that they do not get in the way of understanding the core graphics concepts):
+
+![](rendering.png)
+
+Even though I had already deliberately avoided many algorithms and topics in the course design — intersection of rays and triangles, for instance, or animation, a subject of intense research focus in recent years — assignment submission numbers still fell exponentially over the course of the semester. Entirely predictable, but dispiriting nonetheless.
+
+![](stats.png)
+
+The pandemic probably played a role: almost everyone was still deeply disoriented by remote work and remote study. I had redesigned the entire course with the honest intention of giving students more genuinely useful knowledge (at least, I believed this was the right thing to do), and I had hoped to attract some undergraduates who might eventually collaborate with me on research. Instead of gratitude, from the second session onwards students began complaining to the professor and attacking my approach:
+
+1. There are too many exercises; there is not enough time.
+2. The exercises are too difficult; they are completely incomprehensible.
+3. The exercises do not match what was taught in the lectures.
+4. The lecture content is useless for the exam.
+5. ...
+
+I did not take any of this particularly seriously. The complaints were illogical and hard to defend on the facts: each programming exercise was no more than 50 lines of code; the assignments were entirely voluntary with no grading and no reward. If a student found them too hard, they were perfectly free to skip them and study the model solutions after the next session. As for the claim that the lecture content was useless for the exam — as far as I could tell, the previous year's exam questions had been leaked, and students noticed that newly added material had not appeared on the old paper.
+
+All this accumulated resentment finally exploded around the final exam. In June the professor convened me and my colleague to discuss the exam format (the pandemic ruled out in-person examinations). As the lead teaching assistant, and following the tradition of previous years, I would be responsible for designing the exam and marking the papers. Since in-person examination was no longer an option, and online examination needed to deter cheating, I proposed an online programming format: a one-month take-home period covering three programming projects. There was a good deal of back-and-forth — the professor felt that programming-only assessment was too narrow and that some written question-and-answer component was still needed — so the final format became: two graphics programming projects (one a seven-day task to implement a solar system, the other a fourteen-day task to implement a complete rasterisation pipeline, both in Node.js), plus a written question-and-answer paper in a format close to a traditional in-person exam (five days).
+
+After a month of examinations (July), the results were disappointing. In the German grading system, 5.0 means fail, 4.0 is a bare pass, and 1.0 is full marks. The final statistics showed a pass rate of only 66.1%:
+
+![](grade_raw.png)
+
+This result was, in fact, very similar to the Graphics exam results of previous years — in 2018 and 2019 the pass rate was also around 65%. In one sense the online format had actually performed slightly better than the in-person exams of previous years. But within a week of results being published, students were flooding in with complaints: the questions were confusing, the questions were poorly set, the answers weren't in the slides. One student even complained: *I can't even find the answers on Google — how are we supposed to sit this exam?*
+
+All of this culminated in an official complaint to the Student Representative Council, filed by a group of furious students after marks were published in August (a particularly memorable individual: a student who had scraped through the previous year's exam and returned to improve their grade, only to fail this time). The grounds included but were not limited to:
+
+1. The exercises were too difficult and not appropriate for learning. (My view: a university is not a service industry. Who gave you the right to pass judgment on a teacher's work?)
+2. The lecture content was irrelevant to the exam; the exam tested things that had not been covered in lectures. (My view: you didn't even come to class, and you never seriously attempted the exercises. What right do you have to say this content wasn't covered?)
+3. Compared to previous years, the difficulty had risen sharply, so the results must be much worse. (My view: a false claim — subsequent analysis of the pass rate showed the results were actually better than previous years.)
+4. ...
+
+Following mediation by the Student Representative Council, and in order to appease the students' anger, I had no choice once again but to compromise. I proposed a gamma-correction transformation of the grades, raising the final pass rate to 89.8%. The specific transformation formula is available [here](https://www.medien.ifi.lmu.de/lehre/ss20/cg1/stats/gamma_correction.txt).
+
+Since November I have been leading another, more advanced course: Geometry Processing. Unlike the previous courses, where the professor still handled the lecture component, this one I ran entirely on my own — I single-handedly covered 99% of the work: lectures, exercises, and student supervision alike:
+
+- https://changkun.de/s/gp-0-org
+- https://changkun.de/s/gp-1-intro
+- https://changkun.de/s/gp-2-ddg
+- https://changkun.de/s/gp-3-smooth
+- https://changkun.de/s/gp-4-param
+- https://github.com/mimuc/gp-ws2021
+
+![](gp.png)
+
+As the course grew progressively harder, attendance fell from over fifty students at the start to just two by the halfway point. Two students remaining is not much, but it at least proves that someone out there is willing to pursue this subject seriously. I hope they can hold on to the end :)
+
+### When Gratitude Disappears
+
+Emerging from all that struggle, challenge, and negative feedback, I kept asking myself throughout the year:
+
+- Why is everyone here so reluctant to change? Is it me, or is it them?
+- Why are the students here so full of complaints? Why do they retreat at the slightest difficulty? Is my approach wrong, or are they the problem?
+- ...
+
+I shared these experiences with people around me, expecting to hear some thoughtful perspectives. Instead, some of them turned the questions back on me: *Why are you doing all this? Does anyone thank you for it? What do you actually get out of it? Are you still making it hard for your students?*...
+
+In the mirror of these responses I caught a glimpse of someone I recognised — a teacher from my undergraduate years who was despised by most students, notorious for letting people fail, but whom I personally admired deeply for his genuine seriousness and sense of responsibility in the classroom. Much of what I think of as my foundational knowledge in computing was kindled by that teacher's guidance. This year's experiences seem to have turned me into him.
+
+What is all this work for? Is it to make students' lives miserable? Is it to maximise the failure rate? Why won't these people acknowledge that my intentions are good? Since I took on various teaching duties, people around me have increasingly addressed me as "Teacher Ou." That form of address is, in fact, a marker of having stepped into the next phase of life: I have now fully shed the identity of the student who could readily receive positive feedback from others, and completed the role transition. Naturally, positive feedback no longer comes so easily.
+
+I still remember a passage I once encountered in the *Book of Rites*: **A teacher must first be upright in themselves before they can educate others — this is the very foundation of a teacher's virtue.** To those who believe I was "making things difficult" for students, I have only one silent response: those who walk different roads cannot counsel each other.
+
+## Beyond the Field
+
+### To Go or Not to Go
+
+In 2019 most of my spare time went into writing [*Go Under the Hood*](https://golang.design/under-the-hood), and it was through that project that I got to know many prominent figures in the Chinese Go community.
+
+By February of this year *Go Under the Hood* had essentially completed the outline for the first half of the book — the runtime section. An outline, yes; the actual content still needed a great deal of rewriting and polish. The original purpose of the project (back in 2018) had not been to write for other readers at all: there was very little material available at the time about the internals I wanted to understand, so it started as a personal set of notes on source code research. As the readership grew and I began to think about how to make the content durable and valuable, it gradually evolved into a book that aspired to introduce Go's design philosophy and underlying principles.
+
+Just as I was beginning to plan the compiler section and had earmarked it as a key annual goal, I stumbled across another work that was almost uncannily similar in both scope and purpose: [*The Design and Implementation of the Go Language*](https://draveness.me/golang) — a book that had not existed when I first started *Go Under the Hood*. After skimming through most of it I made a decisive choice: I would stop maintaining *Go Under the Hood*, and I wrote a [blog post](https://changkun.de/blog/posts/why-i-stopped-blogging/) to express how I felt at the time. Looking back now, some of the sentiments in that post were perhaps a little excessive — we were probably simply two people who, at the same moment, wanted to do the same thing without being aware of each other.
+
+The original creative vision behind *Go Under the Hood* actually resonates with what the Huíxíngzhēn team described in their [annual retrospective video](https://www.bilibili.com/video/BV1AV41187t9): "We want to create things for the Chinese-language internet that will last — content that will still have value years from now, things that would not exist if we did not make them; we want to fill in the gaps." Since someone else was willing and eager to do this thing even better, I concluded that *Go Under the Hood* no longer needed to be maintained or updated.
+
+In retrospect, that decision was right. It freed up more time to deepen my expertise in my own field and to focus on collaborative industry projects (read: overtime). Revisiting *The Design and Implementation of the Go Language* recently, it appears there has not been much new content added since then — many of the topics I had not yet researched when I stopped updating *Go Under the Hood*, which I had hoped this author would eventually cover, have not been added either. The reason is unknown, but it is a shame.
+
+A few months after stopping work on *Go Under the Hood*, with the generous support (and sponsorship) of [Yang Wen](https://maiyang.me), I registered a new domain, [golang.design](https://golang.design), and created a new project, [golang.design/history](https://changkun.de/s/go-history), reorganising and releasing the Go-related resources I had gathered while writing *Go Under the Hood*. It serves as a continuation of sorts.
+
+In November I relaunched the podcast [talkgo.fm](https://changkun.de/s/talkgofm) — a project I had planned at the end of 2019 but had left dormant for nearly a year. I was very fortunate that in the [second episode](https://changkun.de/s/talkgofm2) we managed to invite [Meng Zhuo](https://mzh.io), whose technical outlook resonates with mine on many levels. (I edited that episode myself — see the Easter egg at the end :)
+
+Looking back across the year, beyond the talks I gave at Go Nights in the early part of the year:
+
+- https://changkun.de/s/timer114
+- https://changkun.de/s/go2generic
+- https://changkun.de/s/gobench
+
+And a collection of small open-source Go projects (there are also non-open commercial projects written in Go):
+
+- https://changkun.de/s/midgard
+- https://changkun.de/s/redir
+- https://changkun.de/s/bench
+- https://changkun.de/s/ssaplayground
+- https://changkun.de/s/code2img
+- https://changkun.de/s/tli
+- https://changkun.de/s/upbot
+- https://changkun.de/s/rmtrash
+- https://changkun.de/s/lockfree
+- https://changkun.de/s/go2generics
+- ...
+
+...it is hard to convince myself of a clear reason why I keep gravitating toward Go. After all, computer graphics is ruled by C/C++ for many historical reasons (an aside: the [C++ book](https://changkun.de/modern-cpp) I wrote during my undergraduate years has now passed 12k stars). To Go or Not to Go — it's a tough question. Why do I use Go? Probably just because I am genuinely captivated by the design philosophy of the language.
+
+### The Pandemic
+
+The pandemic — how did it not come up earlier when it dominated the whole year? What impact did it actually have on my life? It is true that early in the year I took special leave and returned to China to spend the New Year with my parents. I had hoped for a pleasant holiday; instead the outbreak erupted in China right at that time. After the holiday I flew back to Germany through the height of the epidemic, with a nagging feeling that proved well-founded: within less than a month the virus had begun sweeping through Europe, and it has not stopped since.
+
+The biggest practical impact of the pandemic on my life was the cancellation of every travel plan I had made for the year. My perfect itinerary for CHI 2020 in Hawaii and a visit to Silicon Valley in May was scrubbed entirely, and part of the airfare has still not been refunded. The annual Christmas skiing trip — a fixture of every year — was also impossible: both the borders and the ski resorts were closed. On the bright side, I had been able to ski at the beginning of the year thanks to the Winter School organised by our research group, so the annual tradition was technically preserved:
+
+<div style="text-align: center">
+<video height="520" controls>
+<source src="snow.mp4" type="video/mp4">
+</video>
+</div>
+
+In early October, at the professor's strong insistence, the Internal Doctor Colloquium that should have been cancelled due to the pandemic went ahead as scheduled. It took us to Venice — a city I had long wanted to visit. The purpose was work: I was there to give a [talk](https://changkun.de/s/polyred4us), but it was nonetheless the one journey in the whole year that I found genuinely satisfying.
+
+![](venice.JPG)
+
+The one unfortunate coda was that after returning from Venice I fell ill and was hospitalised for two weeks (not COVID) — yet another singular experience to add to the year.
+
+## Afterword
+
+I remember a conversation in July with a friend who was about to finish his PhD and preparing to return to China for a while before entering industry. We talked about what comes after the doctorate — whether to go into industry or continue in academia. In the European system, whichever path you choose will make the other very difficult to return to, so our discussion revolved around the question of What's Next. As it happened, something of the same conversation came up again during the Venice trip with the professor, and again yesterday during the podcast recording with our guest. My view has gradually crystallised: early in a career you need many credentials (such as academic qualifications) and must pass through many selection processes (such as interviews) to continually demonstrate your ability. But as the career enters its middle and later stages, the path should in principle become smoother. If it does not, I am more inclined to think it means one's overall professional development has not grown enough — perhaps one is even standing still — because the natural arc of life should be that the road grows broader and more open as you walk it.
+
+Many people pursue job security by working diligently so as not to be let go. But look at it another way: which is truly more stable — spending enormous effort to stand out from the crowd only to rack your brain a few years later about where to find your next job; or cultivating one or more steady relationships, so that there is always someone who, when you want to make a change, will unhesitatingly offer to hire or sponsor you on mutually agreeable terms? At this point in my life I lean toward the latter.
+
+In an episode of the Acquired podcast about Indie Hackers, there was a line that struck me deeply: "Being an Indie Hacker is really about the idea that you can achieve your own freedom. Whatever that means to you. Maybe that's financial freedom, maybe that's creative freedom so you can work on whatever you want, maybe that's time freedom so you can work whatever hours and schedule you want. Being an Indie Hacker is really this confidence in yourself. You can create something that'll make your life better, make other people's lives better in the process, and give you that freedom. Maybe that looks like raising a ton of money in the future."
+
+Yes — achieving one's own freedom, whatever that freedom means to oneself. Was that not precisely the reason I chose a PhD over the industry offers waiting for me at the end of my master's?
+
+2020 was undeniably a year of setback after setback, more than in any year before. At bottom, all of it traces back to the fact that I have undergone a complete life-stage transition. Perhaps this is simply what adulthood looks like. I hope this photo — taken in Venice, just before boarding for the return flight to Munich, visibly weary — can serve as the motivation that drives me further into 2021 in search of answers I find more satisfying.
+
+![](venice-2.JPG)
+
+Ou Changkun
+
+3 January 2021
+Munich
+
+## Further Reading
+
+- Previous year-end summaries: [https://changkun.de/blog/tags/总结/](https://changkun.de/blog/tags/总结/)
+
+## Acknowledgements
+
+Thank you to the friends who have accompanied me sincerely through this year.
+{{% /en %}}
+
+{{% zh %}}
+2020 年算是彻底结束了，像往常一样，我又打开了自己的博客，开始写下这篇我从本科开始就
+坚持年更类型的文章。这一年里看似发生了许多，以至于在一年的最后一天我还在办公室里加班。
+要说这一年里最大的收获是什么，可能会总结为两个字：转变。
+
+<!--more-->
+
+到了博士阶段，也就不能像是本科、研究生那样只扩宽自己技能的广度，需要更多的专注在如何将自身
+的能力做深度的培养（尽管学习的时候是系统性的学习，但如果没有长期实践这些知识的话，也只能作为谈资，
+毕竟整个社会对专业技能的评价是取决于做过什么贡献，而非学习过什么）。
+
+本科阶段的思维很活跃，对事物总是过目不忘，从大脑里存取知识几乎没有延迟，
+但随着年龄的增长（说得好像我已经很老了一样），越发的感到这个存取的延迟在增加。
+这可能是几方面原因导致的：
+
+1. 大脑内知识的存取和计算机硬盘的工作原理依然很相似，在脑子里存放的东西越来越多。
+   曾经在学习的时候整理有序的知识体系，也随着时间的推移躺在硬盘里甚至都不记得曾经把这些知识放进过脑子里；
+2. 所接触的领域知识越来越深入，真正能非常系统的理解所在领域的人非常少，也就很很难就同一领域的话题进行讨论，
+   进而得到的反馈与沟通也相对较少，也就不那么容易形成比较深刻的记忆；
+
+回想一下自己从一个完全没有接触过计算机编程的本科新生到现在，也不过七年的时间，而这些时间里
+可能只有三年的时间是真正全神贯注的扑在计算机领域的。
+今年做了非常多的系统性的总结，将自己曾经的部分积累，最终以教学演讲幻灯片的形式进行输出，
+毕竟这些工作算在今年整体工作的占比较大，就从教学工作的回顾谈起吧。
+
+## 为人师，德以配天地
+
+很多人以为读博士就是读书写论文，跟研究生区别不够显著。但实际上攻读博士学位只是
+平时工作中的一部分。我在高校里主要承担的很大一部分工作其实包含了跟业界伙伴的项目合作、
+在高校的教职等等，取得博士学位从某种意义上算是一个附带的产物。
+
+除了科研本身（写论文）、做项目这些暂时还不能敞开聊的内容之外，
+要说这 2020 一年里所发生的与我联系最紧密的事情，可能得从 2019 年的 10 月份说起。
+从那个时候起，我开始作为一名 Teaching Assistant 正式在一所德国的公立大学里承担教职工作，
+包括给本科生和研究生上课、指导本科生和研究生的毕业论文等等。这也是我一年中花费精力最多的部分。
+
+### 妥协与折中
+
+我在大学里教授的第一门课便是我曾经最喜欢的几门课之一的
+「[Online Multimedia](https://www.medien.ifi.lmu.de/lehre/ws1920/omm/)」，
+这门面向研究生的课程涵盖的面非常广，从最基本的 Web 前端多媒体技术谈起，介绍了数字版权
+甚至于多媒体技术兴起对社会来带的影响和变革。这门课在当时（2016 年）看来内容非常
+的新颖，但在 2020 年前后看来从某种程度上已经不再那么的兴奋了。
+
+在这门课开课之前（19 年 10 月份），这门课的教授 Huassmann 找到我，希望我作为他的
+第二助教来承担一些教学工作。当然跟以前一样，我对承担这类责任比较大的工作时首先表现出来的
+自然是不自信，所以最初给教授的回复是，毕竟比我入职更早的同事有很多，
+我个人对 Web 技术的实践也不过来自我曾经实习期间做过的一些项目
+（话虽这么说，但内心其实想的是：天道轮回，终于轮到我来给这门课做一些变革了）。
+
+所以在学期开始之前，教授、另一位助教同事 Florian 和我在第一次 Kick-off 会议的时候
+我就毫不忌讳的提出了这门课的些许内容需要进行一些升级，比如说 Web 前端技术里的 Angular
+已经不再是这个领域首选、早些年服务端编程中大热的 Node.js 早已被时代给「抛弃」、课程
+应该更多的覆盖这些年里 Cloud Native 中发展出来的各种 Web 基础设施。我甚至直接建议
+将这门 Full Stack JavaScript 为设计蓝本的课整个用 Go 「重写」，我非常有热情来做这件事情。
+
+当然，开始的时候教授就表达了极大的兴趣，并没有对我的提案表达出任何异议，整个会议
+在一片祥和的氛围中结束了。不过事与愿违，真正到课程进行到一半，
+也就是我认为需要进行改变的时候，无论是教授还是另一名同事都没有任何行动。
+直到后来眼瞅着只有一周时间就要到我提议说需要改变的课程内容时，我实在是耐不住了就写了
+邮件再次询问，才得知他们的真实想法：想法很好，但工作量很大，做出这种改变很危险，
+我对这些新兴的领域还不够熟悉，不利于教学。
+
+于是我只能妥协并无奈的将早早准备的将整门课从 JavaScript 切换
+到 Go 的入门课件顺利抛弃掉了 (https://changkun.de/s/golang-intro)。
+
+当然这并不是终点，既然不能摆脱掉 JavaScript 的命运，仍然可以用 JS 来涵盖那些希望
+覆盖的主题。作为折中，我只重新设计了前端的部分（从 Angular 切换到 React）：
+
+- https://changkun.de/s/react-intro
+- https://changkun.de/s/frontend-tooling
+
+并将后端主题与流媒体技术进一步结合，将这门面向研究生、但后端技术仅停留在 CURD 的课
+进一步扩展增加了一些关于系统设计的主题，并介绍了 Docker/K8s 这些概念：
+
+- https://changkun.de/s/media-streaming
+- https://changkun.de/s/web-infra
+- https://changkun.de/s/media-outlook
+
+![](outlook.png)
+
+跟教学不仅仅只有课件，还包括习题等，这些内容都存放在这个
+[Git 仓库](https://github.com/mimuc/omm-ws1920) 里了。
+
+虽然得知教授表面上同意但内心上并没有打算要做这件事情时非常沮丧甚至有些气愤，但事后回忆起来，
+毕竟教授作为整个计算机学院的几个领头人之一，每日除了教学工作之外，还有数不清的教务工作，
+也能对这些事情表示理解。至于另一个同事，可能只是单纯的对教学类的工作不够感兴趣罢了，
+这个无伤大雅。
+
+### 失望大于期望
+
+时间来到了 2020 年的 3 月，这个时候疫情在全球爆发，欧洲是重灾区。
+但教学任务不能耽搁，大学的教学工作还是得继续，学生依然得上课。好在 3 至 4 月是德国
+大学教学年历中的寒假，也就留出了足够多的空隙给整个学校的教学计划做调整。
+
+进入博士第二年的我，毫不意外的开始负责一些与我专业领域强相关基础课的教学：
+[计算机图形学](https://www.medien.ifi.lmu.de/lehre/ss20/cg1/)。
+这也就成为了我在今年 4 - 6 月期间全身心投入的一个教学工作。和第一门课一样，
+我对这门课进行了大量的重新设计，增加了大量现代图形学中不应该回避的主题：
+手动实现光栅化管线的算法细节、全局光照技术的实现细节等等。
+重新设计并制作这些课件、设计前后互相关联的习题，成为了我非常 Enjoy 的一部分工作：
+
+- https://changkun.de/s/cg-1-math
+- https://changkun.de/s/cg-2-transform
+- https://changkun.de/s/cg-3-geometry
+- https://changkun.de/s/cg-4-camera
+- https://changkun.de/s/cg-5-raster
+- https://changkun.de/s/cg-6-material
+- https://changkun.de/s/cg-7-illumination
+- https://changkun.de/s/cg-8-review
+- https://changkun.de/s/cg101
+- https://github.com/mimuc/cg1-ss20
+- ...等等几乎一整套完整的从零开始学习图形学核心知识的路径
+
+![](mindmap.png)
+
+当然，图形学里的主题并不是那么的简单，除了对知识有足够深入的理解，在编码能力上还有很高
+的要求，比如在实现光线追踪的时候，理解下图中的公示可能很简单，但真正将这段公式转换为代码
+还是需要非常多的前期准备工作的（以至于这门课都没有选择使用 C++ 和 OpenGL 作为编码工具，
+相反而是使用了比较容易上手，可以绕开很多与理解图形学中核心主题无关的纯技术细节的工具
+ Node.js 和 three.js）：
+
+![](rendering.png)
+
+虽然我在课程涵盖的内容设计上已经避开了很多算法和主题（比如光线和三角形求交这类非常基础的算法、
+近些年来研究领域非常关注的动画相关的主题），
+但这仍然导致了这门课的作业提交数量呈指数级下降（意料之中）。
+
+![](stats.png)
+
+可能是由于疫情的影响，几乎每个人都还沉浸在在家办公、学习带来的极度不适应的氛围中。
+我本着能够让学生学习到更多有用的知识而重新设计的整个课程（至少我认为这是在做正确的事情）
+原以为至少能够培养一些可以和我一起做研究的本科生时，反而没有收获足够的感激，
+倒是从第二堂课就开始不断的有学生向教授抱怨和攻击我：
+
+1. 习题的数量太大没有时间做
+2. 习题的难度太大完全没办法理解
+3. 习题和课程讲授的内容不匹配
+4. 课程讲授的内容对考试毫无帮助
+5. ...
+
+当然，我并没有对这件事情非常的在意，毕竟这些抱怨不仅没有逻辑可言也很难站住脚跟，比如：
+每道编程的习题工作量不超过 50 行，而且这些作业完全是自愿的而非强制的，既没有评分也没有奖励。
+如果学生觉得难度太高，完全可以不做，等着下一节课讲完习题答案之后再自己深入学习；至于
+抱怨课程讲授的内容对考试毫无帮助，据我所知，完完全全只是是因为前一年的考试题目被泄漏过，
+而学生发现新加入的内容没有出现在去年的考题中而已。
+
+最终，这些怨念不断的累计，终于在期末的考试前后集中爆发。在六月的时候，教授召集我和另外一名
+同事一起讨论考试的形式（因为疫情的影响，线下考试已经是不可能了）。我作为助教的第一负责人，
+以往届的传统，考试题目的设计、考卷的批改最终都会落到我的头上，既然线下考试不再是可选项，
+线上考试需要避免学生的作弊行为，我也就主动提议采取线上编程的形式进行考试，为期一个月的时间，
+一共涉及三个编程项目。当然这期间还有很多来回的争辩，比如说教授认为全部用编程进行考试可能
+太过片面，还是需要进行一些书面性问答类的考试，所以最终的考试形式确定为：
+两个图形学的编程项目（一个是 7 天内实现太阳系、一个是 14 天内完整实现光栅化管线，工具限制为使用 Node.js），
+和一套与传统线下考试形式几乎一样的文字问答类的考卷（为期 5 天）。
+
+经历了为期一个月（7 月）的考试，最终的考试很不如人意，在德国的评分体系中，
+5.0 表示挂科，4.0 表示刚刚及格，而 1.0 表示满分。从最终考试结果的统计来看，通过率只有 66.1%：
+
+![](grade_raw.png)
+
+这个结果其实跟往年图形学的考试结果非常类似，比如 2018、2019 年考试的通过率也只有 65%，
+从某种意义上来说，这一年的考试反而比往年线下考试表现得稍微好那么一些。
+但在整个考试进行结束的一周内，不断的有学生来信抱怨：题目看不懂、题目出得很差、
+课件上找不到答案等等；有些学生甚至抱怨说：我连 Google 都找不到答案？怎么考？
+
+所有的这一切，在八月份我和同事完成考题批改后成绩公布时，被一群气愤填膺的学生给「告」到
+了学生理事会（其中有一个很有代表性的学生，这个学生去年考试低分飘过，今年来刷分，结果却考挂了），
+这也成为了我这一年中非常独特的经历。他们的论据包括但不限于：
+
+1. 习题太难，不适合学习（我的观点：大学不是服务行业，你们有什么资格来对教师的工作品头论足？）
+2. 课堂讲过的内容跟考试无关、考试题目没有在课堂中涉及（我的观点：你们连课都不来上，作业也没认真做过，有什么资格说这些内容没有在课堂涉及？）
+3. 考试结果跟往年比难度大幅增加，最终的结果「肯定」比往年差很多（我的观点：不实的论据，所以后来查证通过率显示最终的考试结果比往年要好）
+4. ...
+
+经过学生理事会的调节工作，为了平息这群学生心中的怒火，我又只能做出妥协，最终提出了一个将成绩
+进行伽马变换的方案，将最终的通过率提高到了 89.8%，在[这里](https://www.medien.ifi.lmu.de/lehre/ss20/cg1/stats/gamma_correction.txt)可以看到成绩变换的具体方案。
+
+从 11 月以来我又开始主导另一门更加深入的课程《几何处理》，要说之前的课还有教授负责讲座的部分，
+而这门课完完全全有我来主导，我一人统揽了上课、习题、指导等 99% 的工作：
+
+- https://changkun.de/s/gp-0-org
+- https://changkun.de/s/gp-1-intro
+- https://changkun.de/s/gp-2-ddg
+- https://changkun.de/s/gp-3-smooth
+- https://changkun.de/s/gp-4-param
+- https://github.com/mimuc/gp-ws2021
+
+![](gp.png)
+
+不过随着这门课的难度逐步深入，参加课程的人数也从最初的 50 多人，到现在的课程过半，只剩两人了。
+虽然只剩两名学生，但至少证明还是有愿意学习这个领域的学生的，希望他们能够坚持到课程的最后 :)
+
+### 当不再心怀感激
+
+从种种的斗争、质疑和负反馈中挣脱出来，这一年里我总是不断的问自己：
+
+- 为什么这里的每个人都非常不愿意做出改变？是我的问题还是他们的问题？
+- 为什么这里的学生这么的怨声载道？遇到一点点的困难就退缩？是我的做法有问题还是他们本身有问题？
+- ...
+
+这些经历我与身边的人分享过，我本以为能够听到一些观点，却从一些人的口中得到了这样的反问：
+你为什么要做这些事情？你做这些有人感激你吗？你能从中收获什么呢？那你还在刁难学生吗？...
+
+从这些人的口中，我似乎看到了我变成了曾经本科阶段那个被大部分人唾弃，以经常让学生挂科而闻名，
+但却是我自己非常欣赏的一位在教学上认真负责的老师，我在计算机领域的很多「启蒙」知识，
+都是受这位老师的指引。今年的这些经历，似乎让我仿佛成为了那个他。
+
+我做这些工作都是为了什么？是为了刁难学生吗？是为了让他们都挂科吗？为什么我的好心好意
+得不到这些人的认同？从我开始承担各种教职工作开始，开始不断的从人的口中听到「欧老师」这个称呼。
+这个称呼其实是暗示人生迈向下一个阶段的标志，如今的我已经彻底的从他人口中
+轻易获取正反馈的学生阶段中脱离开来，完成了角色的转变，自然也就不那么容易获得正向的反馈。
+
+我仍然记得曾经在《礼记》中有过学到过这样的一段：
+**为人师者，必先正其身，方能教书育人，此乃师德之本也。**
+对那些认为我在「刁难」学生的人，我只是在心里默默回应：道不同不相为谋。
+
+## 领域之外
+
+### To Go or Not to Go
+
+2019 年的时侯我的大部分在业余时间都用在撰写《[Go 语言原本](https://golang.design/under-the-hood)》，
+也是因为编写这本书的的原因，结实了国内 Go 语言圈内的许多大佬。
+
+《原本》这本书在今年二月份的时候其实已经基本完成一本书前半部分运行时部分的写作大纲。
+是的，大纲，实际的内容还需要非常多的重写和润色。
+毕竟最初（2018 年）写作的目的并不是给其他人看的，因为我希望深入了解的这些知识
+在当时的环境下并没有太多相关资料，所以我自己对研究源码的一个总结罢了，
+只不过随着关注的人数越来越多，而在成书的过程中因为希望让内容更加长久
+而有价值的保留下来时，逐渐演变成了一本希望介绍 Go 语言设计哲学和理念的书。
+
+就在我差不多开始着手准备手规划有关编译器部分的内容，并把它定为我的年度计划之一时，
+我偶然间发现了另一本无论从内容规划还是写作目的都出奇一致的同类作品
+《[Go 语言的设计与实现](https://draveness.me/golang)》，这个在我开始撰写《原本》
+之前是没有的。在扫读了大部分内容之后，我毅然决然的决定了停止维护《原本》，并且还写了一篇
+[博客文章](https://changkun.de/blog/posts/why-i-stopped-blogging/) 来表达当时的心情。
+现在事后看来，博客文章里面提到的一些想法还是有些过头了，因为我们可能只是单纯的在相同的时间点
+想要做相同的事情，而彼此没有发现对方罢了。
+
+所以《原本》最初的创作价值观其实与回形针在他们的[年度回顾视频](https://www.bilibili.com/video/BV1AV41187t9)中
+提到的价值观是存在一定共鸣的：「我们希望为中文互联网创造一些可以留下来的东西，一些在多年后仍然会有价值
+的内容，一些我们不做就不会有人做的东西，我们要做的就是填补空白」。
+既然有人愿意并希望把这件事情做的更好，那我也就认为《原本》也没有必要再进一步维护和更新了。
+
+现在回顾看来，这个决定是对的，我腾出了更多的时间专注在我的专业领域的精进、与业界伙伴的合作项目上（即加班）。
+这么久之后再重新点开《设计与实现》这本书时，内容上似乎也没有再做过多太多的更新，
+很多我停更《原本》前还没来来得及研究的内容，本来期待这位作者能够涵盖，却也都没有再进一步增加，虽然不知道是什么原因，
+但也是比较可惜的事情。
+
+停更《原本》的几个月之后，在[杨文](https://maiyang.me) 的撮合（大力赞助）下，注册了一个
+新的域名 [golang.design](https://golang.design)，并创建了一个新的项目
+[golang.design/history](https://changkun.de/s/go-history)，
+将我自己为了撰写《原本》而积累的与 Go 相关的资源进行了重新整理，并开放了出来，也算是对停更《原本》
+的一种延续。
+
+在 11 月的时候，重启了 2019 年年底就计划做，但坑了近一年的播客节目
+[talkgo.fm](https://changkun.de/s/talkgofm)，
+还在[第二期节目](https://changkun.de/s/talkgofm2)就非常幸运的邀请到了
+技术理念上同样有着很多共鸣的[蒙卓](https://mzh.io)（这期节目是我剪的，参见节目末尾的彩蛋 :）
+
+回顾这一年，除了年初的在 Go 夜读做过的分享：
+
+- https://changkun.de/s/timer114
+- https://changkun.de/s/go2generic
+- https://changkun.de/s/gobench
+
+与几个用 Go 写成的（小打小闹的）开源项目之外（虽然还有些工作上用 Go 写的、但没有开源的商业项目）：
+
+- https://changkun.de/s/midgard
+- https://changkun.de/s/redir
+- https://changkun.de/s/bench
+- https://changkun.de/s/ssaplayground
+- https://changkun.de/s/code2img
+- https://changkun.de/s/tli
+- https://changkun.de/s/upbot
+- https://changkun.de/s/rmtrash
+- https://changkun.de/s/lockfree
+- https://changkun.de/s/go2generics
+- ...
+
+似乎很难说服自己为什么要跟 Go 产生联系。
+毕竟计算机图形学，由于很多历史原因是 C/C++ 在统治（题外话：我本科时期写的一本有关
+[C++ 的书](https://changkun.de/modern-cpp) 已经突破 12k 的 star 了）。
+To Go or Not to Go? It's a tough question.
+我为什么要使用 Go？可能只是存粹被这门语言设计哲学所吸引吧。
+
+### 疫情
+
+疫情呢？似乎 2020 这一年里最重要的事情都没有提及？对我的生活产生了什么影响？
+确实，年初的时候我专程请假回国陪父母过年，本以为能够过个比较舒适的新年，却恰好那个时候
+疫情在国内爆发，年后我顶着疫情肆虐的风口顺利返回德国，有预感却没想到不到一个月时间
+疫情就开始在欧洲肆虐，直到现在都没有结束。
+
+要说疫情对我生活造成最多的影响，要数我这一年里原本计划的行程都取消了，
+原本五月份 CHI2020 夏威夷参会行程和造访硅谷的完美计划也惨遭取消，
+甚至机票钱至今仍有一部分没有追回；每年年末圣诞节的保留项目滑雪，
+也因为疫情的原因边境和雪场双双关闭无法出行，好在年初刚回到德国的时候有因为
+研究组举办的 Winter School 在上课之余还有滑雪的保留项目，某种意义上算是补全了一年一次活动：
+
+<div style="text-align: center">
+<video height="520" controls>
+<source src="snow.mp4" type="video/mp4">
+</video>
+</div>
+
+10 月上旬的时候在教授的大力要求下，原本因为疫情应该取消的 Internal Doctor Colloquium 如期举行，
+去到了心想念想的威尼斯，虽然是工作目的需要去做一个[演讲](https://changkun.de/s/polyred4us)，
+但也是这一年中唯一一次比较满意的旅程。
+
+![](venice.JPG)
+
+美中不足可能要数从威尼斯回来之后竟然病倒住院两周（不是新冠），也是非常特别的人生经历了。
+
+## 尾声
+
+记得是 7 月份的时候，我跟一位即将博士毕业准备回国实习一段时间朋友聊到博士之后想要要进业界
+还是进一步在学术圈里打拼，无论选择哪一方，在欧洲这个体系下都将是未来很难再选择另一方的抉择，
+所以讨论的核心围绕着 What's Next 进行。
+无独有偶，在今年去威尼斯的旅程跟教授、以及昨天的播客节目录制中的嘉宾又或多或少的
+聊到了这个话题。现在的我似乎逐渐形成了这样的看法：在职业生涯的初期其实需要很多的敲门砖（例如学历），
+同时需要经历很多的选拔（例如面试）来不断的证明自己的能力，但进入到职业发展的中后期，
+这条道路其实理应变得更加的顺畅，否则的话我更倾向于整个人在职业生涯发展的格局上的提升还不够高，
+甚至还只是原地踏步，因为人生本该就是将道路越走越宽越走越畅的过程。
+
+许多人追求工作上的稳定而勤勤恳恳的工作而不被淘汰，
+但换个角度来思考，究竟是费尽千辛万苦从众人中脱引而出，几年后又绞尽脑汁思考下一份工作应该去哪儿来得稳定；
+还是发展一个或多个稳定的关系，总是有那么一个人，在你希望更换工作时毫不犹豫的愿意以双方都乐意的条件
+雇佣或者资助你来得稳定呢？目前的我可能更倾向于后者。
+
+在 Acquired 播客的一期关于 Indie Hacker 的
+[节目](https://www.acquired.fm/episodes/special-acquired-x-indie-hackers) 中有一个非常触动我的观点：
+「Being an Indie Hacker is really about the idea that you can achieve your own freedom. Whatever that means to you. Maybe that's financial freedom, maybe that's creative freedom so you can work on whatever you want, maybe that's time freedom so you can work whatever hours and schedule you want. Being an Indie Hacker is really this confidence in yourself. You can create something that'll make your life better, make other people's lives better in the process, and give you that freedom. Maybe that looks like raising a ton of money in the future.」
+是啊，实现自我的自由，无论这个自由对自己意味着什么。这不就是当初我硕士毕业，没有选择业界 Offer
+而是选择读博士的原动力吗？
+
+2020 年无疑是「挫折」连连的一年，这些「挫折」似乎要比以往来的都要多。
+总结归根结底还是因为人生阶段完成了彻底的转变，也许这就是成年后的常态。
+希望这张摄于威尼斯准备启程返回慕尼黑略显疲态的瞬间，
+能够成为激励我在 2021 年进一步搜寻更能令我满意的答案的动力吧。
+
+![](venice-2.JPG)
+
+
+欧长坤
+
+2021 年 1 月 3 日
+于慕尼黑
+
+## 进一步阅读的参考
+
+- 往年年终总结 [https://changkun.de/blog/tags/总结/](https://changkun.de/blog/tags/总结/)
+
+## 致谢
+
+感谢这一年里身边真诚相伴的朋友们。
+{{% /zh %}}
