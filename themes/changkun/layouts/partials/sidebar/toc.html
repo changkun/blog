@@ -22,7 +22,7 @@
         {{ else }}
             {{ .TableOfContents }}
             <script>
-            (function() {
+            document.addEventListener('DOMContentLoaded', function() {
               var links = document.querySelectorAll('.post-toc-content a');
               for (var i = 0; i < links.length; i++) {
                 var href = links[i].getAttribute('href');
@@ -36,7 +36,7 @@
                   li.classList.add(langBlock.classList.contains('lang-en') ? 'lang-en' : 'lang-zh');
                 }
               }
-            })();
+            });
             </script>
         {{ end }}
         </div>
