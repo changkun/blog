@@ -223,18 +223,29 @@
   updatePlaceholders();
   new MutationObserver(updatePlaceholders).observe(document.documentElement, { attributes: true, attributeFilter: ['data-lang'] });
 
-  // Auth: check eagerly on load, cache result for instant click.
-  var authed = false;
-  if (typeof changkunLogin !== 'undefined') {
-    changkunLogin.check().then(function(res) { authed = res.ok; }).catch(function() {});
-  }
+  var REOPEN_KEY = 'compose-reopen';
 
   function isZh() {
     return document.documentElement.getAttribute('data-lang') === 'zh';
   }
 
+  // Auth: a valid token is known synchronously from localStorage. On load we
+  // also finish any pending login redirect (?code=...) and, if we came back
+  // from logging in to compose, reopen the window automatically.
+  var authed = false;
+  if (typeof latereAuth !== 'undefined') {
+    authed = latereAuth.hasValidToken();
+    latereAuth.handleCallback().then(function(ok) {
+      authed = ok;
+      if (ok && sessionStorage.getItem(REOPEN_KEY)) {
+        sessionStorage.removeItem(REOPEN_KEY);
+        openCompose();
+      }
+    });
+  }
+
   btn.addEventListener('click', function() {
-    if (typeof changkunLogin === 'undefined') {
+    if (typeof latereAuth === 'undefined') {
       showToast(isZh() ? '登录服务不可用' : 'Login service unavailable');
       return;
     }
@@ -242,22 +253,8 @@
       openCompose();
       return;
     }
-    btn.disabled = true;
-    btn.style.opacity = '0.4';
-    changkunLogin.check().then(function(res) {
-      btn.disabled = false;
-      btn.style.opacity = '';
-      if (!res.ok) {
-        changkunLogin.login(window.location.href);
-      } else {
-        authed = true;
-        openCompose();
-      }
-    }).catch(function() {
-      btn.disabled = false;
-      btn.style.opacity = '';
-      showToast(isZh() ? '登录服务不可用' : 'Login service unavailable');
-    });
+    sessionStorage.setItem(REOPEN_KEY, '1');
+    latereAuth.login(window.location.href);
   });
 
   function openCompose() {
@@ -299,10 +296,16 @@
     var zh = isZh();
     status.textContent = zh ? '发送中...' : 'Sending...';
 
-    var token = '';
-    try { token = changkunLogin.getToken(); } catch(e) {}
-
-    fetch('https://api.changkun.de/ideas/post', {
+    latereAuth.getToken().then(function(token) {
+      if (!token) {
+        authed = false;
+        sendBtn.disabled = false;
+        status.textContent = '';
+        sessionStorage.setItem(REOPEN_KEY, '1');
+        latereAuth.login(window.location.href);
+        return;
+      }
+      return fetch('https://api.changkun.de/ideas/post', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -317,7 +320,9 @@
         authed = false;
         sendBtn.disabled = false;
         status.textContent = '';
-        changkunLogin.login(window.location.href);
+        latereAuth.logout();
+        sessionStorage.setItem(REOPEN_KEY, '1');
+        latereAuth.login(window.location.href);
         return;
       }
       return resp.json().then(function(data) {
@@ -337,6 +342,7 @@
     }).catch(function() {
       status.textContent = zh ? '网络错误，请重试' : 'Network error, please retry';
       sendBtn.disabled = false;
+      });
     });
   }
 
