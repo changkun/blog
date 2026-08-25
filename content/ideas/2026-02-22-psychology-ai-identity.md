@@ -32,7 +32,7 @@ when you face a decision, your brain reactivates physiological states from past 
 
 the Iowa Gambling Task proved it: normal participants develop a "hunch" about dangerous card decks 10-15 trials before conscious awareness catches up. their skin conductance spikes before reaching for a bad deck. the body knows before the mind knows. patients with ventromedial prefrontal cortex damage understand the math perfectly when told. but keep choosing the bad decks anyway. their somatic markers are gone. without the emotional signal, raw reasoning isn't enough.
 
- Overskeid (2020) argues Damasio undersold his own theory: emotions may be the substrate upon which all voluntary action is built.
+ Overskeid (2020) argues Damasio undersold his own theory: emotions may be the foundation upon which all voluntary action is built.
 
 put the threads together. Conway: memory is organized around self-relevant goals. Damasio: emotion makes memories actionable. Rathbone: memories cluster around identity transitions. Bruner: narrative is the glue.
 

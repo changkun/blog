@@ -52,7 +52,7 @@ Key structural observation: **spec is the invariant that survives across rebuild
 
 **Theory direction**: The distance between the weak version of "structure selection with memory" and strict Friston free energy minimization deserves independent clarification. To retain the free energy minimization terminology, we must answer: who is the subject minimizing $F$? Where does the generative model $p(s, o)$ come from? How do we parameterize $q$ in discrete topology space? Without answers to these three questions, using the free energy minimization term invites scrutiny.
 
-**Narrative direction**: This architecture is isomorphic with spec-driven thinking in Wallfacer—spec is the persistent topology invariant, agent instances are ephemeral execution substrates. Whether this correspondence merits inclusion in product narrative or academic papers requires separate decision.
+**Narrative direction**: This architecture is isomorphic with spec-driven thinking in Wallfacer—spec is the persistent topology invariant, agent instances are ephemeral execution units. Whether this correspondence merits inclusion in product narrative or academic papers requires separate decision.
 
 **Unresolved questions**: The concrete standard for TTL setting (time? task count? token count? combinations?), the schema design for post-mortem records, and how to balance "weak priors from the learning layer" with "forced mutation" all lack definitive answers and require iteration during implementation.
 

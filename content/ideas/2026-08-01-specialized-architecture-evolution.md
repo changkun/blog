@@ -53,7 +53,7 @@ https://www.youtube.com/watch?v=ffdR5fZTC5E
 
 - **摩尔定律的历史其实是一部「特化史」而非「通用胜利史」。** 通用 CPU 的单核性能红利在 Dennard scaling 终结后停滞，产业被迫转向 GPU、TPU、NPU、DPU 等**异构计算（heterogeneous computing）**。Hennessy 与 Patterson 在图灵奖演讲中明确指出，未来属于领域特定架构（Domain-Specific Architectures），因为通用处理器已无法在能效上继续 scaling（[Hennessy & Patterson, "A New Golden Age for Computer Architecture"](https://cacm.acm.org/magazines/2019/2/234352-a-new-golden-age-for-computer-architecture/fulltext)）。这印证了笔记的核心观察：真正能规模化的技术都在朝特化推进。
 
-- **对 Bitter Lesson 的关键澄清与反驳。** 值得注意的是，Sutton 论证的「通用」指的是**通用的学习与搜索方法**（method），而非通用的**硬件或系统架构**（substrate）。笔记恰恰揭示了一个常被忽略的层次错位：即便算法层面追求通用学习，其**物理与工程实现却必须高度特化**才能 scale。换言之，通用性存在于「what to optimize」，特化性存在于「how to run it」——这两者并不矛盾，笔记所批判的「幻觉」正是把方法层的通用性错误外推到系统层。
+- **对 Bitter Lesson 的关键澄清与反驳。** 值得注意的是，Sutton 论证的「通用」指的是**通用的学习与搜索方法**（method），而非通用的**硬件或系统架构**。笔记恰恰揭示了一个常被忽略的层次错位：即便算法层面追求通用学习，其**物理与工程实现却必须高度特化**才能 scale。换言之，通用性存在于「what to optimize」，特化性存在于「how to run it」——这两者并不矛盾，笔记所批判的「幻觉」正是把方法层的通用性错误外推到系统层。
 
 - **Agent 工程栈的分层特化。** 笔记提出从早期的 Agent Harness 单一设计，演化到**全栈模型 + 推理引擎 + Agent Harness + Workload Scheduler** 的分层通用设计。这与当前基础设施的实际趋势吻合：推理引擎层出现 vLLM 的 PagedAttention 等针对 LLM 内存/吞吐特性的专门优化（[Kwon et al., "Efficient Memory Management for Large Language Model Serving with PagedAttention"](https://arxiv.org/abs/2309.06180)）；调度层则需要针对 Agent 工作负载（长尾、多轮、工具调用异构）做专门的 workload scheduling，而非套用传统微服务调度。每一层看似「通用」，其内部实现却各自高度特化。
 
