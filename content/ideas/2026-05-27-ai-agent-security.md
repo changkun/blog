@@ -57,7 +57,7 @@ What the original framing didn't account for: Saltzer and Schroeder themselves n
 
 Norman's argument (from *The Design of Everyday Things*) is that constraints and affordances shape whether users can even discover what a system can do. In a B2C context with non-technical users, a "Default Closed" configuration doesn't just restrict — it obscures. Users who can't get started never reach the point where they understand what they're giving up. The B2B context resolves this because a trained admin mediates onboarding; the B2C context has no such intermediary.
 
-Thaler and Sunstein's complementary point is precise: "people are most likely to need nudges for decisions that are difficult, complex, and infrequent, and when they have poor feedback and few opportunities for learning." Agent configuration is exactly this type of decision for most consumers — making the default load-bearing in a way it isn't for expert users.
+Thaler and Sunstein's complementary point is precise: "people are most likely to need nudges for decisions that are difficult, complex, and infrequent, and when they have poor feedback and few opportunities for learning." Agent configuration is exactly this type of decision for most consumers — making the default decisive in a way it is not for expert users.
 
 #### 3. Nudge Theory: Defaults Encode Ideology, Not Just Policy
 
