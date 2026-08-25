@@ -38,7 +38,7 @@ This note presents a counterintuitive argument against a YouTube interview, prop
 {{% /en %}}
 
 {{% zh %}}
-这个访谈很应景，里面有些认知很有感触。其中关于通用技术发展的讨论尤其值得关注。很多人愿意相信「Bitter Lesson」所说的通用技术最终会胜过非通用技术，但实际上，无论从摩尔定律的历史经验来看，还是从现在模型发展的角度来看，我们都会发现所谓的通用泛化技术本质上都只是一些错觉。真正能够规模化的技术都在朝着特化的方向推进。比如通用计算演化到如今的异构计算，比如 Agent Harness 的设计演化到全栈模型 + 推理引擎 + Agent Harness + Workload Scheduler 的通用设计。高层通用抽象有一定的作用，但没办法掌握底层细节的通用永远无法做出能够承重、对复杂性进行有效封装的设计。
+这个访谈很应景，里面有些认知很有感触。其中关于通用技术发展的讨论尤其值得关注。很多人愿意相信「Bitter Lesson」所说的通用技术最终会胜过非通用技术，但实际上，无论从摩尔定律的历史经验来看，还是从现在模型发展的角度来看，我们都会发现所谓的通用泛化技术本质上都只是一些错觉。真正能够规模化的技术都在朝着特化的方向推进。比如通用计算演化到如今的异构计算，比如 Agent Harness 的设计演化到全栈模型 + 推理引擎 + Agent Harness + Workload Scheduler 的通用设计。高层通用抽象有一定的作用，但没办法掌握底层细节的通用永远无法做出经得起压力、对复杂性进行有效封装的设计。
 
 https://www.youtube.com/watch?v=ffdR5fZTC5E
 
@@ -57,7 +57,7 @@ https://www.youtube.com/watch?v=ffdR5fZTC5E
 
 - **Agent 工程栈的分层特化。** 笔记提出从早期的 Agent Harness 单一设计，演化到**全栈模型 + 推理引擎 + Agent Harness + Workload Scheduler** 的分层通用设计。这与当前基础设施的实际趋势吻合：推理引擎层出现 vLLM 的 PagedAttention 等针对 LLM 内存/吞吐特性的专门优化（[Kwon et al., "Efficient Memory Management for Large Language Model Serving with PagedAttention"](https://arxiv.org/abs/2309.06180)）；调度层则需要针对 Agent 工作负载（长尾、多轮、工具调用异构）做专门的 workload scheduling，而非套用传统微服务调度。每一层看似「通用」，其内部实现却各自高度特化。
 
-- **「高层通用抽象有作用，但无法封装底层复杂性」——即抽象泄漏。** 这一论断与 Joel Spolsky 的**Law of Leaky Abstractions**（所有非平凡的抽象在某种程度上都会泄漏）高度呼应（[Spolsky, "The Law of Leaky Abstractions"](https://www.joelonsoftware.com/2002/11/11/the-law-of-leaky-abstractions/)）。笔记把这一软件工程原理推广到 AI 系统架构：一个能「承重」的复杂性封装，必须能感知并利用底层的特化细节（内存层级、算子融合、硬件拓扑），纯粹的高层通用接口做不到这一点。
+- **「高层通用抽象有作用，但无法封装底层复杂性」——即抽象泄漏。** 这一论断与 Joel Spolsky 的**Law of Leaky Abstractions**（所有非平凡的抽象在某种程度上都会泄漏）高度呼应（[Spolsky, "The Law of Leaky Abstractions"](https://www.joelonsoftware.com/2002/11/11/the-law-of-leaky-abstractions/)）。笔记把这一软件工程原理推广到 AI 系统架构：一个真正管用的复杂性封装，必须能感知并利用底层的特化细节（内存层级、算子融合、硬件拓扑），纯粹的高层通用接口做不到这一点。
 
 - **一个隐含的辩证张力。** 笔记描述的「全栈 + 推理引擎 + Harness + Scheduler 的通用设计」本身其实是一种**分层通用性（layered generality）**——通用性并未消失，而是退居为「组合特化模块的接口约定」。这暗示真正的答案可能不是「通用 vs 特化」的二元对立，而是**通用性作为编排层、特化性作为执行层**的共生结构，类似于 RISC 用简单通用指令集承载、由编译器/微架构做特化优化的思路。
 
