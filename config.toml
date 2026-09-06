@@ -8,6 +8,7 @@ MetaDataFormat =  "yaml"
 CanonifyUrls =  true
 BuildDrafts =  false
 enableGitInfo = true
+ignoreFiles = ["figs\\.py$", "/fonts/"]
 [pagination]
   pagerSize = 5
   path = "p"
