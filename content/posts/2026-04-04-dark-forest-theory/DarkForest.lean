@@ -687,6 +687,153 @@ theorem grim_delay (hpw : p < w) (hwg : w < g) (hlp : l ≤ p) (ι τ : ℝ) (h�
 
 end Repeated
 
+/-! ## Costly signals (Section 8.1)
+
+A civilization is hostile with probability `p`. It may send a signal that
+costs `cB` if it is benign and `cH` if it is hostile; a receiver that trusts
+it is worth `V` to either, and one that does not trust it strikes. -/
+
+/-- The threat a receiver believes after a signal, by Bayes' rule, when a
+hostile sender signals with probability `sH` and a benign one with
+probability `sB`. -/
+noncomputable def signalPosterior (p sB sH : ℝ) : ℝ := p * sH / (p * sH + (1 - p) * sB)
+
+/-- The threat a receiver believes after silence. -/
+noncomputable def silencePosterior (p sB sH : ℝ) : ℝ := signalPosterior p (1 - sB) (1 - sH)
+
+/-- If only benign civilizations signal, a signal proves goodwill. -/
+theorem separating_posterior (p : ℝ) : signalPosterior p 1 0 = 0 := by
+  simp [signalPosterior]
+
+/-- ... and silence proves hostility. -/
+theorem separating_silence (p : ℝ) (hp0 : 0 < p) : silencePosterior p 1 0 = 1 := by
+  simp [silencePosterior, signalPosterior, hp0.ne']
+
+/-- If both signal, the signal says nothing: the threat believed is the
+prior, as in Proposition 1. -/
+theorem pooling_posterior (p : ℝ) : signalPosterior p 1 1 = p := by
+  simp [signalPosterior]
+
+/-- The separating profile, in which benign civilizations signal, hostile ones
+do not, and receivers restrain exactly towards those who signal, is an
+equilibrium exactly when the signal costs a benign sender no more than trust
+is worth and a hostile sender at least as much. Receivers' replies are
+optimal for any threshold `t` in `[0, 1)`: the posteriors are 0 and 1. -/
+theorem separating_iff (p cB cH V t : ℝ) (hp0 : 0 < p) (ht0 : 0 ≤ t)
+    (ht1 : t < 1) :
+    ((signalPosterior p 1 0 ≤ t ∧ t < silencePosterior p 1 0) ∧
+      0 ≤ V - cB ∧ V - cH ≤ 0) ↔ cB ≤ V ∧ V ≤ cH := by
+  rw [separating_posterior p, separating_silence p hp0]
+  constructor
+  · rintro ⟨_, h1, h2⟩; constructor <;> linarith
+  · rintro ⟨h1, h2⟩; exact ⟨⟨ht0, ht1⟩, by linarith, by linarith⟩
+
+/-! ## Many civilizations (Section 8.5)
+
+With `n` civilizations, each of the others may strike a detected one, each may
+see a strike, and a target may have allies. -/
+
+/-- The risk once detected, when each of the other `n - 1` civilizations
+strikes and succeeds with probability `π q`, independently. -/
+def rhoN (π q : ℝ) (n : ℕ) : ℝ := 1 - (1 - π * q) ^ (n - 1)
+
+/-- More civilizations make detection more dangerous. -/
+theorem rhoN_mono (π q : ℝ) (h0 : 0 ≤ π * q) (h1 : π * q ≤ 1) : Monotone (rhoN π q) := by
+  intro n n' h
+  unfold rhoN
+  have := pow_le_pow_of_le_one (by linarith : (0 : ℝ) ≤ 1 - π * q) (by linarith) (by omega : n - 1 ≤ n' - 1)
+  linarith
+
+/-- ... so if hiding beats revealing among `n` civilizations, it does among
+more: silence is strengthened. -/
+theorem silence_strengthens (M B C dR dH ρ0 π q : ℝ) (hM : 0 ≤ M) (hd : dH < dR)
+    (h0 : 0 ≤ π * q) (h1 : π * q ≤ 1) (n n' : ℕ) (hn : n ≤ n')
+    (h : uReveal M B dR (rhoN π q n) ρ0 < uHide M C dH (rhoN π q n) ρ0) :
+    uReveal M B dR (rhoN π q n') ρ0 < uHide M C dH (rhoN π q n') ρ0 := by
+  rw [prop4_hide_iff] at h ⊢
+  have hr := rhoN_mono π q h0 h1 hn
+  have : (dR - dH) * (rhoN π q n - ρ0) * M ≤ (dR - dH) * (rhoN π q n' - ρ0) * M := by
+    apply mul_le_mul_of_nonneg_right _ hM
+    exact mul_le_mul_of_nonneg_left (by linarith) (by linarith)
+  linarith
+
+/-- The attacker's payoff when each of the `n - 2` third parties sees the
+strike with probability `e`, and a strike that is seen kills the attacker
+with probability `κ`. -/
+def uAttackSeen (M K q e κ : ℝ) (n : ℕ) : ℝ :=
+  uAttack M K q - (1 - (1 - e) ^ (n - 2)) * κ * M
+
+/-- More civilizations make a strike less attractive. -/
+theorem uAttackSeen_anti (M K q e κ : ℝ) (hM : 0 ≤ M) (he0 : 0 ≤ e) (he1 : e ≤ 1) (hκ : 0 ≤ κ) :
+    Antitone (uAttackSeen M K q e κ) := by
+  intro n n' h
+  unfold uAttackSeen
+  have := pow_le_pow_of_le_one (by linarith : (0 : ℝ) ≤ 1 - e) (by linarith) (by omega : n - 2 ≤ n' - 2)
+  have hκM : 0 ≤ κ * M := mul_nonneg hκ hM
+  nlinarith
+
+/-- The attacker's payoff when the target has `m` allies, each of which
+strikes back and kills with probability `qa`, independently of the target's
+own return strike. -/
+def uAttackAllied (M K q qa : ℝ) (m : ℕ) : ℝ :=
+  -((1 - (1 - (1 - q) * q) * (1 - qa) ^ m) * M) - K
+
+/-- More allies make a strike less attractive ... -/
+theorem uAttackAllied_anti (M K q qa : ℝ) (hM : 0 ≤ M) (hq0 : 0 ≤ q) (hq1 : q ≤ 1)
+    (hqa0 : 0 ≤ qa) (hqa1 : qa ≤ 1) : Antitone (uAttackAllied M K q qa) := by
+  intro m m' h
+  unfold uAttackAllied
+  have hpow := pow_le_pow_of_le_one (by linarith : (0 : ℝ) ≤ 1 - qa) (by linarith) h
+  have hc : 0 ≤ 1 - (1 - q) * q := by nlinarith
+  have := mul_le_mul_of_nonneg_left hpow hc
+  nlinarith
+
+/-- ... and with enough allies waiting beats striking whatever the other side
+does: a coalition deters. -/
+theorem coalition_deters (M K q qa : ℝ) (hM : 0 ≤ M) (hK : 0 < K) (hq0 : 0 ≤ q) (hq1 : q < 1)
+    (hqa0 : 0 < qa) (hqa1 : qa ≤ 1) :
+    ∃ m₀ : ℕ, ∀ m ≥ m₀, ∀ r ≤ 1, uAttackAllied M K q qa m < uWait M q r := by
+  have hc : 0 < 1 - (1 - q) * q := by nlinarith
+  have hlim : Tendsto (fun m : ℕ => (1 - qa) ^ m) atTop (𝓝 0) :=
+    tendsto_pow_atTop_nhds_zero_of_lt_one (by linarith) (by linarith)
+  have hgoal : (0 : ℝ) < (1 - q) / (1 - (1 - q) * q) := div_pos (by linarith) hc
+  obtain ⟨m₀, hm₀⟩ := (hlim.eventually (gt_mem_nhds hgoal)).exists_forall_of_atTop
+  refine ⟨m₀, fun m hm r hr => ?_⟩
+  have hsmall := hm₀ m hm
+  -- With this many allies the attacker dies with probability at least `q`.
+  have hdie : q ≤ 1 - (1 - (1 - q) * q) * (1 - qa) ^ m := by
+    have := (lt_div_iff₀ hc).mp hsmall
+    nlinarith
+  have h1 : q * M ≤ (1 - (1 - (1 - q) * q) * (1 - qa) ^ m) * M := mul_le_mul_of_nonneg_right hdie hM
+  have h2 : r * q * M ≤ q * M := by
+    have := mul_nonneg hq0 hM; nlinarith
+  unfold uAttackAllied uWait; linarith
+
+/-! ## Each condition is used
+
+Each of B1–B5, dropped alone, admits a case in which a conclusion of the Dark
+Forest fails: that is the sense in which the set is minimal. Whether the
+informal conditions are logically independent is not a question a formal
+model can answer. -/
+
+/-- Dropping B1 (an enforcer destroys violators with probability `φ ≥ q²`),
+B2 (goodwill verified, `r = 0`) or B5 (strikes never succeed): waiting beats
+striking. Dropping B3 (interaction frequent enough, `δ` above the threshold):
+restraint is sustained against grim trigger. Dropping B4 when no one is
+hostile now (`π = 0`): revealing beats hiding. -/
+theorem each_condition_used (M K q φ r : ℝ) (hM : 0 ≤ M) (hK : 0 < K) (hq0 : 0 ≤ q)
+    (hq1 : q ≤ 1) (hr : r ≤ 1) (hφ : q ^ 2 ≤ φ)
+    (w g l p δ : ℝ) (hδ0 : 0 ≤ δ) (hδ1 : δ < 1) (hpw : p < w) (hwg : w < g) (hlp : l ≤ p)
+    (hδ : (g - w) / (g - p) ≤ δ) (B C dR dH : ℝ) (hBC : 0 < B + C) :
+    uEnforced M K q φ < uWait M q r ∧
+    uAttack M K q < uWait M q 0 ∧
+    (∀ a, grimPay w g l p δ a ≤ w / (1 - δ)) ∧
+    uHide M C dH (pStrike 0 0 * q) 0 < uReveal M B dR (pStrike 0 0 * q) 0 ∧
+    uAttack M K 0 < uWait M 0 r :=
+  ⟨prop0_enforced M K q φ r hM hq0 hK hφ hr, prop0_verified M K q hM hq0 hq1 hK,
+    (grim_sustains w g l p δ hδ0 hδ1 hpw hwg hlp).mpr hδ,
+    prop0_verified_reveal M B C dR dH q hBC, prop0_no_preemption_when_strikes_fail M K r hK⟩
+
 /-! ## Equilibrium selection in a global game (Proposition 3)
 
 The strike success `q` is not known exactly: each civilization sees a noisy
@@ -908,6 +1055,44 @@ theorem global_game (V₁ V₂ : View sig η δ) (hπ1 : π < 1) (hη : 0 ≤ η
 
 end GlobalGame
 
+
+section Existence
+variable {sig : Set ℝ} {η δ : ℝ} (π : ℝ)
+
+/-- A side's best reply to the other's strategy: strike exactly where striking
+gains. -/
+def bestReply (V : View sig η δ) (s : ℝ → Prop) : ℝ → Prop := fun x => 0 < gainV π V s x
+
+/-- The more the other side strikes, the more striking gains, so best replies
+grow with the other's strategy. -/
+lemma bestReply_mono (V : View sig η δ) (hπ1 : π ≤ 1) : Monotone (bestReply π V) := by
+  intro s s' h x hx
+  have hb := V.bel_mono s s' x (fun y _ hy => h y hy)
+  have := mul_le_mul_of_nonneg_left hb (by linarith : (0 : ℝ) ≤ 1 - π)
+  unfold bestReply gainV at *
+  linarith
+
+/-- Every pair of views has an equilibrium: best replies are monotone on the
+complete lattice of strategy pairs, so by Knaster and Tarski the best-reply
+map has a fixed point, and a fixed point is an equilibrium. This covers the
+flat, uniform and smooth priors, whatever the beliefs near the prior's
+edges. -/
+theorem equilibrium_exists (V₁ V₂ : View sig η δ) (hπ1 : π ≤ 1) :
+    ∃ s₁ s₂, IsEqPair π V₁ V₂ s₁ s₂ := by
+  let F : (ℝ → Prop) × (ℝ → Prop) →o (ℝ → Prop) × (ℝ → Prop) :=
+    { toFun := fun s => (bestReply π V₁ s.2, bestReply π V₂ s.1)
+      monotone' := fun s t h => ⟨bestReply_mono π V₁ hπ1 h.2, bestReply_mono π V₂ hπ1 h.1⟩ }
+  have hfix := F.map_lfp
+  have h₁ : bestReply π V₁ (OrderHom.lfp F).2 = (OrderHom.lfp F).1 := congrArg Prod.fst hfix
+  have h₂ : bestReply π V₂ (OrderHom.lfp F).1 = (OrderHom.lfp F).2 := congrArg Prod.snd hfix
+  refine ⟨(OrderHom.lfp F).1, (OrderHom.lfp F).2, fun x _ => ⟨fun hs => ?_, fun hs => ?_⟩,
+    fun x _ => ⟨fun hs => ?_, fun hs => ?_⟩⟩
+  · rw [← h₁] at hs; exact le_of_lt hs
+  · rw [← h₁] at hs; exact not_lt.mp hs
+  · rw [← h₂] at hs; exact le_of_lt hs
+  · rw [← h₂] at hs; exact not_lt.mp hs
+
+end Existence
 /-- Noise with a flat prior, exact at every signal. `bel s x` is the
 probability that the other side strikes, given one's own signal `x`, when the
 other side plays strategy `s`; `G` is that probability against a threshold
@@ -2341,5 +2526,1226 @@ theorem kmr_selects_restraint (π t : ℝ) (hπ1 : π < 1) (hrd : (1 + π) / 2 <
   obtain ⟨hα, hβ⟩ := kmr_pos N (kmrK π t N) hkN ε hε0 hε1
   rw [kmr_stationary N _ ε μ hμ (by linarith)]
   exact hε
+
+
+/-! ## Equilibrium selection in two-by-two coordination games
+
+The game above is one case of a wider class. Each side chooses to act (strike)
+or not; acting gains `g x + c β` over not acting, where `x` is the side's
+signal, `β` the probability that the other side acts, and `c > 0`. The state
+shifts a side's gain by the same amount whatever the other does, so `g x` is
+the part of the gain the signal predicts: under a flat prior and payoffs
+affine in the state, it is the payoff term at the state itself. `g` is
+continuous and increasing, and far enough out each action is dominant. In the
+game above, `g x = x + π - 1` and `c = 1 - π`. -/
+
+/-- A continuous function that is at most 0 on a set is at most 0 at its
+supremum. -/
+lemma cvd_sup_limit (W : Set ℝ) (hne : W.Nonempty) (hb : BddAbove W) (f : ℝ → ℝ)
+    (hf : ContinuousAt f (sSup W)) (h : ∀ w ∈ W, f w ≤ 0) : f (sSup W) ≤ 0 := by
+  have hmem := mem_closure_image hf (csSup_mem_closure hne hb)
+  have hsub : f '' W ⊆ Set.Iic 0 := by rintro _ ⟨w, hw, rfl⟩; exact h w hw
+  exact isClosed_Iic.closure_subset_iff.mpr hsub hmem
+
+/-- ... and a continuous function that is at least 0 on a set is at least 0
+at its infimum. -/
+lemma cvd_inf_limit (T : Set ℝ) (hne : T.Nonempty) (hb : BddBelow T) (f : ℝ → ℝ)
+    (hf : ContinuousAt f (sInf T)) (h : ∀ z ∈ T, 0 ≤ f z) : 0 ≤ f (sInf T) := by
+  have hmem := mem_closure_image hf (csInf_mem_closure hne hb)
+  have hsub : f '' T ⊆ Set.Ici 0 := by rintro _ ⟨z, hz, rfl⟩; exact h z hz
+  exact isClosed_Ici.closure_subset_iff.mpr hsub hmem
+
+/-- Dominance for one side: at signals where acting loses even against a sure
+act it waits, and where acting gains even against a sure wait it acts. -/
+lemma cvd_dominance (N : Noise) (g : ℝ → ℝ) (hgm : Monotone g) (c : ℝ) (hc : 0 < c)
+    (xlo xhi : ℝ) (hlo : g xlo + c < 0) (hhi : 0 < g xhi) (si sj : ℝ → Prop)
+    (h : ∀ x, (si x → 0 ≤ g x + c * N.bel sj x) ∧ (¬ si x → g x + c * N.bel sj x ≤ 0)) :
+    (∀ x, x ≤ xlo → ¬ si x) ∧ (∀ x, xhi ≤ x → si x) := by
+  constructor
+  · intro x hx hs
+    have h1 := (h x).1 hs
+    have h2 : c * N.bel sj x ≤ c := by nlinarith [N.bel_le_one sj x]
+    linarith [hgm hx]
+  · intro x hx
+    by_contra hs
+    have h1 := (h x).2 hs
+    have h2 : 0 ≤ c * N.bel sj x := mul_nonneg hc.le (N.bel_nonneg sj x)
+    linarith [hgm hx]
+
+/-- The top of one side's waiting set, `X`, when the other side acts at every
+signal above `Xj`: the gain there, against the belief `G (X - Xj)`, is at
+most 0. -/
+lemma cvd_top (N : Noise) (g : ℝ → ℝ) (c : ℝ) (hc : 0 ≤ c) (si sj : ℝ → Prop)
+    (hbr : ∀ x, ¬ si x → g x + c * N.bel sj x ≤ 0) (hne : ∃ x, ¬ si x)
+    (hbdd : BddAbove {x | ¬ si x}) (Xj : ℝ) (hup : ∀ y, Xj < y → sj y)
+    (hcont : ContinuousAt (fun x => g x + c * N.G (x - Xj)) (sSup {x | ¬ si x})) :
+    g (sSup {x | ¬ si x}) + c * N.G (sSup {x | ¬ si x} - Xj) ≤ 0 := by
+  apply cvd_sup_limit {x | ¬ si x} hne hbdd _ hcont
+  intro w hw
+  have hb : N.G (w - Xj) ≤ N.bel sj w := N.bel_gt Xj w ▸ N.bel_mono _ _ w hup
+  have := hbr w hw
+  nlinarith
+
+/-- The bottom of one side's acting set, `Y`, when the other side acts only at
+signals from `Yj` on: the gain there, against the belief `G (Y - Yj)`, is at
+least 0. -/
+lemma cvd_bottom (N : Noise) (g : ℝ → ℝ) (c : ℝ) (hc : 0 ≤ c) (si sj : ℝ → Prop)
+    (hbr : ∀ x, si x → 0 ≤ g x + c * N.bel sj x) (hne : ∃ x, si x)
+    (hbdd : BddBelow {x | si x}) (Yj : ℝ) (hdown : ∀ y, sj y → Yj ≤ y)
+    (hcont : ContinuousAt (fun x => g x + c * N.G (x - Yj)) (sInf {x | si x})) :
+    0 ≤ g (sInf {x | si x}) + c * N.G (sInf {x | si x} - Yj) := by
+  apply cvd_inf_limit {x | si x} hne hbdd _ hcont
+  intro z hz
+  have hb : N.bel sj z ≤ N.G (z - Yj) := N.bel_ge Yj z ▸ N.bel_mono _ _ z hdown
+  have := hbr z hz
+  nlinarith
+
+/-- Equilibrium selection for symmetric payoffs: with the same `g` and `c` for
+both sides, and exact beliefs from any noises, the two possibly different,
+every equilibrium pair acts at signals above the root `m` of `g m + c/2 = 0`
+and waits below it. -/
+theorem cvd_symmetric (N₁ N₂ : Noise) (g : ℝ → ℝ) (c : ℝ) (hg : Continuous g)
+    (hgm : StrictMono g) (hc : 0 < c) (xlo xhi : ℝ) (hlo : g xlo + c < 0) (hhi : 0 < g xhi)
+    (m : ℝ) (hm : g m + c / 2 = 0) (s₁ s₂ : ℝ → Prop)
+    (h₁ : ∀ x, (s₁ x → 0 ≤ g x + c * N₁.bel s₂ x) ∧ (¬ s₁ x → g x + c * N₁.bel s₂ x ≤ 0))
+    (h₂ : ∀ x, (s₂ x → 0 ≤ g x + c * N₂.bel s₁ x) ∧ (¬ s₂ x → g x + c * N₂.bel s₁ x ≤ 0)) :
+    (∀ x, m < x → s₁ x ∧ s₂ x) ∧ (∀ x, x < m → ¬ s₁ x ∧ ¬ s₂ x) := by
+  obtain ⟨lo₁, hi₁⟩ := cvd_dominance N₁ g hgm.monotone c hc xlo xhi hlo hhi s₁ s₂ h₁
+  obtain ⟨lo₂, hi₂⟩ := cvd_dominance N₂ g hgm.monotone c hc xlo xhi hlo hhi s₂ s₁ h₂
+  -- The waiting and acting sets are nonempty and bounded.
+  have w1ne : ∃ x, ¬ s₁ x := ⟨xlo, lo₁ xlo le_rfl⟩
+  have w2ne : ∃ x, ¬ s₂ x := ⟨xlo, lo₂ xlo le_rfl⟩
+  have t1ne : ∃ x, s₁ x := ⟨xhi, hi₁ xhi le_rfl⟩
+  have t2ne : ∃ x, s₂ x := ⟨xhi, hi₂ xhi le_rfl⟩
+  have w1b : BddAbove {x | ¬ s₁ x} := ⟨xhi, fun x hx => by
+    by_contra hc'; exact hx (hi₁ x (not_le.mp hc').le)⟩
+  have w2b : BddAbove {x | ¬ s₂ x} := ⟨xhi, fun x hx => by
+    by_contra hc'; exact hx (hi₂ x (not_le.mp hc').le)⟩
+  have t1b : BddBelow {x | s₁ x} := ⟨xlo, fun x hx => by
+    by_contra hc'; exact lo₁ x (not_le.mp hc').le hx⟩
+  have t2b : BddBelow {x | s₂ x} := ⟨xlo, fun x hx => by
+    by_contra hc'; exact lo₂ x (not_le.mp hc').le hx⟩
+  have strikesAbove : ∀ (s : ℝ → Prop), BddAbove {x | ¬ s x} →
+      ∀ X, sSup {x | ¬ s x} ≤ X → ∀ y, X < y → s y := fun s hb X hX y hy => by
+    by_contra hc'; exact absurd (le_csSup hb hc') (not_le.mpr (lt_of_le_of_lt hX hy))
+  have waitsBelow : ∀ (s : ℝ → Prop), BddBelow {x | s x} →
+      ∀ X, X ≤ sInf {x | s x} → ∀ y, s y → X ≤ y := fun s hb X hX y hy =>
+    le_trans hX (csInf_le hb hy)
+  -- Continuity of the limiting gain at a point, against a belief at the threshold.
+  have hcont : ∀ (N : Noise) (X : ℝ), ContinuousAt (fun x => g x + c * N.G (x - X)) X :=
+    fun N X => hg.continuousAt.add (continuousAt_const.mul
+      (N.G_cont.comp_of_eq (continuousAt_id.sub continuousAt_const) (by simp)))
+  -- The side whose waiting set ends last faces a belief of one half there.
+  have top : ∀ (N : Noise) (si sj : ℝ → Prop),
+      (∀ x, ¬ si x → g x + c * N.bel sj x ≤ 0) → (∃ x, ¬ si x) → BddAbove {x | ¬ si x} →
+      (∀ y, sSup {x | ¬ si x} < y → sj y) → sSup {x | ¬ si x} ≤ m := by
+    intro N si sj hbr hne hb hup
+    have := cvd_top N g c hc.le si sj hbr hne hb _ hup (hcont N _)
+    rw [sub_self, N.G_zero] at this
+    by_contra hlt
+    have := hgm (not_le.mp hlt); linarith
+  have bot : ∀ (N : Noise) (si sj : ℝ → Prop),
+      (∀ x, si x → 0 ≤ g x + c * N.bel sj x) → (∃ x, si x) → BddBelow {x | si x} →
+      (∀ y, sj y → sInf {x | si x} ≤ y) → m ≤ sInf {x | si x} := by
+    intro N si sj hbr hne hb hdown
+    have := cvd_bottom N g c hc.le si sj hbr hne hb _ hdown (hcont N _)
+    rw [sub_self, N.G_zero] at this
+    by_contra hlt
+    have := hgm (not_le.mp hlt); linarith
+  have hX : max (sSup {x | ¬ s₁ x}) (sSup {x | ¬ s₂ x}) ≤ m := by
+    rcases le_total (sSup {x | ¬ s₂ x}) (sSup {x | ¬ s₁ x}) with hle | hle
+    · rw [max_eq_left hle]
+      exact top N₁ s₁ s₂ (fun x => (h₁ x).2) w1ne w1b (strikesAbove s₂ w2b _ hle)
+    · rw [max_eq_right hle]
+      exact top N₂ s₂ s₁ (fun x => (h₂ x).2) w2ne w2b (strikesAbove s₁ w1b _ hle)
+  have hY : m ≤ min (sInf {x | s₁ x}) (sInf {x | s₂ x}) := by
+    rcases le_total (sInf {x | s₁ x}) (sInf {x | s₂ x}) with hle | hle
+    · rw [min_eq_left hle]
+      exact bot N₁ s₁ s₂ (fun x => (h₁ x).1) t1ne t1b (waitsBelow s₂ t2b _ hle)
+    · rw [min_eq_right hle]
+      exact bot N₂ s₂ s₁ (fun x => (h₂ x).1) t2ne t2b (waitsBelow s₁ t1b _ hle)
+  refine ⟨fun x hx => ⟨?_, ?_⟩, fun x hx => ⟨fun hs => ?_, fun hs => ?_⟩⟩
+  · exact strikesAbove s₁ w1b m ((le_max_left _ _).trans hX) x hx
+  · exact strikesAbove s₂ w2b m ((le_max_right _ _).trans hX) x hx
+  · exact absurd (csInf_le t1b hs) (not_le.mpr (lt_of_lt_of_le hx ((hY).trans (min_le_left _ _))))
+  · exact absurd (csInf_le t2b hs) (not_le.mpr (lt_of_lt_of_le hx ((hY).trans (min_le_right _ _))))
+
+/-- The threshold strategy at `m` is itself an equilibrium, for any noise. -/
+theorem cvd_threshold_is_equilibrium (N : Noise) (g : ℝ → ℝ) (c : ℝ) (hgm : StrictMono g)
+    (hc : 0 < c) (m : ℝ) (hm : g m + c / 2 = 0) (x : ℝ) :
+    (m < x → 0 ≤ g x + c * N.bel (fun y => m < y) x) ∧
+      (¬ m < x → g x + c * N.bel (fun y => m < y) x ≤ 0) := by
+  rw [N.bel_gt]
+  constructor
+  · intro hx
+    have hG : 1 / 2 ≤ N.G (x - m) := N.G_zero ▸ N.G_mono (by linarith)
+    have := hgm hx
+    nlinarith
+  · intro hx
+    have hx : x ≤ m := not_lt.mp hx
+    have hG : N.G (x - m) ≤ 1 / 2 := N.G_zero ▸ N.G_mono (by linarith)
+    have := hgm.monotone hx
+    nlinarith
+
+/-- The root exists and is unique. -/
+theorem cvd_root (g : ℝ → ℝ) (c : ℝ) (hg : Continuous g) (hgm : StrictMono g) (hc : 0 < c)
+    (xlo xhi : ℝ) (hlo : g xlo + c < 0) (hhi : 0 < g xhi) : ∃! m, g m + c / 2 = 0 := by
+  have hle : xlo ≤ xhi := by
+    by_contra h; have := hgm (not_le.mp h); linarith
+  obtain ⟨m, _, hm⟩ := intermediate_value_Icc hle (hg.add continuous_const).continuousOn
+    (show (0 : ℝ) ∈ Set.Icc (g xlo + c / 2) (g xhi + c / 2) from ⟨by linarith, by linarith⟩)
+  have hm2 : g m + c / 2 = 0 := hm
+  refine ⟨m, hm2, fun m' hm' => ?_⟩
+  have hm3 : g m' + c / 2 = 0 := hm'
+  exact hgm.injective (by linarith)
+
+/-- The root is the boundary of risk dominance: in the game at state `θ`,
+acting is the better reply to an even chance of either exactly when `θ > m`. -/
+theorem cvd_risk_dominant (g : ℝ → ℝ) (c : ℝ) (hgm : StrictMono g) (m : ℝ)
+    (hm : g m + c / 2 = 0) (θ : ℝ) : 0 < g θ + c * (1 / 2) ↔ m < θ := by
+  constructor
+  · intro h; by_contra hle; have := hgm.monotone (not_lt.mp hle); linarith
+  · intro h; have := hgm h; linarith
+
+/-- The dark forest game is the case `g x = x + π - 1`, `c = 1 - π`, whose
+root is the threshold of `global_game`. -/
+theorem cvd_dark_forest (π : ℝ) : (kStar π + π - 1) + (1 - π) / 2 = 0 := by
+  unfold kStar; ring
+
+/-! Asymmetric payoffs: side `i` gains `g i x + c i β`. Both sides' signals
+carry independent noise from one law, and beliefs are the flat prior's. -/
+
+section Asymmetric
+open MeasureTheory ProbabilityTheory
+variable (ν : Measure ℝ) [IsProbabilityMeasure ν]
+
+/-- The flat belief moves continuously at every point, because the noises
+have no atoms. -/
+lemma cvd_flatG_continuous (hatom : ∀ c, ν {c} = 0) (t : ℝ) : ContinuousAt (flatG ν) t := by
+  have hm : Measurable (fun e : ℝ × ℝ => e.1 - e.2) := measurable_fst.sub measurable_snd
+  set ρ := (ν.prod ν).map (fun e : ℝ × ℝ => e.1 - e.2)
+  rw [show flatG ν = cdf ρ from funext (flatG_eq_cdf ν hatom)]
+  have h0 : ρ {t} = 0 := by
+    rw [Measure.map_apply hm (measurableSet_singleton t)]; exact diff_null ν hatom t
+  have hsing := (cdf ρ).measure_singleton t
+  rw [measure_cdf, h0] at hsing
+  have hle : Function.leftLim (cdf ρ) t ≤ cdf ρ t := (cdf ρ).mono.leftLim_le le_rfl
+  have hge : cdf ρ t ≤ Function.leftLim (cdf ρ) t := by
+    have := ENNReal.ofReal_eq_zero.mp hsing.symm; linarith
+  rw [(cdf ρ).mono.continuousAt_iff_leftLim_eq_rightLim, (cdf ρ).rightLim_eq]
+  exact le_antisymm hle hge
+
+/-- The flat belief is symmetric: the chance that the other's signal lies
+above one's own by more than `t` is the chance that it lies below by more than
+`t`, because the two noises are exchangeable and almost never tie. -/
+lemma cvd_flatG_symm (hatom : ∀ c, ν {c} = 0) (t : ℝ) : flatG ν t + flatG ν (-t) = 1 := by
+  have hm : Measurable (fun e : ℝ × ℝ => e.1 - e.2) := measurable_fst.sub measurable_snd
+  have hA : MeasurableSet {e : ℝ × ℝ | e.1 - e.2 < t} := measurableSet_lt hm measurable_const
+  have hC : MeasurableSet {e : ℝ × ℝ | e.1 - e.2 = t} := measurableSet_eq_fun hm measurable_const
+  -- Swapping the noises turns `D < -t` into `t < D`.
+  have hswap : (ν.prod ν) {e : ℝ × ℝ | e.1 - e.2 < -t} = (ν.prod ν) {e | t < e.1 - e.2} := by
+    conv_lhs => rw [← Measure.prod_swap]
+    rw [Measure.map_apply measurable_swap (measurableSet_lt hm measurable_const)]
+    congr 1; ext e; simp only [Set.mem_preimage, Prod.fst_swap, Prod.snd_swap, Set.mem_ofPred_eq]
+    constructor <;> intro <;> linarith
+  -- Everything not below `t` is above it, up to a null tie.
+  have hcompl : (ν.prod ν) {e : ℝ × ℝ | e.1 - e.2 < t}ᶜ = (ν.prod ν) {e | t < e.1 - e.2} := by
+    have hsplit : {e : ℝ × ℝ | e.1 - e.2 < t}ᶜ = {e | t < e.1 - e.2} ∪ {e | e.1 - e.2 = t} := by
+      ext e; simp only [Set.mem_compl_iff, Set.mem_ofPred_eq, Set.mem_union, not_lt]
+      constructor
+      · intro h; rcases h.lt_or_eq with h | h
+        · exact Or.inl h
+        · exact Or.inr h.symm
+      · rintro (h | h)
+        · exact h.le
+        · exact h.symm.le
+    have hdisj : Disjoint {e : ℝ × ℝ | t < e.1 - e.2} {e | e.1 - e.2 = t} :=
+      Set.disjoint_left.mpr fun e (h1 : t < e.1 - e.2) (h2 : e.1 - e.2 = t) => (ne_of_gt h1) h2
+    rw [hsplit, measure_union hdisj hC, diff_null ν hatom t, add_zero]
+  have htot := measure_add_measure_compl (μ := ν.prod ν) hA
+  rw [measure_univ, hcompl] at htot
+  unfold flatG
+  rw [measureReal_def, measureReal_def, hswap, ← ENNReal.toReal_add (measure_ne_top _ _)
+    (measure_ne_top _ _), htot, ENNReal.toReal_one]
+
+/-- With noise within `σ`, the two signals differ by at most `2σ`, so the
+flat belief is 1 beyond `2σ` and 0 below `-2σ`. -/
+lemma cvd_flatG_step (σ : ℝ) (hsupp : ∀ᵐ e ∂ν, |e| ≤ σ) :
+    (∀ t, 2 * σ < t → flatG ν t = 1) ∧ (∀ t, t < -(2 * σ) → flatG ν t = 0) := by
+  have hm : Measurable (fun e : ℝ × ℝ => e.1 - e.2) := measurable_fst.sub measurable_snd
+  have h1 : ∀ᵐ e ∂(ν.prod ν), |e.1| ≤ σ := Measure.quasiMeasurePreserving_fst.ae hsupp
+  have h2 : ∀ᵐ e ∂(ν.prod ν), |e.2| ≤ σ := Measure.quasiMeasurePreserving_snd.ae hsupp
+  have hD : ∀ᵐ e ∂(ν.prod ν), |e.1 - e.2| ≤ 2 * σ := by
+    filter_upwards [h1, h2] with e he1 he2
+    have := abs_le.mp he1; have := abs_le.mp he2
+    rw [abs_le]; constructor <;> linarith
+  constructor
+  · intro t ht
+    have hA : MeasurableSet {e : ℝ × ℝ | e.1 - e.2 < t} := measurableSet_lt hm measurable_const
+    have hnull : (ν.prod ν) {e : ℝ × ℝ | e.1 - e.2 < t}ᶜ = 0 := by
+      rw [measure_eq_zero_iff_ae_notMem]
+      filter_upwards [hD] with e he hmem
+      exact hmem (by simp only [Set.mem_ofPred_eq]; linarith [(abs_le.mp he).2])
+    unfold flatG
+    rw [measureReal_def, (prob_compl_eq_zero_iff hA).mp hnull, ENNReal.toReal_one]
+  · intro t ht
+    have hnull : (ν.prod ν) {e : ℝ × ℝ | e.1 - e.2 < t} = 0 := by
+      rw [measure_eq_zero_iff_ae_notMem]
+      filter_upwards [hD] with e he hmem
+      have : e.1 - e.2 < t := hmem
+      linarith [(abs_le.mp he).1]
+    unfold flatG
+    rw [measureReal_def, hnull, ENNReal.toReal_zero]
+
+end Asymmetric
+
+/-- The top of the two waiting sets, for asymmetric payoffs: if each side's
+belief at the other's threshold is its indifference point or below, neither
+waiting set reaches `θ + 2σ`. `p i x = -g i x / c i` is the belief at which
+side `i` is indifferent. -/
+lemma cvd_pair_top (p₁ p₂ G : ℝ → ℝ) (σ : ℝ) (hσ : 0 < σ) (hp₁ : StrictAnti p₁)
+    (hp₂ : Antitone p₂) (hG1 : ∀ t, 2 * σ < t → G t = 1) (hsym : ∀ t, G t + G (-t) = 1)
+    (θ : ℝ) (hθ : p₁ θ + p₂ θ = 1) (hθ1 : p₁ θ < 1) (X₁ X₂ : ℝ)
+    (hA : G (X₁ - X₂) ≤ p₁ X₁) (hB : G (X₂ - X₁) ≤ p₂ X₂) : X₁ < θ + 2 * σ := by
+  by_contra hge
+  have hge := not_lt.mp hge
+  have hX₁ : θ < X₁ := by linarith
+  have h1 := hp₁ hX₁
+  rcases lt_or_ge (2 * σ) (X₁ - X₂) with hd | hd
+  · -- Far apart: side 1 waits even though sure the other acts, so it is below `θ`.
+    rw [hG1 _ hd] at hA; linarith
+  · -- Close: both sit above `θ`, where the indifference beliefs sum to less than 1.
+    have h2 := hp₂ (show θ ≤ X₂ by linarith)
+    have := hsym (X₁ - X₂); rw [neg_sub] at this
+    linarith
+
+/-- The bottom of the two acting sets, the mirror image: neither reaches down
+to `θ - 2σ`. -/
+lemma cvd_pair_bottom (p₁ p₂ G : ℝ → ℝ) (σ : ℝ) (hσ : 0 < σ) (hp₁ : StrictAnti p₁)
+    (hp₂ : Antitone p₂) (hG0 : ∀ t, t < -(2 * σ) → G t = 0) (hsym : ∀ t, G t + G (-t) = 1)
+    (θ : ℝ) (hθ : p₁ θ + p₂ θ = 1) (hθ0 : 0 < p₁ θ) (Y₁ Y₂ : ℝ)
+    (hC : p₁ Y₁ ≤ G (Y₁ - Y₂)) (hD : p₂ Y₂ ≤ G (Y₂ - Y₁)) : θ - 2 * σ < Y₁ := by
+  by_contra hle
+  have hle := not_lt.mp hle
+  have hY₁ : Y₁ < θ := by linarith
+  have h1 := hp₁ hY₁
+  rcases lt_or_ge (Y₁ - Y₂) (-(2 * σ)) with hd | hd
+  · rw [hG0 _ hd] at hC; linarith
+  · have h2 := hp₂ (show Y₂ ≤ θ by linarith)
+    have := hsym (Y₁ - Y₂); rw [neg_sub] at this
+    linarith
+
+/-- Equilibrium selection for asymmetric payoffs, at a given noise level:
+side `i` gains `g i x + c i β`, and beliefs come from a noise whose `G` is
+continuous, symmetric, and a step outside `[-2σ, 2σ]`. Let `θ` be where the
+indifference beliefs `p i = -g i / c i` sum to 1, with neither action dominant
+there. Then in every equilibrium pair both sides act at signals from `θ + 2σ`
+on and wait at signals up to `θ - 2σ`. -/
+theorem cvd_asymmetric (N : Noise) (σ : ℝ) (hσ : 0 < σ) (hGc : Continuous N.G)
+    (hsym : ∀ t, N.G t + N.G (-t) = 1) (hG1 : ∀ t, 2 * σ < t → N.G t = 1)
+    (hG0 : ∀ t, t < -(2 * σ) → N.G t = 0)
+    (g₁ g₂ : ℝ → ℝ) (c₁ c₂ : ℝ) (hg₁ : Continuous g₁) (hg₂ : Continuous g₂)
+    (hgm₁ : StrictMono g₁) (hgm₂ : StrictMono g₂) (hc₁ : 0 < c₁) (hc₂ : 0 < c₂)
+    (xlo xhi : ℝ) (hlo₁ : g₁ xlo + c₁ < 0) (hlo₂ : g₂ xlo + c₂ < 0)
+    (hhi₁ : 0 < g₁ xhi) (hhi₂ : 0 < g₂ xhi)
+    (θ : ℝ) (hθ : -g₁ θ / c₁ + -g₂ θ / c₂ = 1) (hθ0 : 0 < -g₁ θ / c₁) (hθ1 : -g₁ θ / c₁ < 1)
+    (s₁ s₂ : ℝ → Prop)
+    (h₁ : ∀ x, (s₁ x → 0 ≤ g₁ x + c₁ * N.bel s₂ x) ∧ (¬ s₁ x → g₁ x + c₁ * N.bel s₂ x ≤ 0))
+    (h₂ : ∀ x, (s₂ x → 0 ≤ g₂ x + c₂ * N.bel s₁ x) ∧ (¬ s₂ x → g₂ x + c₂ * N.bel s₁ x ≤ 0)) :
+    (∀ x, θ + 2 * σ ≤ x → s₁ x ∧ s₂ x) ∧ (∀ x, x ≤ θ - 2 * σ → ¬ s₁ x ∧ ¬ s₂ x) := by
+  set p₁ := fun x => -g₁ x / c₁
+  set p₂ := fun x => -g₂ x / c₂
+  have hp₁ : StrictAnti p₁ := fun x y hxy => by
+    simp only [p₁]; exact div_lt_div_of_pos_right (by linarith [hgm₁ hxy]) hc₁
+  have hp₂ : StrictAnti p₂ := fun x y hxy => by
+    simp only [p₂]; exact div_lt_div_of_pos_right (by linarith [hgm₂ hxy]) hc₂
+  obtain ⟨lo₁, hi₁⟩ := cvd_dominance N g₁ hgm₁.monotone c₁ hc₁ xlo xhi hlo₁ hhi₁ s₁ s₂ h₁
+  obtain ⟨lo₂, hi₂⟩ := cvd_dominance N g₂ hgm₂.monotone c₂ hc₂ xlo xhi hlo₂ hhi₂ s₂ s₁ h₂
+  have w1ne : ∃ x, ¬ s₁ x := ⟨xlo, lo₁ xlo le_rfl⟩
+  have w2ne : ∃ x, ¬ s₂ x := ⟨xlo, lo₂ xlo le_rfl⟩
+  have t1ne : ∃ x, s₁ x := ⟨xhi, hi₁ xhi le_rfl⟩
+  have t2ne : ∃ x, s₂ x := ⟨xhi, hi₂ xhi le_rfl⟩
+  have w1b : BddAbove {x | ¬ s₁ x} := ⟨xhi, fun x hx => by
+    by_contra hc'; exact hx (hi₁ x (not_le.mp hc').le)⟩
+  have w2b : BddAbove {x | ¬ s₂ x} := ⟨xhi, fun x hx => by
+    by_contra hc'; exact hx (hi₂ x (not_le.mp hc').le)⟩
+  have t1b : BddBelow {x | s₁ x} := ⟨xlo, fun x hx => by
+    by_contra hc'; exact lo₁ x (not_le.mp hc').le hx⟩
+  have t2b : BddBelow {x | s₂ x} := ⟨xlo, fun x hx => by
+    by_contra hc'; exact lo₂ x (not_le.mp hc').le hx⟩
+  set X₁ := sSup {x | ¬ s₁ x}
+  set X₂ := sSup {x | ¬ s₂ x}
+  set Y₁ := sInf {x | s₁ x}
+  set Y₂ := sInf {x | s₂ x}
+  have above : ∀ (s : ℝ → Prop), BddAbove {x | ¬ s x} → ∀ y, sSup {x | ¬ s x} < y → s y :=
+    fun s hb y hy => by by_contra hc'; exact absurd (le_csSup hb hc') (not_le.mpr hy)
+  have below : ∀ (s : ℝ → Prop), BddBelow {x | s x} → ∀ y, s y → sInf {x | s x} ≤ y :=
+    fun s hb y hy => csInf_le hb hy
+  have hcont : ∀ (g : ℝ → ℝ) (c : ℝ), Continuous g → ∀ Z X : ℝ,
+      ContinuousAt (fun x => g x + c * N.G (x - Z)) X :=
+    fun g c hg Z X => hg.continuousAt.add (continuousAt_const.mul
+      ((hGc.comp (continuous_id.sub continuous_const)).continuousAt))
+  -- At the top of each waiting set, the belief is at most the indifference point.
+  have hA : N.G (X₁ - X₂) ≤ p₁ X₁ := by
+    have := cvd_top N g₁ c₁ hc₁.le s₁ s₂ (fun x => (h₁ x).2) w1ne w1b X₂ (above s₂ w2b)
+      (hcont g₁ c₁ hg₁ X₂ X₁)
+    simp only [p₁]; rw [le_div_iff₀ hc₁]; linarith
+  have hB : N.G (X₂ - X₁) ≤ p₂ X₂ := by
+    have := cvd_top N g₂ c₂ hc₂.le s₂ s₁ (fun x => (h₂ x).2) w2ne w2b X₁ (above s₁ w1b)
+      (hcont g₂ c₂ hg₂ X₁ X₂)
+    simp only [p₂]; rw [le_div_iff₀ hc₂]; linarith
+  -- At the bottom of each acting set, the belief is at least the indifference point.
+  have hC : p₁ Y₁ ≤ N.G (Y₁ - Y₂) := by
+    have := cvd_bottom N g₁ c₁ hc₁.le s₁ s₂ (fun x => (h₁ x).1) t1ne t1b Y₂ (below s₂ t2b)
+      (hcont g₁ c₁ hg₁ Y₂ Y₁)
+    simp only [p₁]; rw [div_le_iff₀ hc₁]; linarith
+  have hD : p₂ Y₂ ≤ N.G (Y₂ - Y₁) := by
+    have := cvd_bottom N g₂ c₂ hc₂.le s₂ s₁ (fun x => (h₂ x).1) t2ne t2b Y₁ (below s₁ t1b)
+      (hcont g₂ c₂ hg₂ Y₁ Y₂)
+    simp only [p₂]; rw [div_le_iff₀ hc₂]; linarith
+  have hθ' : p₂ θ + p₁ θ = 1 := by simp only [p₁, p₂] at hθ ⊢; linarith
+  have hθ1' : p₂ θ < 1 := by simp only [p₂] at hθ hθ0 ⊢; linarith
+  have hθ0' : 0 < p₂ θ := by simp only [p₂] at hθ hθ1 ⊢; linarith
+  have hX₁ := cvd_pair_top p₁ p₂ N.G σ hσ hp₁ hp₂.antitone hG1 hsym θ hθ hθ1 X₁ X₂ hA hB
+  have hX₂ := cvd_pair_top p₂ p₁ N.G σ hσ hp₂ hp₁.antitone hG1 hsym θ hθ' hθ1' X₂ X₁ hB hA
+  have hY₁ := cvd_pair_bottom p₁ p₂ N.G σ hσ hp₁ hp₂.antitone hG0 hsym θ hθ hθ0 Y₁ Y₂ hC hD
+  have hY₂ := cvd_pair_bottom p₂ p₁ N.G σ hσ hp₂ hp₁.antitone hG0 hsym θ hθ' hθ0' Y₂ Y₁ hD hC
+  refine ⟨fun x hx => ⟨above s₁ w1b x (by linarith), above s₂ w2b x (by linarith)⟩,
+    fun x hx => ⟨fun hs => ?_, fun hs => ?_⟩⟩
+  · have := below s₁ t1b x hs; linarith
+  · have := below s₂ t2b x hs; linarith
+
+/-- The same for independent noise from any atomless law within `σ`: the
+belief it gives is continuous, symmetric and a step outside `[-2σ, 2σ]`. -/
+theorem cvd_asymmetric_flat (ν : MeasureTheory.Measure ℝ) [MeasureTheory.IsProbabilityMeasure ν]
+    (hatom : ∀ c, ν {c} = 0) (σ : ℝ) (hσ : 0 < σ) (hsupp : ∀ᵐ e ∂ν, |e| ≤ σ)
+    (g₁ g₂ : ℝ → ℝ) (c₁ c₂ : ℝ) (hg₁ : Continuous g₁) (hg₂ : Continuous g₂)
+    (hgm₁ : StrictMono g₁) (hgm₂ : StrictMono g₂) (hc₁ : 0 < c₁) (hc₂ : 0 < c₂)
+    (xlo xhi : ℝ) (hlo₁ : g₁ xlo + c₁ < 0) (hlo₂ : g₂ xlo + c₂ < 0)
+    (hhi₁ : 0 < g₁ xhi) (hhi₂ : 0 < g₂ xhi)
+    (θ : ℝ) (hθ : -g₁ θ / c₁ + -g₂ θ / c₂ = 1) (hθ0 : 0 < -g₁ θ / c₁) (hθ1 : -g₁ θ / c₁ < 1)
+    (s₁ s₂ : ℝ → Prop)
+    (h₁ : ∀ x, (s₁ x → 0 ≤ g₁ x + c₁ * flatBel ν s₂ x) ∧ (¬ s₁ x → g₁ x + c₁ * flatBel ν s₂ x ≤ 0))
+    (h₂ : ∀ x, (s₂ x → 0 ≤ g₂ x + c₂ * flatBel ν s₁ x) ∧ (¬ s₂ x → g₂ x + c₂ * flatBel ν s₁ x ≤ 0)) :
+    (∀ x, θ + 2 * σ ≤ x → s₁ x ∧ s₂ x) ∧ (∀ x, x ≤ θ - 2 * σ → ¬ s₁ x ∧ ¬ s₂ x) := by
+  obtain ⟨hG1, hG0⟩ := cvd_flatG_step ν σ hsupp
+  exact cvd_asymmetric (flatNoise ν hatom) σ hσ
+    (continuous_iff_continuousAt.mpr (cvd_flatG_continuous ν hatom)) (cvd_flatG_symm ν hatom)
+    hG1 hG0 g₁ g₂ c₁ c₂ hg₁ hg₂ hgm₁ hgm₂ hc₁ hc₂ xlo xhi hlo₁ hlo₂ hhi₁ hhi₂ θ hθ hθ0 hθ1
+    s₁ s₂ h₁ h₂
+
+/-- As the noise vanishes, both sides switch exactly at `θ`: for every
+`ε > 0`, noise within `ε / 2` of any atomless law puts every equilibrium
+pair's switch within `ε` of `θ`. -/
+theorem cvd_asymmetric_limit (g₁ g₂ : ℝ → ℝ) (c₁ c₂ : ℝ) (hg₁ : Continuous g₁)
+    (hg₂ : Continuous g₂) (hgm₁ : StrictMono g₁) (hgm₂ : StrictMono g₂) (hc₁ : 0 < c₁)
+    (hc₂ : 0 < c₂) (xlo xhi : ℝ) (hlo₁ : g₁ xlo + c₁ < 0) (hlo₂ : g₂ xlo + c₂ < 0)
+    (hhi₁ : 0 < g₁ xhi) (hhi₂ : 0 < g₂ xhi)
+    (θ : ℝ) (hθ : -g₁ θ / c₁ + -g₂ θ / c₂ = 1) (hθ0 : 0 < -g₁ θ / c₁) (hθ1 : -g₁ θ / c₁ < 1)
+    (ε : ℝ) (hε : 0 < ε) :
+    ∃ σ₀ > 0, ∀ σ, 0 < σ → σ ≤ σ₀ → ∀ (ν : MeasureTheory.Measure ℝ)
+      [MeasureTheory.IsProbabilityMeasure ν], (∀ c, ν {c} = 0) → (∀ᵐ e ∂ν, |e| ≤ σ) →
+      ∀ s₁ s₂ : ℝ → Prop,
+      (∀ x, (s₁ x → 0 ≤ g₁ x + c₁ * flatBel ν s₂ x) ∧ (¬ s₁ x → g₁ x + c₁ * flatBel ν s₂ x ≤ 0)) →
+      (∀ x, (s₂ x → 0 ≤ g₂ x + c₂ * flatBel ν s₁ x) ∧ (¬ s₂ x → g₂ x + c₂ * flatBel ν s₁ x ≤ 0)) →
+      (∀ x, θ + ε ≤ x → s₁ x ∧ s₂ x) ∧ (∀ x, x ≤ θ - ε → ¬ s₁ x ∧ ¬ s₂ x) := by
+  refine ⟨ε / 2, half_pos hε, fun σ hσ hσ₀ ν _ hatom hsupp s₁ s₂ h₁ h₂ => ?_⟩
+  have h := cvd_asymmetric_flat ν hatom σ hσ hsupp g₁ g₂ c₁ c₂ hg₁ hg₂ hgm₁ hgm₂ hc₁ hc₂ xlo xhi
+    hlo₁ hlo₂ hhi₁ hhi₂ θ hθ hθ0 hθ1 s₁ s₂ h₁ h₂
+  exact ⟨fun x hx => h.1 x (by linarith), fun x hx => h.2 x (by linarith)⟩
+
+/-- `θ` exists and is unique: the indifference beliefs fall continuously from
+above 2 to below 0 across the dominance bounds. -/
+theorem cvd_theta_exists (g₁ g₂ : ℝ → ℝ) (c₁ c₂ : ℝ) (hg₁ : Continuous g₁)
+    (hg₂ : Continuous g₂) (hgm₁ : StrictMono g₁) (hgm₂ : StrictMono g₂) (hc₁ : 0 < c₁)
+    (hc₂ : 0 < c₂) (xlo xhi : ℝ) (hlo₁ : g₁ xlo + c₁ < 0) (hlo₂ : g₂ xlo + c₂ < 0)
+    (hhi₁ : 0 < g₁ xhi) (hhi₂ : 0 < g₂ xhi) :
+    ∃! θ, -g₁ θ / c₁ + -g₂ θ / c₂ = 1 := by
+  set f := fun x => -g₁ x / c₁ + -g₂ x / c₂
+  have hf : Continuous f := ((hg₁.neg).div_const _).add ((hg₂.neg).div_const _)
+  have hanti : StrictAnti f := fun x y hxy => by
+    have h1 : -g₁ y / c₁ < -g₁ x / c₁ := div_lt_div_of_pos_right (by linarith [hgm₁ hxy]) hc₁
+    have h2 : -g₂ y / c₂ < -g₂ x / c₂ := div_lt_div_of_pos_right (by linarith [hgm₂ hxy]) hc₂
+    simp only [f]; linarith
+  have hflo : 1 < f xlo := by
+    have h1 : 1 < -g₁ xlo / c₁ := by rw [lt_div_iff₀ hc₁]; linarith
+    have h2 : 1 < -g₂ xlo / c₂ := by rw [lt_div_iff₀ hc₂]; linarith
+    simp only [f]; linarith
+  have hfhi : f xhi < 1 := by
+    have h1 : -g₁ xhi / c₁ < 0 := div_neg_of_neg_of_pos (by linarith) hc₁
+    have h2 : -g₂ xhi / c₂ < 0 := div_neg_of_neg_of_pos (by linarith) hc₂
+    simp only [f]; linarith
+  have hle : xlo ≤ xhi := by
+    by_contra h; have := hanti.antitone (not_le.mp h).le; linarith
+  obtain ⟨θ, _, hθ⟩ := intermediate_value_Icc' hle hf.continuousOn
+    (show (1 : ℝ) ∈ Set.Icc (f xhi) (f xlo) from ⟨hfhi.le, hflo.le⟩)
+  exact ⟨θ, hθ, fun θ' hθ' => hanti.injective (hθ'.trans hθ.symm)⟩
+
+/-- Harsanyi and Selten's risk dominance for an asymmetric two-by-two game at
+state `m`: both acting risk-dominates both waiting when the product of the
+losses from deviating is larger there, and this is the case exactly when the
+indifference beliefs sum to less than 1. -/
+theorem cvd_risk_dominance_hs (g₁ g₂ : ℝ → ℝ) (c₁ c₂ : ℝ) (hc₁ : 0 < c₁) (hc₂ : 0 < c₂)
+    (m : ℝ) :
+    (-g₁ m) * (-g₂ m) < (g₁ m + c₁) * (g₂ m + c₂) ↔ -g₁ m / c₁ + -g₂ m / c₂ < 1 := by
+  have key : (g₁ m + c₁) * (g₂ m + c₂) - (-g₁ m) * (-g₂ m) =
+      c₁ * c₂ * (1 - (-g₁ m / c₁ + -g₂ m / c₂)) := by
+    field_simp; ring
+  have hcc : 0 < c₁ * c₂ := mul_pos hc₁ hc₂
+  constructor
+  · intro h
+    have : 0 < c₁ * c₂ * (1 - (-g₁ m / c₁ + -g₂ m / c₂)) := by linarith
+    have := (mul_pos_iff_of_pos_left hcc).mp this
+    linarith
+  · intro h
+    have : 0 < c₁ * c₂ * (1 - (-g₁ m / c₁ + -g₂ m / c₂)) := mul_pos hcc (by linarith)
+    linarith
+
+/-- ... so `θ` is the boundary of risk dominance: both acting risk-dominates
+exactly at states above `θ`. -/
+theorem cvd_theta_is_risk_dominance (g₁ g₂ : ℝ → ℝ) (c₁ c₂ : ℝ) (hgm₁ : StrictMono g₁)
+    (hgm₂ : StrictMono g₂) (hc₁ : 0 < c₁) (hc₂ : 0 < c₂) (θ : ℝ)
+    (hθ : -g₁ θ / c₁ + -g₂ θ / c₂ = 1) (m : ℝ) :
+    (-g₁ m) * (-g₂ m) < (g₁ m + c₁) * (g₂ m + c₂) ↔ θ < m := by
+  rw [cvd_risk_dominance_hs g₁ g₂ c₁ c₂ hc₁ hc₂ m]
+  have hanti : StrictAnti (fun x => -g₁ x / c₁ + -g₂ x / c₂) := fun x y hxy => by
+    have h1 : -g₁ y / c₁ < -g₁ x / c₁ := div_lt_div_of_pos_right (by linarith [hgm₁ hxy]) hc₁
+    have h2 : -g₂ y / c₂ < -g₂ x / c₂ := div_lt_div_of_pos_right (by linarith [hgm₂ hxy]) hc₂
+    linarith
+  constructor
+  · intro h; by_contra hle
+    have := hanti.antitone (not_lt.mp hle); linarith
+  · intro h; have := hanti h; linarith
+
+
+/-! ## The folk theorem with Nash reversion (Friedman)
+
+A finite stage game is repeated forever with discount `δ`. A strategy maps
+each history of past action profiles to an action. Grim reversion plays a
+target profile `a` while everyone always has, and a stage Nash equilibrium
+`e` from the first departure on. If each player's one-period gain from
+departing, `g - w`, is at most what reversion then costs, `δ (g - p)`, no
+player gains by switching to any other strategy, and after every history
+the continuation is again an equilibrium. -/
+
+section Folk
+variable {ι : Type*} {A : ι → Type*}
+
+/-- A strategy for every player: an action for each history of past profiles. -/
+abbrev Plan (A : ι → Type*) := ∀ i, List (∀ j, A j) → A i
+
+/-- The profile played after history `h`. -/
+def playAt (σ : Plan A) (h : List (∀ j, A j)) : ∀ j, A j := fun j => σ j h
+
+/-- The history of the first `t` profiles. -/
+def histOf (σ : Plan A) : ℕ → List (∀ j, A j)
+  | 0 => []
+  | t + 1 => histOf σ t ++ [playAt σ (histOf σ t)]
+
+/-- The profile played in period `t`. -/
+def pathOf (σ : Plan A) (t : ℕ) : ∀ j, A j := playAt σ (histOf σ t)
+
+/-- A player's discounted payoff. -/
+noncomputable def folkPay (u : (∀ j, A j) → ι → ℝ) (δ : ℝ) (σ : Plan A) (i : ι) : ℝ :=
+  ∑' t, δ ^ t * u (pathOf σ t) i
+
+/-- How the game continues after history `h`: each strategy reads `h` first. -/
+def contPlan (σ : Plan A) (h : List (∀ j, A j)) : Plan A := fun i h' => σ i (h ++ h')
+
+lemma mem_histOf (σ : Plan A) (t : ℕ) (x : ∀ j, A j) :
+    x ∈ histOf σ t ↔ ∃ s < t, pathOf σ s = x := by
+  induction t with
+  | zero => simp [histOf]
+  | succ t ih =>
+    simp only [histOf, List.mem_append, List.mem_singleton, ih]
+    constructor
+    · rintro (⟨s, hs, rfl⟩ | rfl)
+      · exact ⟨s, by omega, rfl⟩
+      · exact ⟨t, by omega, rfl⟩
+    · rintro ⟨s, hs, rfl⟩
+      rcases Nat.lt_succ_iff_lt_or_eq.mp hs with h | rfl
+      · exact Or.inl ⟨s, h, rfl⟩
+      · exact Or.inr rfl
+
+/-- A constant stream pays its value over `1 - δ`. -/
+lemma folk_const_pay (u : (∀ j, A j) → ι → ℝ) (δ : ℝ) (hδ0 : 0 ≤ δ) (hδ1 : δ < 1) (σ : Plan A)
+    (x : ∀ j, A j) (hx : ∀ t, pathOf σ t = x) (i : ι) : folkPay u δ σ i = u x i / (1 - δ) := by
+  simp only [folkPay, hx]
+  rw [tsum_mul_right, tsum_geometric_of_lt_one hδ0 hδ1, div_eq_mul_inv, mul_comm]
+
+variable [DecidableEq ι]
+
+/-- No player gains by switching to any other strategy while the rest keep theirs. -/
+def IsRepeatedNash (u : (∀ j, A j) → ι → ℝ) (δ : ℝ) (σ : Plan A) : Prop :=
+  ∀ i (τ : List (∀ j, A j) → A i), folkPay u δ (Function.update σ i τ) i ≤ folkPay u δ σ i
+
+/-- Subgame perfect: after every history, how the game continues is again an
+equilibrium. -/
+def IsSubgamePerfect (u : (∀ j, A j) → ι → ℝ) (δ : ℝ) (σ : Plan A) : Prop :=
+  ∀ h, IsRepeatedNash u δ (contPlan σ h)
+
+/-- A stage Nash equilibrium: no player gains by changing only its own action. -/
+def IsStageNash (u : (∀ j, A j) → ι → ℝ) (e : ∀ j, A j) : Prop :=
+  ∀ i (b : A i), u (Function.update e i b) i ≤ u e i
+
+lemma playAt_update (σ : Plan A) (i : ι) (τ : List (∀ j, A j) → A i) (h : List (∀ j, A j)) :
+    playAt (Function.update σ i τ) h = Function.update (playAt σ h) i (τ h) := by
+  funext j
+  by_cases hj : j = i
+  · subst hj; simp [playAt]
+  · simp [playAt, Function.update_of_ne hj]
+
+variable [Fintype ι] [∀ i, DecidableEq (A i)]
+
+/-- Grim reversion: play `a` while every past profile was `a`, `e` otherwise. -/
+def grimPlan (a e : ∀ j, A j) : Plan A := fun i h => if ∀ x ∈ h, x = a then a i else e i
+
+omit [DecidableEq ι] in
+lemma playAt_grim (a e : ∀ j, A j) (h : List (∀ j, A j)) :
+    playAt (grimPlan a e) h = if ∀ x ∈ h, x = a then a else e := by
+  funext j; simp only [playAt, grimPlan]; split_ifs <;> rfl
+
+omit [DecidableEq ι] in
+/-- Under grim reversion nobody departs, so `a` is played in every period. -/
+lemma pathOf_grim (a e : ∀ j, A j) (t : ℕ) : pathOf (grimPlan a e) t = a := by
+  induction t using Nat.strong_induction_on with
+  | _ t ih =>
+    rw [pathOf, playAt_grim]
+    split_ifs with h
+    · rfl
+    · exact absurd (fun x hx => by
+        obtain ⟨s, hs, rfl⟩ := (mem_histOf _ t x).mp hx
+        exact ih s hs) h
+
+omit [DecidableEq ι] in
+/-- Grim reversion pays `w / (1 - δ)`, with `w` the payoff of `a`. -/
+theorem folk_grim_pay (u : (∀ j, A j) → ι → ℝ) (a e : ∀ j, A j) (δ : ℝ) (hδ0 : 0 ≤ δ)
+    (hδ1 : δ < 1) (i : ι) : folkPay u δ (grimPlan a e) i = u a i / (1 - δ) :=
+  folk_const_pay u δ hδ0 hδ1 _ a (pathOf_grim a e) i
+
+variable [∀ i, Fintype (A i)] [∀ i, Nonempty (A i)]
+
+/-- The most a player can earn in one period by departing alone from `a`. -/
+noncomputable def devGain (u : (∀ j, A j) → ι → ℝ) (a : ∀ j, A j) (i : ι) : ℝ :=
+  Finset.univ.sup' Finset.univ_nonempty (fun b : A i => u (Function.update a i b) i)
+
+omit [Fintype ι] [∀ i, DecidableEq (A i)] in
+lemma le_devGain (u : (∀ j, A j) → ι → ℝ) (a : ∀ j, A j) (i : ι) (b : A i) :
+    u (Function.update a i b) i ≤ devGain u a i :=
+  Finset.le_sup' (fun b : A i => u (Function.update a i b) i) (Finset.mem_univ b)
+
+omit [Fintype ι] [∀ i, DecidableEq (A i)] in
+/-- Departing to one's own action is no departure, so `w ≤ g`. -/
+lemma self_le_devGain (u : (∀ j, A j) → ι → ℝ) (a : ∀ j, A j) (i : ι) : u a i ≤ devGain u a i := by
+  have := le_devGain u a i (a i); rwa [Function.update_eq_self] at this
+
+omit [∀ i, DecidableEq (A i)] in
+/-- Every payoff stream is summable: there are finitely many profiles. -/
+lemma folk_summable (u : (∀ j, A j) → ι → ℝ) (δ : ℝ) (hδ0 : 0 ≤ δ) (hδ1 : δ < 1) (σ : Plan A)
+    (i : ι) : Summable (fun t => δ ^ t * u (pathOf σ t) i) := by
+  set C := Finset.univ.sup' Finset.univ_nonempty (fun x : ∀ j, A j => |u x i|)
+  refine Summable.of_norm_bounded ((summable_geometric_of_lt_one hδ0 hδ1).mul_left C) fun t => ?_
+  rw [Real.norm_eq_abs, abs_mul, abs_of_nonneg (pow_nonneg hδ0 t), mul_comm]
+  exact mul_le_mul_of_nonneg_right
+    (Finset.le_sup' (fun x : ∀ j, A j => |u x i|) (Finset.mem_univ _)) (pow_nonneg hδ0 t)
+
+/-- Friedman's folk theorem with Nash reversion: if `e` is a stage Nash
+equilibrium and every player's gain from departing from `a` for one period is
+at most what reversion to `e` then costs, `g - w ≤ δ (g - p)`, grim reversion
+is a Nash equilibrium of the repeated game. -/
+theorem folk_nash_reversion (u : (∀ j, A j) → ι → ℝ) (a e : ∀ j, A j) (he : IsStageNash u e)
+    (δ : ℝ) (hδ0 : 0 ≤ δ) (hδ1 : δ < 1)
+    (hδ : ∀ i, devGain u a i - u a i ≤ δ * (devGain u a i - u e i)) :
+    IsRepeatedNash u δ (grimPlan a e) := by
+  intro i τ
+  have h1δ : 0 < 1 - δ := by linarith
+  set σ := Function.update (grimPlan a e) i τ
+  set w := u a i
+  set g := devGain u a i
+  set p := u e i
+  rw [folk_grim_pay u a e δ hδ0 hδ1 i]
+  -- The profile in each period: the others follow grim reversion, `i` follows `τ`.
+  have hpathA : ∀ t, (∀ x ∈ histOf σ t, x = a) →
+      pathOf σ t = Function.update a i (τ (histOf σ t)) := by
+    intro t ht; rw [pathOf, playAt_update, playAt_grim]; split_ifs with hc
+    · rfl
+    · exact absurd ht hc
+  have hpathE : ∀ t, ¬ (∀ x ∈ histOf σ t, x = a) →
+      pathOf σ t = Function.update e i (τ (histOf σ t)) := by
+    intro t ht; rw [pathOf, playAt_update, playAt_grim]; split_ifs with hc
+    · exact absurd hc ht
+    · rfl
+  by_cases hex : ∃ t, pathOf σ t ≠ a
+  · classical
+    set T := Nat.find hex
+    have hbefore : ∀ t < T, pathOf σ t = a := fun t ht => by
+      simpa using Nat.find_min hex ht
+    have hle : ∀ t, δ ^ t * u (pathOf σ t) i ≤
+        δ ^ t * (if t < T then w else if t = T then g else p) := by
+      intro t
+      apply mul_le_mul_of_nonneg_left _ (pow_nonneg hδ0 t)
+      by_cases hlt : t < T
+      · simp only [hlt, ↓reduceIte, hbefore t hlt, w, le_refl]
+      · by_cases heq : t = T
+        · -- Everyone else still plays `a`; `i` earns at most its best departure.
+          have hall : ∀ x ∈ histOf σ t, x = a := fun x hx => by
+            obtain ⟨s, hs, rfl⟩ := (mem_histOf σ t x).mp hx
+            exact hbefore s (heq ▸ hs)
+          rw [show (if t < T then w else if t = T then g else p) = g by simp [heq],
+            hpathA t hall]
+          exact le_devGain u a i _
+        · -- After a departure, everyone else plays `e`, and `e` is stage Nash.
+          have hnot : ¬ ∀ x ∈ histOf σ t, x = a := fun hall =>
+            Nat.find_spec hex (hall _ ((mem_histOf σ t _).mpr ⟨T, by omega, rfl⟩))
+          rw [show (if t < T then w else if t = T then g else p) = p by simp [hlt, heq],
+            hpathE t hnot]
+          exact he i _
+    have hpay := hasSum_le hle (folk_summable u δ hδ0 hδ1 σ i).hasSum
+      (hasSum_path w g p δ hδ0 hδ1 T)
+    refine le_trans hpay ?_
+    -- The departure loses `δ^T ((w - p) - (g - p)(1 - δ))`, which is not negative.
+    have hT : 0 ≤ δ ^ T := pow_nonneg hδ0 T
+    have key : 0 ≤ δ ^ T * ((w - p) - (g - p) * (1 - δ)) :=
+      mul_nonneg hT (by have := hδ i; nlinarith)
+    rw [← add_div, div_add' _ _ _ h1δ.ne', div_le_div_iff_of_pos_right h1δ]
+    nlinarith
+  · -- Never departing earns exactly what grim reversion does.
+    push Not at hex
+    exact le_of_eq (folk_const_pay u δ hδ0 hδ1 σ a hex i)
+
+omit [∀ i, DecidableEq (A i)] in
+/-- Once everyone plays the stage Nash equilibrium `e` whatever happens, no
+player gains by any strategy either. -/
+theorem folk_nash_forever (u : (∀ j, A j) → ι → ℝ) (e : ∀ j, A j) (he : IsStageNash u e)
+    (δ : ℝ) (hδ0 : 0 ≤ δ) (hδ1 : δ < 1) : IsRepeatedNash u δ (fun j _ => e j) := by
+  intro i τ
+  have hconst : ∀ t, pathOf (fun j (_ : List (∀ k, A k)) => e j) t = e := fun t => rfl
+  rw [folk_const_pay u δ hδ0 hδ1 _ e hconst i]
+  have hle : ∀ t, δ ^ t * u (pathOf (Function.update (fun j _ => e j) i τ) t) i ≤ δ ^ t * u e i := by
+    intro t
+    apply mul_le_mul_of_nonneg_left _ (pow_nonneg hδ0 t)
+    rw [pathOf, playAt_update]
+    exact he i _
+  have hgeo : HasSum (fun t : ℕ => δ ^ t * u e i) (u e i / (1 - δ)) := by
+    rw [div_eq_inv_mul]; exact (hasSum_geometric_of_lt_one hδ0 hδ1).mul_right (u e i)
+  exact hasSum_le hle (folk_summable u δ hδ0 hδ1 _ i).hasSum hgeo
+
+/-- Grim reversion is subgame perfect under the same condition: after a
+history on which everyone always played `a`, the game continues as grim
+reversion; after any other, as `e` forever. -/
+theorem folk_subgame_perfect (u : (∀ j, A j) → ι → ℝ) (a e : ∀ j, A j) (he : IsStageNash u e)
+    (δ : ℝ) (hδ0 : 0 ≤ δ) (hδ1 : δ < 1)
+    (hδ : ∀ i, devGain u a i - u a i ≤ δ * (devGain u a i - u e i)) :
+    IsSubgamePerfect u δ (grimPlan a e) := by
+  intro h
+  by_cases hh : ∀ x ∈ h, x = a
+  · have : contPlan (grimPlan a e) h = grimPlan a e := by
+      funext j h'
+      simp only [contPlan, grimPlan, List.mem_append]
+      congr 1
+      exact propext ⟨fun H x hx => H x (Or.inr hx), fun H x hx => hx.elim (hh x) (H x)⟩
+    rw [this]; exact folk_nash_reversion u a e he δ hδ0 hδ1 hδ
+  · have : contPlan (grimPlan a e) h = fun j _ => e j := by
+      funext j h'
+      simp only [contPlan, grimPlan]
+      split_ifs with H
+      · exact absurd (fun x hx => H x (List.mem_append_left _ hx)) hh
+      · rfl
+    rw [this]; exact folk_nash_forever u e he δ hδ0 hδ1
+
+omit [Fintype ι] [∀ i, DecidableEq (A i)] in
+/-- Each player's threshold `(g - w)/(g - p)` lies in `[0, 1)` when `a` pays
+it more than `e`. -/
+theorem folk_threshold (u : (∀ j, A j) → ι → ℝ) (a e : ∀ j, A j) (i : ι)
+    (hae : u e i < u a i) :
+    0 ≤ (devGain u a i - u a i) / (devGain u a i - u e i) ∧
+      (devGain u a i - u a i) / (devGain u a i - u e i) < 1 := by
+  have hwg := self_le_devGain u a i
+  have hgp : 0 < devGain u a i - u e i := by linarith
+  exact ⟨div_nonneg (by linarith) hgp.le, (div_lt_one hgp).mpr (by linarith)⟩
+
+/-- Patient players sustain any pure profile that pays every player more than
+a stage Nash equilibrium: from some discount factor below 1 on, grim
+reversion to that equilibrium is a subgame-perfect equilibrium. -/
+theorem folk_patient (u : (∀ j, A j) → ι → ℝ) (a e : ∀ j, A j) (he : IsStageNash u e)
+    (hae : ∀ i, u e i < u a i) :
+    ∃ δ₀ < 1, 0 ≤ δ₀ ∧ ∀ δ, δ₀ ≤ δ → δ < 1 → IsSubgamePerfect u δ (grimPlan a e) := by
+  set thr := fun i => (devGain u a i - u a i) / (devGain u a i - u e i)
+  set D := insert 0 (Finset.univ.image thr)
+  have hD : D.Nonempty := Finset.insert_nonempty _ _
+  have h0D : (0 : ℝ) ≤ D.max' hD := Finset.le_max' D 0 (Finset.mem_insert_self _ _)
+  refine ⟨D.max' hD, ?_, h0D, fun δ hδ hδ1 => ?_⟩
+  · rcases Finset.mem_insert.mp (D.max'_mem hD) with h | h
+    · rw [h]; norm_num
+    · obtain ⟨i, _, hi⟩ := Finset.mem_image.mp h
+      rw [← hi]; exact (folk_threshold u a e i (hae i)).2
+  · refine folk_subgame_perfect u a e he δ (le_trans h0D hδ) hδ1 fun i => ?_
+    have hgp : 0 < devGain u a i - u e i := by linarith [self_le_devGain u a i, hae i]
+    have hi : thr i ≤ δ :=
+      le_trans (Finset.le_max' D (thr i)
+        (Finset.mem_insert_of_mem (Finset.mem_image_of_mem _ (Finset.mem_univ i)))) hδ
+    rw [div_le_iff₀ hgp] at hi
+    linarith
+
+end Folk
+
+/-! The two-action game of Proposition 0 (d) is a case: two civilizations,
+each restraining (`false`) or striking (`true`), with mutual striking the
+stage Nash equilibrium and mutual restraint the target. -/
+
+/-- The two-action game, as a stage game for two players. -/
+def twoActionGame (w g l p : ℝ) (x : Fin 2 → Bool) (i : Fin 2) : ℝ :=
+  stagePay w g l p (x i) (x i.rev)
+
+lemma fin2_rev_ne (i : Fin 2) : i.rev ≠ i := by fin_cases i <;> decide
+
+/-- Mutual striking is a stage Nash equilibrium when `l ≤ p`. -/
+theorem twoAction_stage_nash (w g l p : ℝ) (hlp : l ≤ p) :
+    IsStageNash (twoActionGame w g l p) (fun _ => true) := by
+  intro i b
+  simp only [twoActionGame, Function.update_self, Function.update_of_ne (fin2_rev_ne i)]
+  cases b <;> simp [stagePay, hlp]
+
+/-- In the two-action game the best one-period departure from mutual
+restraint pays `g`, so the folk theorem's condition is `g - w ≤ δ (g - p)`,
+the threshold `(g - w)/(g - p)` of `grim_sustains`. -/
+theorem twoAction_devGain (w g l p : ℝ) (hwg : w < g) (i : Fin 2) :
+    devGain (twoActionGame w g l p) (fun _ => false) i = g ∧
+      twoActionGame w g l p (fun _ => false) i = w ∧
+      twoActionGame w g l p (fun _ => true) i = p := by
+  refine ⟨le_antisymm (Finset.sup'_le _ _ fun b _ => ?_) ?_, rfl, rfl⟩
+  · simp only [twoActionGame, Function.update_self, Function.update_of_ne (fin2_rev_ne i)]
+    cases b <;> simp [stagePay, hwg.le]
+  · have := le_devGain (twoActionGame w g l p) (fun _ => false) i true
+    simpa [twoActionGame, Function.update_of_ne (fin2_rev_ne i), stagePay] using this
+
+/-- For the two-action game, grim reversion is subgame perfect exactly under
+the threshold of `grim_sustains`. -/
+theorem twoAction_folk (w g l p δ : ℝ) (hpw : p < w) (hwg : w < g) (hlp : l ≤ p)
+    (hδ0 : 0 ≤ δ) (hδ1 : δ < 1) (hδ : (g - w) / (g - p) ≤ δ) :
+    IsSubgamePerfect (twoActionGame w g l p) δ (grimPlan (fun _ => false) (fun _ => true)) := by
+  refine folk_subgame_perfect _ _ _ (twoAction_stage_nash w g l p hlp) δ hδ0 hδ1 fun i => ?_
+  obtain ⟨hg, hw, hp⟩ := twoAction_devGain w g l p hwg i
+  rw [hg, hw, hp]
+  rw [div_le_iff₀ (by linarith)] at hδ
+  linarith
+
+
+/-! ## Long-run selection, one civilization at a time
+
+A second standard dynamic. Each period one of the `N` civilizations, chosen
+uniformly at random, revises its action. With probability `1 - ε` it plays its
+best reply to the current number `z` of strikers, its own action included:
+strike exactly when `k ≤ z`, ties counted as waiting, as in `kmrK`. With
+probability `ε` it makes a mistake and plays the other action. The number of
+strikers then moves by at most one per period: a birth–death chain on
+`0, …, N`. -/
+
+/-- The probability that the reviser strikes, when `z` civilizations strike:
+its best reply with probability `1 - ε`, the other action with probability
+`ε`. -/
+noncomputable def seqStrike (k : ℕ) (ε : ℝ) (z : ℕ) : ℝ := if k ≤ z then 1 - ε else ε
+
+/-- One more striker: a waiter is chosen and strikes. -/
+noncomputable def seqUp (N k : ℕ) (ε : ℝ) (z : ℕ) : ℝ := ((N : ℝ) - z) / N * seqStrike k ε z
+
+/-- One fewer striker: a striker is chosen and waits. -/
+noncomputable def seqDown (N k : ℕ) (ε : ℝ) (z : ℕ) : ℝ := (z : ℝ) / N * (1 - seqStrike k ε z)
+
+/-- One period, from `z` strikers to `z'`: up by one, down by one, or stay. -/
+noncomputable def seqT (N k : ℕ) (ε : ℝ) (z z' : ℕ) : ℝ :=
+  (if z' = z + 1 then seqUp N k ε z else 0) + (if z = z' + 1 then seqDown N k ε z else 0) +
+    (if z' = z then 1 - seqUp N k ε z - seqDown N k ε z else 0)
+
+/-- A stationary distribution of the one-at-a-time chain. -/
+def SeqStationary (N k : ℕ) (ε : ℝ) (μ : ℕ → ℝ) : Prop :=
+  (∀ z, 0 ≤ μ z) ∧ ∑ z ∈ Finset.range (N + 1), μ z = 1 ∧
+    ∀ z' ∈ Finset.range (N + 1), μ z' = ∑ z ∈ Finset.range (N + 1), μ z * seqT N k ε z z'
+
+section Seq
+variable (N k : ℕ) (ε : ℝ)
+
+/-- Into state `z'` flow the chances of arriving from just below, from just
+above, and of staying. -/
+lemma seq_inflow (μ : ℕ → ℝ) (z' : ℕ) (hz' : z' ≤ N) :
+    ∑ z ∈ Finset.range (N + 1), μ z * seqT N k ε z z' =
+      (if 1 ≤ z' then μ (z' - 1) * seqUp N k ε (z' - 1) else 0) +
+      (if z' + 1 ≤ N then μ (z' + 1) * seqDown N k ε (z' + 1) else 0) +
+      μ z' * (1 - seqUp N k ε z' - seqDown N k ε z') := by
+  simp only [seqT, mul_add, Finset.sum_add_distrib, mul_ite, mul_zero]
+  congr 1
+  congr 1
+  · split_ifs with h
+    · rw [Finset.sum_eq_single (z' - 1)]
+      · rw [ite_eq_left (by omega)]
+      · intro b _ hb; rw [ite_eq_right (by omega)]
+      · intro hb; exact absurd (Finset.mem_range.mpr (by omega)) hb
+    · exact Finset.sum_eq_zero fun b _ => by rw [ite_eq_right (by omega)]
+  · split_ifs with h
+    · rw [Finset.sum_eq_single (z' + 1)]
+      · rw [ite_eq_left rfl]
+      · intro b _ hb; rw [ite_eq_right hb]
+      · intro hb; exact absurd (Finset.mem_range.mpr (by omega)) hb
+    · exact Finset.sum_eq_zero fun b hb => by
+        rw [ite_eq_right (by have := Finset.mem_range.mp hb; omega)]
+  · rw [Finset.sum_eq_single z']
+    · rw [ite_eq_left rfl]
+    · intro b _ hb; rw [ite_eq_right (Ne.symm hb)]
+    · intro hb; exact absurd (Finset.mem_range.mpr (by omega)) hb
+
+/-- Every stationary distribution balances each pair of neighbouring states:
+the flow up from `z` equals the flow down from `z + 1`. -/
+theorem seq_detailed_balance (hN : 0 < N) (μ : ℕ → ℝ) (hμ : SeqStationary N k ε μ) :
+    ∀ z, z < N → μ z * seqUp N k ε z = μ (z + 1) * seqDown N k ε (z + 1) := by
+  obtain ⟨_, _, hbal⟩ := hμ
+  intro z
+  induction z with
+  | zero =>
+    intro _
+    have h := hbal 0 (Finset.mem_range.mpr (by omega))
+    rw [seq_inflow N k ε μ 0 (Nat.zero_le _)] at h
+    have hd0 : seqDown N k ε 0 = 0 := by simp [seqDown]
+    simp only [show ¬ (1 ≤ 0) by omega, show 0 + 1 ≤ N by omega, ↓reduceIte, hd0] at h
+    linarith
+  | succ z ih =>
+    intro hz
+    have h := hbal (z + 1) (Finset.mem_range.mpr (by omega))
+    rw [seq_inflow N k ε μ (z + 1) (by omega)] at h
+    simp only [show 1 ≤ z + 1 by omega, show z + 1 + 1 ≤ N by omega, ↓reduceIte,
+      Nat.add_sub_cancel] at h
+    have := ih (by omega)
+    linarith
+
+/-- The exponent of `ε / (1 - ε)` in the stationary weight of state `z`. -/
+def seqExp (k z : ℕ) : ℤ := if z < k then z else 2 * k - 1 - z
+
+/-- The stationary weight of state `z`. -/
+noncomputable def seqW (N k : ℕ) (ε : ℝ) (z : ℕ) : ℝ :=
+  (N.choose z : ℝ) * (ε / (1 - ε)) ^ seqExp k z
+
+/-- The weights balance each pair of neighbouring states. -/
+lemma seqW_balance (hε0 : 0 < ε) (hε1 : ε < 1) (z : ℕ) (hz : z < N) :
+    seqW N k ε z * seqUp N k ε z = seqW N k ε (z + 1) * seqDown N k ε (z + 1) := by
+  set r := ε / (1 - ε) with hr_def
+  have h1ε : (1 - ε) ≠ 0 := by linarith
+  have hr0 : r ≠ 0 := div_ne_zero hε0.ne' h1ε
+  have hr : r * (1 - ε) = ε := div_mul_cancel₀ ε h1ε
+  have hc : (N.choose (z + 1) : ℝ) * ((z : ℝ) + 1) = N.choose z * ((N : ℝ) - z) := by
+    have := Nat.choose_succ_right_eq N z
+    rw [← Nat.cast_sub hz.le]; exact_mod_cast this
+  unfold seqW seqUp seqDown seqStrike seqExp
+  push_cast
+  rcases lt_trichotomy (z + 1) k with h | h | h
+  · -- Both states wait on best reply: one mistake up, one best reply down.
+    simp only [show z < k by omega, show z + 1 < k by omega, show ¬ k ≤ z by omega,
+      show ¬ k ≤ z + 1 by omega, ↓reduceIte]
+    rw [zpow_add_one₀ hr0]
+    linear_combination (-(r ^ (z : ℤ) / N * r * (1 - ε))) * hc +
+      (-(r ^ (z : ℤ) / N * N.choose z * ((N : ℝ) - z))) * hr
+  · -- The step onto the threshold: a mistake either way.
+    subst h
+    simp only [show z < z + 1 by omega, show ¬ z + 1 < z + 1 by omega,
+      show ¬ z + 1 ≤ z by omega, le_refl, ↓reduceIte]
+    push_cast
+    rw [show (2 * ((z : ℤ) + 1) - 1 - ((z : ℤ) + 1)) = (z : ℤ) by ring]
+    linear_combination (-(r ^ (z : ℤ) / N * ε)) * hc
+  · -- Both states strike on best reply: best reply up, one mistake down.
+    simp only [show ¬ z < k by omega, show ¬ z + 1 < k by omega, show k ≤ z by omega,
+      show k ≤ z + 1 by omega, ↓reduceIte]
+    rw [show (2 * (k : ℤ) - 1 - z) = (2 * (k : ℤ) - 1 - (z + 1)) + 1 by ring, zpow_add_one₀ hr0]
+    set B := r ^ (2 * (k : ℤ) - 1 - (z + 1)) / N
+    linear_combination (B * N.choose z * ((N : ℝ) - z)) * hr - (B * ε) * hc
+
+lemma seqDown_pos (hN : 0 < N) (hε0 : 0 < ε) (hε1 : ε < 1) (z : ℕ) (hz : 0 < z) :
+    0 < seqDown N k ε z := by
+  unfold seqDown seqStrike
+  have hNr : (0 : ℝ) < N := by exact_mod_cast hN
+  have hzr : (0 : ℝ) < z := by exact_mod_cast hz
+  split_ifs <;> exact mul_pos (div_pos hzr hNr) (by linarith)
+
+lemma seqW_pos (hε0 : 0 < ε) (hε1 : ε < 1) (z : ℕ) (hz : z ≤ N) : 0 < seqW N k ε z := by
+  unfold seqW
+  exact mul_pos (by exact_mod_cast Nat.choose_pos hz) (zpow_pos (div_pos hε0 (by linarith)) _)
+
+/-- Every stationary distribution is proportional to the weights. -/
+theorem seq_product_form (hN : 0 < N) (hε0 : 0 < ε) (hε1 : ε < 1) (μ : ℕ → ℝ)
+    (hμ : SeqStationary N k ε μ) :
+    ∀ z, z ≤ N → μ z * seqW N k ε 0 = μ 0 * seqW N k ε z := by
+  intro z
+  induction z with
+  | zero => intro _; ring
+  | succ z ih =>
+    intro hz
+    have hμb := seq_detailed_balance N k ε hN μ hμ z (by omega)
+    have hwb := seqW_balance N k ε hε0 hε1 z (by omega)
+    have hd := seqDown_pos N k ε hN hε0 hε1 (z + 1) (by omega)
+    have hih := ih (by omega)
+    -- Both sides, times the flow down from `z + 1`, are equal.
+    have key : μ (z + 1) * seqW N k ε 0 * seqDown N k ε (z + 1) =
+        μ 0 * seqW N k ε (z + 1) * seqDown N k ε (z + 1) := by
+      calc μ (z + 1) * seqW N k ε 0 * seqDown N k ε (z + 1)
+          = μ z * seqUp N k ε z * seqW N k ε 0 := by rw [hμb]; ring
+        _ = μ 0 * (seqW N k ε z * seqUp N k ε z) := by
+          rw [show μ z * seqUp N k ε z * seqW N k ε 0 = μ z * seqW N k ε 0 * seqUp N k ε z by ring,
+            hih]; ring
+        _ = μ 0 * seqW N k ε (z + 1) * seqDown N k ε (z + 1) := by rw [hwb]; ring
+    exact mul_right_cancel₀ hd.ne' key
+
+/-- The stationary distribution: the weights, normalized. -/
+noncomputable def seqStat (N k : ℕ) (ε : ℝ) (z : ℕ) : ℝ :=
+  seqW N k ε z / ∑ y ∈ Finset.range (N + 1), seqW N k ε y
+
+/-- The stationary distribution is unique: every one is `seqStat`. -/
+theorem seq_stationary_unique (hN : 0 < N) (hε0 : 0 < ε) (hε1 : ε < 1) (μ : ℕ → ℝ)
+    (hμ : SeqStationary N k ε μ) : ∀ z, z ≤ N → μ z = seqStat N k ε z := by
+  have hpf := seq_product_form N k ε hN hε0 hε1 μ hμ
+  have hw0 := seqW_pos N k ε hε0 hε1 0 (Nat.zero_le _)
+  have hsum : 0 < ∑ y ∈ Finset.range (N + 1), seqW N k ε y :=
+    Finset.sum_pos (fun y hy => seqW_pos N k ε hε0 hε1 y (by have := Finset.mem_range.mp hy; omega))
+      ⟨0, Finset.mem_range.mpr (by omega)⟩
+  -- The proportionality constant is fixed by the total mass.
+  have hc : μ 0 / seqW N k ε 0 * ∑ y ∈ Finset.range (N + 1), seqW N k ε y = 1 := by
+    rw [← hμ.2.1, Finset.mul_sum]
+    refine Finset.sum_congr rfl fun y hy => ?_
+    have := hpf y (by have := Finset.mem_range.mp hy; omega)
+    field_simp; linarith
+  intro z hz
+  have := hpf z hz
+  unfold seqStat
+  rw [eq_div_iff hsum.ne']
+  have hμz : μ z = μ 0 / seqW N k ε 0 * seqW N k ε z := by field_simp; linarith
+  rw [hμz]
+  calc μ 0 / seqW N k ε 0 * seqW N k ε z * ∑ y ∈ Finset.range (N + 1), seqW N k ε y
+      = (μ 0 / seqW N k ε 0 * ∑ y ∈ Finset.range (N + 1), seqW N k ε y) * seqW N k ε z := by ring
+    _ = seqW N k ε z := by rw [hc, one_mul]
+
+/-- ... and it exists, so that statement is not vacuous. -/
+theorem seq_exists_stationary (hN : 0 < N) (hε0 : 0 < ε) (hε1 : ε < 1) :
+    SeqStationary N k ε (seqStat N k ε) := by
+  have hsum : 0 < ∑ y ∈ Finset.range (N + 1), seqW N k ε y :=
+    Finset.sum_pos (fun y hy => seqW_pos N k ε hε0 hε1 y (by have := Finset.mem_range.mp hy; omega))
+      ⟨0, Finset.mem_range.mpr (by omega)⟩
+  refine ⟨fun z => ?_, ?_, fun z' hz' => ?_⟩
+  · unfold seqStat seqW
+    exact div_nonneg (mul_nonneg (Nat.cast_nonneg _)
+      (zpow_nonneg (div_nonneg hε0.le (by linarith)) _)) hsum.le
+  · unfold seqStat; rw [← Finset.sum_div, div_self hsum.ne']
+  · have hz'N := Finset.mem_range.mp hz'
+    rw [seq_inflow N k ε _ z' (by omega)]
+    unfold seqStat
+    -- The weights balance each neighbour, and nothing leaves through the ends.
+    have hd0 : seqDown N k ε 0 = 0 := by simp [seqDown]
+    have huN : seqUp N k ε N = 0 := by simp [seqUp]
+    set T := ∑ y ∈ Finset.range (N + 1), seqW N k ε y
+    have hlow : 1 ≤ z' → seqW N k ε (z' - 1) * seqUp N k ε (z' - 1) =
+        seqW N k ε z' * seqDown N k ε z' := fun h => by
+      have := seqW_balance N k ε hε0 hε1 (z' - 1) (by omega)
+      rwa [Nat.sub_add_cancel h] at this
+    have hhigh : z' + 1 ≤ N → seqW N k ε (z' + 1) * seqDown N k ε (z' + 1) =
+        seqW N k ε z' * seqUp N k ε z' := fun h => (seqW_balance N k ε hε0 hε1 z' (by omega)).symm
+    by_cases h1 : 1 ≤ z' <;> by_cases h2 : z' + 1 ≤ N <;> simp only [h1, h2, ↓reduceIte]
+    · rw [div_mul_eq_mul_div, div_mul_eq_mul_div, hlow h1, hhigh h2]; field_simp; ring
+    · have : z' = N := by omega
+      subst this
+      rw [div_mul_eq_mul_div, hlow h1, huN]; field_simp; ring
+    · have : z' = 0 := by omega
+      subst this
+      rw [div_mul_eq_mul_div, hhigh h2, hd0]; field_simp; ring
+    · omega
+
+/-- The two ends: all striking is `((1 - ε)/ε)^(N + 1 - 2k)` times as likely
+as all waiting. -/
+theorem seq_ends_ratio (hN : 0 < N) (hk1 : 1 ≤ k) (hkN : k ≤ N) (hε0 : 0 < ε) (hε1 : ε < 1)
+    (μ : ℕ → ℝ) (hμ : SeqStationary N k ε μ) :
+    μ N = μ 0 * (ε / (1 - ε)) ^ (2 * (k : ℤ) - 1 - N) := by
+  have := seq_product_form N k ε hN hε0 hε1 μ hμ N le_rfl
+  unfold seqW seqExp at this
+  simp only [Nat.choose_self, Nat.choose_zero_right, Nat.cast_one, one_mul,
+    show 0 < k by omega, show ¬ N < k by omega, ↓reduceIte, Nat.cast_zero, zpow_zero,
+    mul_one] at this
+  exact this
+
+/-- The binomial coefficients below `N` sum to at most `2^N`. -/
+lemma seq_choose_sum_le (N : ℕ) : ∑ z ∈ Finset.range N, (N.choose z : ℝ) ≤ 2 ^ N := by
+  have h : ∑ z ∈ Finset.range (N + 1), (N.choose z : ℝ) = 2 ^ N := by
+    exact_mod_cast Nat.sum_range_choose N
+  rw [Finset.sum_range_succ] at h
+  have : (0 : ℝ) ≤ N.choose N := Nat.cast_nonneg _
+  linarith
+
+/-- If `2k ≤ N`, all striking holds all but at most `2^N ε/(1-ε)` of the
+stationary weight: every other state lies above it in the weights' exponent. -/
+lemma seq_top_bound (hk1 : 1 ≤ k) (h2k : 2 * k ≤ N) (hε0 : 0 < ε) (hε2 : ε ≤ 1 / 2)
+    (μ : ℕ → ℝ) (hμ : SeqStationary N k ε μ) : 1 - 2 ^ N * (ε / (1 - ε)) ≤ μ N := by
+  have hN : 0 < N := by omega
+  have hε1 : ε < 1 := by linarith
+  set r := ε / (1 - ε) with hr_def
+  have hr0 : 0 < r := div_pos hε0 (by linarith)
+  have hr1 : r ≤ 1 := by rw [hr_def, div_le_one (by linarith)]; linarith
+  have hpf := seq_product_form N k ε hN hε0 hε1 μ hμ
+  have hw0 : seqW N k ε 0 = 1 := by
+    simp [seqW, seqExp, show 0 < k by omega]
+  have hμN : μ N = μ 0 * r ^ (2 * (k : ℤ) - 1 - N) :=
+    seq_ends_ratio N k ε hN hk1 (by omega) hε0 hε1 μ hμ
+  -- Each state below the top has at most `C(N, z) r` times the top's mass.
+  have hz : ∀ z ∈ Finset.range N, μ z ≤ (N.choose z : ℝ) * r * μ N := by
+    intro z hzN
+    have hzN := Finset.mem_range.mp hzN
+    have hμz : μ z = μ 0 * seqW N k ε z := by have := hpf z hzN.le; rwa [hw0, mul_one] at this
+    have hexp : 2 * (k : ℤ) - 1 - N + 1 ≤ seqExp k z := by
+      unfold seqExp; split_ifs <;> omega
+    have hpow : r ^ seqExp k z ≤ r ^ (2 * (k : ℤ) - 1 - N) * r := by
+      rw [← zpow_add_one₀ hr0.ne']
+      exact zpow_le_zpow_right_of_le_one₀ hr0 hr1 hexp
+    rw [hμz, hμN]
+    unfold seqW
+    have hμ0 := hμ.1 0
+    have hc : (0 : ℝ) ≤ N.choose z := Nat.cast_nonneg _
+    calc μ 0 * ((N.choose z : ℝ) * r ^ seqExp k z)
+        ≤ μ 0 * ((N.choose z : ℝ) * (r ^ (2 * (k : ℤ) - 1 - N) * r)) :=
+          mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_left hpow hc) hμ0
+      _ = (N.choose z : ℝ) * r * (μ 0 * r ^ (2 * (k : ℤ) - 1 - N)) := by ring
+  have hsum := hμ.2.1
+  rw [Finset.sum_range_succ] at hsum
+  have hN1 : μ N ≤ 1 := by have := Finset.sum_nonneg (fun z (_ : z ∈ Finset.range N) => hμ.1 z); linarith
+  have hlow : ∑ z ∈ Finset.range N, μ z ≤ 2 ^ N * r := by
+    calc ∑ z ∈ Finset.range N, μ z ≤ ∑ z ∈ Finset.range N, (N.choose z : ℝ) * r * μ N :=
+          Finset.sum_le_sum hz
+      _ = (∑ z ∈ Finset.range N, (N.choose z : ℝ)) * (r * μ N) := by
+          rw [Finset.sum_mul]; exact Finset.sum_congr rfl fun z _ => by ring
+      _ ≤ 2 ^ N * (r * 1) := by
+          apply mul_le_mul (seq_choose_sum_le N) (mul_le_mul_of_nonneg_left hN1 hr0.le)
+            (mul_nonneg hr0.le (hμ.1 N)) (by positivity)
+      _ = 2 ^ N * r := by ring
+  linarith
+
+/-- The mirror: if `2k ≥ N + 2`, all waiting holds all but at most
+`2^N ε/(1-ε)` of the stationary weight. -/
+lemma seq_bottom_bound (hkN : k ≤ N) (h2k : N + 2 ≤ 2 * k) (hε0 : 0 < ε) (hε2 : ε ≤ 1 / 2)
+    (μ : ℕ → ℝ) (hμ : SeqStationary N k ε μ) : 1 - 2 ^ N * (ε / (1 - ε)) ≤ μ 0 := by
+  have hN : 0 < N := by omega
+  have hε1 : ε < 1 := by linarith
+  set r := ε / (1 - ε) with hr_def
+  have hr0 : 0 < r := div_pos hε0 (by linarith)
+  have hr1 : r ≤ 1 := by rw [hr_def, div_le_one (by linarith)]; linarith
+  have hpf := seq_product_form N k ε hN hε0 hε1 μ hμ
+  have hw0 : seqW N k ε 0 = 1 := by
+    simp [seqW, seqExp, show 0 < k by omega]
+  have hsum := hμ.2.1
+  rw [Finset.sum_range_succ'] at hsum
+  have h01 : μ 0 ≤ 1 := by
+    have := Finset.sum_nonneg (fun z (_ : z ∈ Finset.range N) => hμ.1 (z + 1)); linarith
+  -- Each state above the bottom has at most `C(N, z) r` times the bottom's mass.
+  have hz : ∀ i ∈ Finset.range N, μ (i + 1) ≤ (N.choose (i + 1) : ℝ) * r := by
+    intro i hi
+    have hi := Finset.mem_range.mp hi
+    have hμz : μ (i + 1) = μ 0 * seqW N k ε (i + 1) := by
+      have := hpf (i + 1) (by omega); rwa [hw0, mul_one] at this
+    have hexp : (1 : ℤ) ≤ seqExp k (i + 1) := by
+      unfold seqExp; split_ifs <;> omega
+    have hpow : r ^ seqExp k (i + 1) ≤ r := by
+      have := zpow_le_zpow_right_of_le_one₀ hr0 hr1 hexp; rwa [zpow_one] at this
+    rw [hμz]; unfold seqW
+    have hc : (0 : ℝ) ≤ N.choose (i + 1) := Nat.cast_nonneg _
+    have hwz : 0 ≤ (N.choose (i + 1) : ℝ) * r ^ seqExp k (i + 1) :=
+      mul_nonneg hc (zpow_nonneg hr0.le _)
+    calc μ 0 * ((N.choose (i + 1) : ℝ) * r ^ seqExp k (i + 1))
+        ≤ 1 * ((N.choose (i + 1) : ℝ) * r ^ seqExp k (i + 1)) :=
+          mul_le_mul_of_nonneg_right h01 hwz
+      _ ≤ (N.choose (i + 1) : ℝ) * r := by rw [one_mul]; exact mul_le_mul_of_nonneg_left hpow hc
+  have hC : ∑ i ∈ Finset.range N, (N.choose (i + 1) : ℝ) ≤ 2 ^ N := by
+    have h : ∑ z ∈ Finset.range (N + 1), (N.choose z : ℝ) = 2 ^ N := by
+      exact_mod_cast Nat.sum_range_choose N
+    rw [Finset.sum_range_succ'] at h
+    have : (0 : ℝ) ≤ N.choose 0 := Nat.cast_nonneg _
+    linarith
+  have hhigh : ∑ i ∈ Finset.range N, μ (i + 1) ≤ 2 ^ N * r := by
+    calc ∑ i ∈ Finset.range N, μ (i + 1) ≤ ∑ i ∈ Finset.range N, (N.choose (i + 1) : ℝ) * r :=
+          Finset.sum_le_sum hz
+      _ = (∑ i ∈ Finset.range N, (N.choose (i + 1) : ℝ)) * r := by rw [Finset.sum_mul]
+      _ ≤ 2 ^ N * r := mul_le_mul_of_nonneg_right hC hr0.le
+  linarith
+
+/-- `2^N ε/(1-ε)` vanishes as `ε → 0⁺`. -/
+lemma seq_gap_tendsto (N : ℕ) :
+    Tendsto (fun ε : ℝ => 2 ^ N * (ε / (1 - ε))) (𝓝[>] 0) (𝓝 0) := by
+  have hc : ContinuousAt (fun ε : ℝ => 2 ^ N * (ε / (1 - ε))) 0 :=
+    continuousAt_const.mul (continuousAt_id.div (continuousAt_const.sub continuousAt_id) (by simp))
+  have := hc.tendsto
+  simp only [sub_zero, div_one, mul_zero] at this
+  exact tendsto_nhdsWithin_of_tendsto_nhds this
+
+/-- If leaving all striking takes more mistakes than entering it (`2k ≤ N`),
+then as mistakes become rare the population strikes almost all the time. -/
+theorem seq_selects_strike (hk1 : 1 ≤ k) (h2k : 2 * k ≤ N) :
+    ∀ δ > 0, ∀ᶠ ε in 𝓝[>] 0, ∀ μ, SeqStationary N k ε μ → 1 - δ < μ N := by
+  intro δ hδ
+  filter_upwards [(tendsto_order.1 (seq_gap_tendsto N)).2 δ hδ,
+    Ioc_mem_nhdsGT (show (0 : ℝ) < 1 / 2 by norm_num)] with ε hε ⟨hε0, hε2⟩ μ hμ
+  have := seq_top_bound N k ε hk1 h2k hε0 hε2 μ hμ
+  linarith
+
+/-- The mirror: if entering all striking takes more mistakes than leaving it
+(`2k ≥ N + 2`), the population waits almost all the time. -/
+theorem seq_selects_wait (hkN : k ≤ N) (h2k : N + 2 ≤ 2 * k) :
+    ∀ δ > 0, ∀ᶠ ε in 𝓝[>] 0, ∀ μ, SeqStationary N k ε μ → 1 - δ < μ 0 := by
+  intro δ hδ
+  filter_upwards [(tendsto_order.1 (seq_gap_tendsto N)).2 δ hδ,
+    Ioc_mem_nhdsGT (show (0 : ℝ) < 1 / 2 by norm_num)] with ε hε ⟨hε0, hε2⟩ μ hμ
+  have := seq_bottom_bound N k ε hkN h2k hε0 hε2 μ hμ
+  linarith
+
+end Seq
+
+/-- Kandori, Mailath and Rob under one-at-a-time revision, for this game: if
+striking is risk-dominant, then in every large enough population, as mistakes
+become rare, the unique stationary distribution has everyone striking almost
+all the time. -/
+theorem seq_selects_risk_dominant (π t : ℝ) (hπt : π < t) (hrd : t < (1 + π) / 2) :
+    ∃ N₀ : ℕ, ∀ N ≥ N₀, ∀ δ > 0, ∀ᶠ ε in 𝓝[>] 0, ∀ μ,
+      SeqStationary N (kmrK π t N) ε μ → 1 - δ < μ N := by
+  have hπ1 : π < 1 := by linarith
+  have he : 0 ≤ edge π t := div_nonneg (by linarith) (by linarith)
+  have he2 : edge π t < 1 / 2 := (larger_basin_iff_risk_dominant π t hπ1).mpr hrd
+  refine ⟨⌈2 / (1 - 2 * edge π t)⌉₊, fun N hN => ?_⟩
+  have hNr : 2 / (1 - 2 * edge π t) ≤ N := le_trans (Nat.le_ceil _) (by exact_mod_cast hN)
+  have hbig : 2 ≤ (1 - 2 * edge π t) * N := by
+    rw [div_le_iff₀ (by linarith)] at hNr; linarith
+  have hfl := Nat.floor_le (mul_nonneg he (Nat.cast_nonneg N : (0 : ℝ) ≤ N))
+  have h2k : 2 * kmrK π t N ≤ N := by
+    have : (2 * (⌊edge π t * N⌋₊ + 1 : ℕ) : ℝ) ≤ N := by push_cast; nlinarith
+    exact_mod_cast this
+  exact seq_selects_strike N (kmrK π t N) (by simp [kmrK]) h2k
+
+/-- The mirror: if restraint is risk-dominant, in every large enough
+population, as mistakes become rare, everyone waits almost all the time. -/
+theorem seq_selects_restraint (π t : ℝ) (hπ1 : π < 1) (hrd : (1 + π) / 2 < t) (ht1 : t < 1) :
+    ∃ N₀ : ℕ, ∀ N ≥ N₀, ∀ δ > 0, ∀ᶠ ε in 𝓝[>] 0, ∀ μ,
+      SeqStationary N (kmrK π t N) ε μ → 1 - δ < μ 0 := by
+  have h1π : 0 < 1 - π := by linarith
+  have he2 : 1 / 2 < edge π t := by
+    by_contra h
+    have := (larger_basin_iff_risk_dominant π t hπ1).mp
+      (lt_of_le_of_ne (not_lt.mp h) (fun heq => by
+        unfold edge at heq; rw [div_eq_iff h1π.ne'] at heq; linarith))
+    linarith
+  have he1 : edge π t < 1 := by unfold edge; rw [div_lt_one h1π]; linarith
+  refine ⟨⌈2 / (2 * edge π t - 1)⌉₊, fun N hN => ?_⟩
+  have hNr : 2 / (2 * edge π t - 1) ≤ N := le_trans (Nat.le_ceil _) (by exact_mod_cast hN)
+  have hbig : 2 ≤ (2 * edge π t - 1) * N := by
+    rw [div_le_iff₀ (by linarith)] at hNr; linarith
+  have hN0 : (0 : ℝ) < N := by nlinarith
+  have hx : 0 ≤ edge π t * N := by nlinarith
+  have hfl := Nat.floor_le hx
+  have hfl' := Nat.lt_floor_add_one (edge π t * N)
+  have hkN : kmrK π t N ≤ N := by
+    have : (⌊edge π t * N⌋₊ : ℝ) < N := by nlinarith
+    have : ⌊edge π t * N⌋₊ < N := by exact_mod_cast this
+    unfold kmrK; omega
+  have h2k : N + 2 ≤ 2 * kmrK π t N := by
+    have : ((N + 2 : ℕ) : ℝ) < 2 * (⌊edge π t * N⌋₊ + 1 : ℕ) := by push_cast; nlinarith
+    have : N + 2 < 2 * (⌊edge π t * N⌋₊ + 1) := by exact_mod_cast this
+    unfold kmrK; omega
+  exact seq_selects_wait N (kmrK π t N) hkN h2k
 
 end DarkForest
