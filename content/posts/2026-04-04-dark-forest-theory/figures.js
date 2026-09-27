@@ -280,7 +280,7 @@
     var T = f.T, width = 0, live = false, seed = 1, runLen = 3000, perFrame = 4, stage = 0;
     var PRESETS = [
       { name: T('dark forest', '黑暗森林'), p: 0.1, q: 0.7, e: 0.2, B: 0.3, text: T('Hostile civilizations exist: broadcasting dies out, and so does striking.', '存在敌对文明：广播消失了，打击也消失了。') },
-      { name: T('hunting ground', '猎场'), p: 0.3, q: 0.95, e: 0, B: 0.3, text: T('Many hostiles, strikes that almost always succeed and that no one else sees: striking spreads.', '敌对文明众多，打击几乎必定成功，而且别人看不见：打击蔓延开来。') },
+      { name: T('hunting ground', '猎场'), p: 0.3, q: 0.95, e: 0, B: 0.3, text: T('Many hostiles, strikes that almost always succeed and that no one else sees: striking survives, and in some runs spreads to most civilizations.', '敌对文明众多，打击几乎必定成功，而且别人看不见：打击存活下来，在有些运行中还会扩散到多数文明。') },
       { name: T('strikes fail', '打击失败'), p: 0.1, q: 0.15, e: 0.8, B: 0.3, text: T('Strikes usually fail and expose the attacker: nobody strikes, but the hostile few still keep most civilizations quiet.', '打击通常失败，还会暴露攻击者：没有谁去打击，但少数敌对文明仍让大多数文明保持安静。') },
       { name: T('lit forest', '明亮的森林'), p: 0, q: 0.15, e: 0.2, B: 1.5, text: T('No hostiles, and contact pays: most civilizations keep broadcasting.', '没有敌对文明，接触又有好处：大多数文明一直在广播。') }
     ];
