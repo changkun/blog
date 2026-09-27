@@ -56,7 +56,9 @@
     return b;
   }
 
-  // A labelled range input; format shows its value beside it.
+  // A labelled range input; format shows its value beside it. onInput runs
+  // for the reader's own changes; set() moves it without calling onInput,
+  // for a figure that plays itself.
   function slider(parent, opts) {
     var wrap = el('label', { class: 'ifig-slider' }, parent);
     el('span', { class: 'ifig-slider-label', text: opts.label }, wrap);
@@ -65,13 +67,31 @@
     function show() { out.textContent = opts.format ? opts.format(+input.value) : input.value; }
     input.addEventListener('input', function () { show(); opts.onInput(+input.value); });
     show();
+    input.set = function (v) { input.value = v; show(); };
     return input;
   }
 
+  // The play and pause control every animated figure carries. A figure
+  // plays on its own until the reader pauses it or takes a control; with
+  // reduced motion it starts paused. onChange(playing) runs on every change.
+  function player(parent, T, onChange) {
+    var playing = !reduced;
+    var b = el('button', { type: 'button', class: 'ifig-button ifig-play' }, parent);
+    function show() {
+      b.textContent = playing ? T('❚❚ pause', '❚❚ 暂停') : T('▶ play', '▶ 播放');
+      b.setAttribute('aria-label', playing ? T('Pause', '暂停') : T('Play', '播放'));
+    }
+    function set(v) { if (v !== playing) { playing = v; show(); onChange(playing); } }
+    b.addEventListener('click', function () { set(!playing); });
+    show();
+    return { playing: function () { return playing; }, set: set };
+  }
+
   // Runs step(dt) every frame while the figure is on screen. step returns
-  // false to stop; start() resumes. With reduced motion it never runs.
+  // false to stop; start() resumes. With reduced motion it runs only when
+  // the reader asks, start(true).
   function loop(root, step) {
-    var visible = false, running = false, last = 0, wanted = true;
+    var visible = false, running = false, last = 0, wanted = true, asked = false;
     function frame(t) {
       if (!visible || !wanted) { running = false; return; }
       var dt = last ? Math.min((t - last) / 1000, 0.05) : 0;
@@ -80,14 +100,14 @@
       requestAnimationFrame(frame);
     }
     function kick() {
-      if (reduced || running || !visible || !wanted) return;
+      if ((reduced && !asked) || running || !visible || !wanted) return;
       running = true; last = 0; requestAnimationFrame(frame);
     }
     new IntersectionObserver(function (entries) {
       visible = entries[0].isIntersecting;
       kick();
     }, { threshold: 0.15 }).observe(root);
-    return { start: function () { wanted = true; kick(); }, stop: function () { wanted = false; } };
+    return { start: function (ask) { if (ask) asked = true; wanted = true; kick(); }, stop: function () { wanted = false; } };
   }
 
   function mount() {
@@ -127,7 +147,7 @@
 
   window.ifig = {
     register: function (file, build) { registry[file] = build; },
-    el: el, svg: svg, sub: sub, button: button, slider: slider, loop: loop, reduced: reduced
+    el: el, svg: svg, sub: sub, button: button, slider: slider, player: player, loop: loop, reduced: reduced
   };
 
   // The kit and the post's figure script both load deferred, and deferred
