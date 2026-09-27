@@ -355,15 +355,70 @@ svg { width: 16px; height: 16px; flex: none; }
 
 .idea-body { font-size: 15.5px; }
 
-/* A deep dive is folded in the stream and open on the idea's own page. */
+/* A deep dive is folded in the stream and open on the idea's own page.
+ * It is generated text, so it reads as a quieter panel apart from the
+ * idea: smaller type in the secondary tone, its disclaimer as a label,
+ * its headings at the size of the text. */
 .idea-augmented {
     display: none;
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 1px dashed var(--border-strong);
+    margin-top: 28px;
+    padding: 18px 22px 6px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--bg-code);
+    font-size: 14.5px;
+    line-height: 1.7;
+    color: var(--text-secondary);
 }
 
 .post-type-normal .idea-augmented { display: block; }
+
+.prose .idea-augmented > p:first-child {
+    margin-bottom: 14px;
+    font: 500 11.5px/1.5 var(--mono);
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+}
+
+.prose .idea-augmented > p:first-child em { font-style: normal; }
+
+.prose .idea-augmented h1,
+.prose .idea-augmented h2,
+.prose .idea-augmented h3,
+.prose .idea-augmented h4 {
+    margin: 1.4em 0 0.4em;
+    font: 600 15px/1.45 var(--sans);
+    color: var(--text);
+}
+
+.prose .idea-augmented h3,
+.prose .idea-augmented h4 { font-size: 14.5px; }
+
+/* The generated text opens in more than one shape: a rule may follow the
+ * disclaimer, the title may be a first or second level heading, a rule
+ * may follow it. The panel frames the section already, so those rules
+ * go, and whichever heading comes first is the panel's title. */
+.prose .idea-augmented > p:first-child + hr,
+.prose .idea-augmented > p:first-child + h1 + hr,
+.prose .idea-augmented > p:first-child + h2 + hr,
+.prose .idea-augmented > p:first-child + hr + h1 + hr,
+.prose .idea-augmented > p:first-child + hr + h2 + hr { display: none; }
+
+.prose .idea-augmented > p:first-child + h1,
+.prose .idea-augmented > p:first-child + h2,
+.prose .idea-augmented > p:first-child + hr + h1,
+.prose .idea-augmented > p:first-child + hr + h2 { margin-top: 0; font-size: 16.5px; }
+
+.prose .idea-augmented hr { margin: 1.4em 0; }
+
+.prose .idea-augmented p,
+.prose .idea-augmented li { font-size: inherit; }
+
+.prose .idea-augmented strong { color: var(--text); }
+
+.prose .idea-augmented blockquote { font-size: inherit; }
+
+.prose .idea-augmented pre { font-size: 12.5px; }
 
 .idea-toggle {
     display: inline-flex;
@@ -523,10 +578,7 @@ svg { width: 16px; height: 16px; flex: none; }
 /* An idea's own headings stay in the text face, under its serif title. */
 .prose.idea-body h1,
 .prose.idea-body h2,
-.prose.idea-body h3,
-.prose .idea-augmented h1,
-.prose .idea-augmented h2,
-.prose .idea-augmented h3 { font: 600 18px/1.4 var(--sans); margin: 1.6em 0 0.5em; }
+.prose.idea-body h3 { font: 600 18px/1.4 var(--sans); margin: 1.6em 0 0.5em; }
 
 .prose a {
     text-decoration: underline;
@@ -1075,6 +1127,7 @@ svg { width: 16px; height: 16px; flex: none; }
     .prose .highlight > .chroma { margin-left: calc(-1 * var(--gutter)); margin-right: calc(-1 * var(--gutter)); border-radius: 0; border-left: 0; border-right: 0; }
     .prose .highlight pre { margin: 0; }
     .ideas-count { display: none; }
+    .idea-augmented { padding: 14px 16px 4px; }
     .prenext { grid-template-columns: 1fr; }
     .prenext-older { text-align: left; }
     .compose-window { left: 8px; right: 8px; width: auto; max-width: none; transform: translate(0, -50%); }
