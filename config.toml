@@ -3,7 +3,7 @@
 Title =  "Changkun's Blog"
 LanguageCode = "en-US"
 BaseUrl = "https://changkun.de/blog"
-Theme =  "changkun"
+Theme =  "ink"
 MetaDataFormat =  "yaml"
 CanonifyUrls =  true
 BuildDrafts =  false
