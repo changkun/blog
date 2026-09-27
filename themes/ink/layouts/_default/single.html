@@ -46,6 +46,14 @@
       </aside>
     </footer>
   </article>
+  {{- /* A post that lists scripts in its front matter gets the figure kit
+         and those scripts, from its own bundle. */ -}}
+  {{ with .Params.scripts }}
+  {{ $kit := resources.Get "js/ifig.js" | minify | fingerprint }}
+  <script defer src="{{ $kit.RelPermalink }}"></script>
+  {{ range . }}{{ with $.Resources.GetMatch . }}{{ $s := . | minify | fingerprint }}
+  <script defer src="{{ $s.RelPermalink }}"></script>{{ end }}{{ end }}
+  {{ end }}
   {{ if $toc }}
   <aside class="toc-rail" aria-label="Contents">
     <div class="toc-label">{{ partial "bilingual.html" "Contents" }}</div>
