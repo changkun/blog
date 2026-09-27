@@ -712,6 +712,52 @@ svg { width: 16px; height: 16px; flex: none; }
 .prose [style*="#000000" i],
 .prose [style*="color: black" i] { color: inherit !important; }
 
+/* ---- Interactive figures (ifig.js) ---- */
+
+.ifig { margin: 1.8em 0 0.6em; }
+
+.ifig-stage { position: relative; width: 100%; }
+
+.ifig-stage svg { display: block; width: 100%; height: auto; overflow: visible; }
+
+.ifig-stage text { fill: var(--text-secondary); font-family: var(--sans); font-size: 12.5px; }
+
+.ifig-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 14px;
+    margin-top: 12px;
+    font: 12px/1.4 var(--mono);
+    color: var(--text-muted);
+}
+
+.ifig-button {
+    height: 28px;
+    padding: 0 11px;
+    border: 1px solid var(--border-strong);
+    border-radius: 6px;
+    background: none;
+    font: 500 12px var(--mono);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
+}
+
+.ifig-button:hover:not(:disabled) { color: var(--navy); border-color: var(--navy); }
+
+.ifig-button:disabled { opacity: 0.45; cursor: default; }
+
+.ifig-button[aria-pressed="true"] { color: var(--bg); background: var(--text); border-color: var(--text); }
+
+.ifig-slider { display: inline-flex; align-items: center; gap: 8px; }
+
+.ifig-slider input { width: 120px; accent-color: var(--navy); }
+
+.ifig-slider-value { min-width: 3.2em; color: var(--text-secondary); }
+
+.ifig-readout { margin-left: auto; color: var(--text-secondary); }
+
 /* ---- Article footer ---- */
 
 .article-footer { padding: 16px 0 24px; }
