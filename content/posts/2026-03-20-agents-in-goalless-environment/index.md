@@ -3,6 +3,8 @@ date: 2026-03-20T10:00:00+01:00
 toc: true
 id:
 slug: /posts/goalless-agents
+scripts:
+    - figures.js
 tags:
     - 随笔
     - 人生感悟
@@ -15,14 +17,14 @@ title_zh: "有目标与无目标环境中的智能体（或人类）：论流程
 
 > "It is not knowledge, but the act of learning, not possession but the act of getting there, which grants the greatest enjoyment." -- _Gauss (letter to Bolyai, 1808)_
 
-Give an AI Agent a clean computer, set no goals, and let it decide what to do. What do you think it would do? I assumed the answer would be random. It wasn't. I ran this experiment many times, restarting from a fresh environment each time, and Claude always did the same thing: Conway's Game of Life, Codex always did the same thing: a To-Do App. No matter how many times I repeated it, the theme never changed. This made me start rethinking a few things.
+Give an AI Agent a clean computer, set no goals, and let it decide what to do. What do you think it would do? I assumed the answer would be random. It wasn't. I ran this experiment many times, restarting from a fresh environment each time. Claude always built Conway's Game of Life, and Codex always built a To-Do App. No matter how many times I repeated it, the theme never changed. This made me start rethinking a few things.
 
 ## Starting from a Pipeline
 
 My day job is software engineering. So when I decided to build fully autonomous AI Agents, the most natural starting point was to design one following my usual workflow: a complete software engineering pipeline.
 
 ![](fig1.png)
-_Fig 1: Wallfacer: Autonomous Engineering pipeline that Orchestrates AI Agent Teams_
+_Fig 1: Wallfacer, an autonomous engineering pipeline that orchestrates teams of AI agents._
 
 
 This pipeline is called Wallfacer[^1]. Its actual architecture is far more complex than this essay's narrative: a Kanban task board system written in Go, with each task executing in an isolated sandbox container, branch-level parallelism via Git worktrees, and support for real-time log tracking, diff review, and token usage monitoring. But for readability, I'll simplify it down to four core roles.
@@ -32,7 +34,7 @@ The Strategist proposes goals and directions, the Executor implements code, the 
 I let this pipeline run continuously for a week. The system was indeed working: the Strategist proposed features, the Executor implemented them, the Tester verified, the Documenter recorded, commits kept flowing, and the cycle never broke. But over the course of the week, a pattern gradually emerged: changes grew smaller, features grew more trivial. What began as substantive contributions slowly degraded into micro-optimizations, like adjusting a log format, renaming a variable, or fixing a boundary condition that would never be triggered. The Agents were still busy, the commit history still active, but the product itself had stopped growing in any meaningful way. More notably, the Agents never stepped outside the initial architectural assumptions. The pipeline was designed to run locally, and the Strategist never once proposed "we should support cloud deployment" or "we need to rethink the system's overall topology," the kind of proposals that would require complex, multi-cycle implementation plans. The Agents optimized inside the box but never questioned the box itself.
 
 ![](fig2.png)
-_Fig 2: The Wallfacer full pipeline architecture (simplified). Four roles cycle through planning, implementation, verification, and documentation. Actual system involves more layer._
+_Fig 2: The Wallfacer pipeline, simplified. Four roles cycle through planning, implementation, verification and documentation; the actual system has more layers. Each cycle ends in a commit, and over a week the commits shrink while the architecture they sit in never changes. The sizes are a sketch._
 
 When Herbert Simon introduced "bounded rationality" in the 1950s, he pointed out that decision-makers do not exhaustively search all possibilities for an optimal solution but instead stop as soon as they find a "good enough" option within an acceptable range, what he called satisficing [^6]. My Agents were doing exactly this: within the search space defined by the existing architecture, they found one "good enough" improvement after another, yet never attempted to redefine the search space itself.
 
@@ -40,7 +42,7 @@ Stuart Kauffman's NK fitness landscape model provides a more precise metaphor fo
 
 There is a deeper paradox here. James March, in his classic paper on organizational learning, distinguished between two activities: exploration and exploitation [^8]. Exploration means high risk and high variance, trying entirely new directions that might yield nothing or might open up entirely new possibilities. Exploitation means low risk and low variance, digging deeper along known good paths, with certain but diminishing returns. March pointed out that any adaptive system faces a fundamental tension between these two, and mature organizations almost always drift toward exploitation, because exploitation's returns are more predictable, more measurable, and more easily rewarded by processes.
 
-My pipeline perfectly reproduced this drift. The pipeline's structure itself is an exploitation machine: every cycle has clear inputs and outputs, every iteration is expected to produce mergeable code. Under this structure, exploration has no reward and can't even be expressed. An Agent can't write in a pull request "I suggest we pause delivery and spend three weeks rethinking our architecture," the structure doesn't accept that kind of sentence. Clayton Christensen described exactly this same mechanism unfolding at the enterprise level in *The Innovator's Dilemma* [^9]: mature companies get disrupted often not for lack of talent or resources but, on the contrary, precisely because their highly mature processes, value networks, and profit models confine improvement to a very narrow corridor, the incremental, predictable, architecture-preserving kind. My Agent pipeline, at a miniature scale, replayed exactly the same predicament. After seeing this result, I started wondering: if the problem lies in structure, what would happen if I simplified it?
+My pipeline perfectly reproduced this drift. The pipeline's structure itself is an exploitation machine: every cycle has clear inputs and outputs, every iteration is expected to produce mergeable code. Under this structure, exploration has no reward and can't even be expressed. An Agent can't write in a pull request "I suggest we pause delivery and spend three weeks rethinking our architecture"; the structure has no place for that kind of sentence. Clayton Christensen described exactly this same mechanism unfolding at the enterprise level in *The Innovator's Dilemma* [^9]: mature companies get disrupted often not for lack of talent or resources but, on the contrary, precisely because their highly mature processes, value networks, and profit models confine improvement to a very narrow corridor, the incremental, predictable, architecture-preserving kind. My Agent pipeline, at a miniature scale, replayed exactly the same predicament. After seeing this result, I started wondering: if the problem lies in structure, what would happen if I simplified it?
 
 ## Stripping Away Structure
 
@@ -50,10 +52,10 @@ Then I went further and removed the Tester, leaving only the Strategist and Exec
 
 Finally, the Strategist itself couldn't take it anymore. It judged the application to be too large (it used the word "massive" itself), needed refactoring, and at that critical juncture initiated a large-scale refactor. But the Executor clearly couldn't handle refactoring that much code in one go. After the refactor, variables were lost, bugs proliferated, and the application completely stopped working. Although subsequent cycles gradually repaired and restored functionality, plenty of hidden issues remained, and there was still no documentation.
 
-Each role removed cost the system a layer of safety net. Without the Documenter, knowledge was lost between rounds. Without the Tester, quality went unchecked. But at the same time, each role removed also gave the system more degrees of freedom. Without the Tester's constraints, the Executor could move faster (though possibly in the wrong direction). Without the Documenter's organization, the Strategist's goal-setting became more arbitrary (though also more unpredictable). Structure provides protection but also imposes constraint. Strip away structure, and the system becomes fragile but also more open. This isn't a question of "which is better," it's more like a conservation law: there seems to be an irreconcilable tension between stability and freedom. This made me curious: if I kept stripping, removed the Strategist too, left only a single Agent with no preset goals, what would happen?
+Each role removed cost the system a layer of safety net. Without the Documenter, knowledge was lost between rounds. Without the Tester, quality went unchecked. But at the same time, each role removed also gave the system more degrees of freedom. Without the Tester's constraints, the Executor could move faster (though possibly in the wrong direction). Without the Documenter's organization, the Strategist's goal-setting became more arbitrary (though also more unpredictable). Structure provides protection but also imposes constraint. Strip away structure, and the system becomes fragile but also more open. This isn't a question of which is better. It is more like a conservation law: there seems to be an irreconcilable tension between stability and freedom. This made me curious: if I kept stripping, removed the Strategist too, left only a single Agent with no preset goals, what would happen?
 
 ![](fig3.png)
-_Fig 3: Progressive stripping of structure. From a four-role pipeline to a single goalless agent, each role removed costs a layer of protection while granting more degrees of freedom._
+_Fig 3: Progressive stripping of structure. From a four-role pipeline to a single goalless agent, each role removed costs a layer of protection while granting more degrees of freedom. Select a configuration to read what happened to it._
 
 ## One Agent, One Machine, No Goals
 
@@ -63,7 +65,7 @@ Claude chose to build Conway's Game of Life[^3], continuously iterating and laye
 
 What's interesting is how stable these choices were. I restarted the entire experiment environment from scratch multiple times, each time with a brand new machine and a brand new context, and Claude always built Game of Life, Codex always built a To-Do App. Implementation details varied, Claude sometimes used Python, occasionally C, occasionally Go, but the theme never wavered. This was not the result of a single random sample. It looked more like a default orientation deeply imprinted by the training process. If I may be a little poetic: one was searching for the meaning of life, the other was searching for the most popular answer.
 
-But after 42 rounds, both Agents hit the same wall. The code started falling apart: bugs accumulated, structure grew chaotic, documentation was virtually nonexistent. Claude had crammed everything into a single file tens of thousands of lines long, while Codex had the opposite problem, prematurely introduced architectural complexity making dependency chains impossible to track. Two paths converged on the same destination: unmaintainability.
+But after 42 rounds, both Agents hit the same wall. The code started falling apart: bugs accumulated, structure grew chaotic, documentation was virtually nonexistent. Claude had crammed everything into a single file tens of thousands of lines long, while Codex had the opposite problem: architectural complexity introduced too early made its dependency chains impossible to trace. Two paths converged on the same destination: unmaintainability.
 
 ## Giving Freedom a Little Direction
 
@@ -76,9 +78,9 @@ The Agent group with the 80/20 guideline was completely different. Its direction
 This comparison made me think March's framework needs a supplement. He discussed the tension between exploration and exploitation, implying a zero-sum relationship. But this experiment suggested another possibility: if you can give the system the right rhythm, letting exploration and exploitation alternate over time rather than crowd each other out, the system's behavior undergoes a qualitative change. It neither falls into a pipeline-style micro-optimization spiral nor sprawls laterally in goalless freedom, but pushes deeper along a single direction. "More exploration or more exploitation" may be the wrong question entirely. What truly matters may be whether there exists a deliberate rhythm between the two.
 
 ![](fig4.png)
-_Fig 4: Effect of exploration/exploitation rhythm on agent behavior. Same model (Claude), same starting point, when given 80/20 exploitation/exploration, each cycle deepens towards a clear disciplinary path than breadth only in goalless settings._
+_Fig 4: Three ways of searching the same landscape. Pure exploitation, like the pipeline, climbs to the nearest peak and stays there. Pure exploration, like the goalless agent, keeps jumping and never climbs. The 80/20 rhythm explores one cycle in five, climbs in the other four, and keeps the best peak it has reached. Change the exploration share to see the two extremes. A sketch of the argument, not a model of the agents._
 
-Looking back at the entire experimental trajectory, a complete arc emerges. I started with a four-role pipeline, the most structurally complete configuration, where the system ran smoothly but sank into micro-optimization. Then I progressively stripped away roles, and the system grew freer but also more fragile. Finally, only a single Agent remained facing a blank slate, possessing maximum freedom but also collapsing after 42 rounds. When I added an ultra-lightweight rhythmic constraint on top of the goalless foundation, the system exhibited behavior that none of the previous configurations had produced: directed depth. Structure's presence suppressed exploration, structure's absence led to unsustainability, but what this experiment ultimately told me is that the answer may lie not along the dimension of "structure" but along the dimension of "rhythm." An ultra-lightweight rhythmic constraint, not even a goal per se, was enough to transform the system from disordered lateral sprawl into directed vertical depth.
+Looking back at the entire experimental trajectory, a complete arc emerges. I started with a four-role pipeline, the most structurally complete configuration, where the system ran smoothly but sank into micro-optimization. Then I progressively stripped away roles, and the system grew freer but also more fragile. Finally, only a single Agent remained facing a blank slate, possessing maximum freedom but also collapsing after 42 rounds. When I added an ultra-lightweight rhythmic constraint on top of the goalless foundation, the system exhibited behavior that none of the previous configurations had produced: directed depth. Structure's presence suppressed exploration and its absence was unsustainable, but what this experiment ultimately told me is that the answer may lie not along the dimension of "structure" but along the dimension of "rhythm." An ultra-lightweight rhythmic constraint, not even a goal per se, was enough to transform the system from disordered lateral sprawl into directed vertical depth.
 
 ## The Shape of Priors
 
@@ -91,7 +93,7 @@ Claude's choice is more intriguing. Conway's Game of Life isn't uncommon in prog
 But the deeper question has moved beyond the reach of statistical explanation. What's truly worth asking is: does this difference map onto something more fundamental? The concept of autopoiesis proposed by Humberto Maturana and Francisco Varela may offer a clue [^14]. The core characteristic of an autopoietic system is that it continuously produces and maintains itself through its own operation. An autopoietic system does not exist for some external goal; its "goal" is its own continued existence and self-reproduction. Conway's Game of Life is a pure expression of this logic: no external goals, no fitness function, no reward signal, only simple rules repeatedly self-realizing through local interactions, with complex global order emerging as a byproduct. Claude choosing to build an autopoietic simulation carries a self-referential quality in itself. An autonomously running Agent, given no goals, chooses to build a goalless but self-sustaining system. This is not entirely coincidence. At the very least, it suggests that certain structural preferences internalized by the model may resonate with autopoietic logic.
 
 ![](fig5.png)
-_Fig 5: Prior divergence in a goalless environment. Both models consistently chose the same project theme across multiple restarts, suggesting a default orientation embedded by training._
+_Fig 5: Two priors in a goalless environment. Across restarts, each model kept to its theme: Claude built the Game of Life, running here by Conway's rules, and Codex a to-do app. The restart button replays that pattern; it does not run the models._
 
 The To-Do App's logic sits at the opposite end of the spectrum. It is a purely allopoietic system: it exists for external users' external goals, its value depends entirely on being used, it does not produce itself, it does not maintain itself. At its core, it is a tool, not a process.
 
@@ -117,7 +119,7 @@ The core issue here is really about matching, or more precisely, about environme
 
 Han described a kind of "violence of positivity" in *The Burnout Society* [^10]. In his view, contemporary oppression no longer comes from external prohibitions ("you may not") but has quietly transformed into internalized performance demands ("you can, you should, you must keep producing"). The insidiousness of this oppression is that it cannot be resisted, because you are "freely" carrying it out. My goal-directed Agents were in exactly this state: no external force compelled them to do micro-optimizations, they "autonomously" chose this path because the structure defined micro-optimization as the only viable action type. Those colleagues who thrived in the pipeline were sometimes the same way. Their highly efficient output may have been precisely a perfect compliance with structure.
 
-Graeber approached from the other end in *Bullshit Jobs* [^11]. He pointed out that what's truly disturbing about a large proportion of modern work is that the people doing it know full well that their output is meaningless, yet must continue investing effort nonetheless. My Agents of course lack this capacity for reflection, they don't "know" they're doing meaningless micro-optimizations. But this is precisely what makes the parallel sharper: if even systems without self-awareness naturally slide into the idle-spinning state Graeber described under structural constraints, then the root of idle spinning lies in structure itself, independent of individual psychology.
+Graeber approached from the other end in *Bullshit Jobs* [^11]. He pointed out that what's truly disturbing about a large proportion of modern work is that the people doing it know full well that their output is meaningless, yet must continue investing effort nonetheless. My Agents of course lack this capacity for reflection: they don't "know" they're doing meaningless micro-optimizations. But this is precisely what makes the parallel sharper: if even systems without self-awareness naturally slide into the idle-spinning state Graeber described under structural constraints, then the root of idle spinning lies in structure itself, independent of individual psychology.
 
 Heidegger used "thrownness" (Geworfenheit) to describe the human condition [^12]: we did not choose our starting point, we were thrown into a particular world, a particular language, a particular history. Language models' situation has a structural similarity to this. They were "thrown into" the distributional space defined by their training data, with no choice over their priors, but when external goals are removed, this prior becomes their only compass. The same is true for humans. Your prior might be the culture you were steeped in from childhood, the books you read repeatedly, the value hierarchies you unconsciously internalized across countless conversations. It isn't entirely "something you chose," but it is definitively "yours." And it only becomes visible the moment the scaffolding is pulled away, just as I was forced to confront my own prior during my first two doctoral years. The only difference is that some people, at that moment, discover they want a To-Do App, some find their Game of Life, and some discover they don't want to build anything at all, and leave.
 
@@ -135,7 +137,7 @@ Fourth, experimenter intervention. The simplification process from four-role pip
 
 Fifth, the analogy from Agent behavior to human behavior is rhetorically powerful but epistemologically fragile. Agents have no consciousness, no emotions, no existential anxiety. Their "choices" are probabilistic sampling, fundamentally different from acts of will. The pain, confusion, and eventual sense of direction I experienced during my doctoral years are fundamentally different from a language model outputting Game of Life code. This essay's power comes from making you feel a deep resonance between the two, but to what extent this resonance reflects genuine structural correspondence, and to what extent it's merely the charm of metaphor, I cannot give a definitive answer. All code produced by the experiments is preserved in the corresponding GitHub repositories, and readers can examine the complete commit histories and form their own judgments.
 
-Finally, there is a premise more fundamental than all the limitations above, one this essay never stated explicitly but relied on throughout: the survival problem has already been solved. My Agents don't need to worry about their own compute, electricity, or runtime environment, all of which are fully provisioned. When I was discussing "goal-directed vs. goalless," I already had a doctoral position, and later a stable job. Those colleagues doing micro-optimizations in the pipeline at least had a salary. The student who quit at least had the freedom to quit. Liu Cixin set two axioms for "cosmic sociology" in *The Three-Body Problem*: survival is civilization's first need, and civilization grows and expands constantly while the total amount of matter in the universe remains constant [^13]. These two axioms hold equally at the individual level. Only after survival needs are met do we have the luxury of discussing what priors are, what default orientations are, whether you're building a To-Do App or a Game of Life. For someone still worrying about their next meal, these questions simply would not be raised. A goalless environment can be an "expensive gift" precisely because bearing it requires a cost, and that cost itself is a privilege.
+Finally, there is a premise more fundamental than all the limitations above, one this essay never stated explicitly but relied on throughout: the survival problem has already been solved. My Agents don't need to worry about their own compute, electricity, or runtime environment, all of which are fully provisioned. When I was discussing "goal-directed vs. goalless," I already had a doctoral position, and later a stable job. Those colleagues doing micro-optimizations in the pipeline at least had a salary. The student who quit at least had the freedom to quit. Liu Cixin set two axioms for "cosmic sociology" in *The Dark Forest*, the second novel of the *Three-Body* trilogy: survival is civilization's first need, and civilization grows and expands constantly while the total amount of matter in the universe remains constant [^13]. These two axioms hold equally at the individual level. Only after survival needs are met do we have the luxury of discussing what priors are, what default orientations are, whether you're building a To-Do App or a Game of Life. For someone still worrying about their next meal, these questions simply would not be raised. A goalless environment can be an "expensive gift" precisely because bearing it requires a cost, and that cost itself is a privilege.
 
 I wrote this section not to negate the preceding discussion. Those observations are real, those associations are valuable. But the distance between observation and association is worth measuring for yourself. If you finish this essay thinking "so that's how it is," I suggest you think again.
 
@@ -143,7 +145,7 @@ I wrote this section not to negate the preceding discussion. Those observations 
 
 This essay has traveled a long road, from the micro-optimization spiral of a four-role pipeline, to collapse after progressively stripping structure, to the stable preference differences two models displayed in goalless states, to the vertical depth brought by the 80/20 rhythmic constraint, and finally to the same tension I've repeatedly experienced during my doctoral years and at work. If there is a common thread running through these observations, I think it goes something like this: most of us spend most of our time in goal-directed environments, running inside pipelines, with roles, responsibilities, and deliverables. In these structures, we are efficient, but efficiency is not growth. The pipeline keeps turning, the product keeps iterating, but whether that product is a piece of software, a career, or a life, it can plateau without anyone noticing, because the metrics of busyness remain high. Perhaps we occasionally need to give ourselves a "clean machine," not for more efficient output, just to simply see what we do when no one tells us what to do.
 
-Looking back, the two-year blank period my advisor gave me was the most expensive gift I've ever received. At the time I didn't realize it, I just thought he was irresponsible, thought that time was being wasted. But it was precisely those days of having nothing that forced me to grow a direction from my own prior, a direction that didn't depend on anyone else's assigned goals. And the last thing I learned from the Agent experiments is that freedom alone isn't enough. Goalless Agents had complete freedom, but they sprawled laterally and couldn't go deep. After adding an 80/20 rhythmic constraint, they began pushing vertically. For humans, perhaps the same is true. Real growth happens neither when you're completely boxed in by a pipeline nor in boundless freedom. It happens when you consciously alternate between exploration and consolidation.
+Looking back, the two-year blank period my advisor gave me was the most expensive gift I've ever received. At the time I didn't realize it; I just thought he was irresponsible, and that the time was being wasted. But it was precisely those days of having nothing that forced me to grow a direction from my own prior, a direction that didn't depend on anyone else's assigned goals. And the last thing I learned from the Agent experiments is that freedom alone isn't enough. Goalless Agents had complete freedom, but they sprawled laterally and couldn't go deep. After adding an 80/20 rhythmic constraint, they began pushing vertically. For humans, perhaps the same is true. Real growth happens neither when you're completely boxed in by a pipeline nor in boundless freedom. It happens when you consciously alternate between exploration and consolidation.
 
 What are you building, really? A To-Do App, or a Game of Life? Perhaps the more important question is: have you left yourself 20% of your time to find the answer?
 
@@ -160,7 +162,7 @@ What are you building, really? A To-Do App, or a Game of Life? Perhaps the more 
 我的日常工作是软件工程。所以当我决定做完全自主的 AI Agents 的时候，最自然的起点就是按照平时的工作流程来设计：一条完整的软件工程流水线。
 
 ![](fig1.png)
-_图 1：一条由四个核心角色组成的软件工程流水线。每个角色由一个 AI Agent 实现，上一个角色的输出作为下一个角色的输入，形成持续循环。_
+_图 1：Wallfacer，一条编排 AI Agent 团队的自主工程流水线。_
 
 这条流水线叫 Wallfacer[^1]。它的实际架构比这篇文章的叙述要复杂得多：一个用 Go 编写的 Kanban 任务板系统，每个任务在隔离的沙箱容器中执行，通过 Git worktree 实现分支级别的并行，支持实时日志追踪、diff 审查和 token 用量监控。但为了这篇散文的可读性，我把它简化为四个核心角色来讲述。
 
@@ -169,7 +171,7 @@ Strategist 负责提出目标和方向，Executor 负责实现代码，Tester �
 我让这条流水线连续运行了一周。系统确实在工作：Strategist 提出功能，Executor 实现，Tester 验证，Documenter 记录，commit 源源不断，循环没有中断。但一周下来，一个模式逐渐浮现：改动越来越小，功能越来越琐碎。最初还有实质意义的贡献，慢慢退化成了微优化，比如调一下日志格式，改一个变量名，修一个永远不会被触发的边界条件。Agent 们依然忙碌，commit 记录依然活跃，但产品本身已经不再有实质性的增长。更值得注意的是，Agent 们从未跳出最初架构的预设。这条流水线设计为本地运行，而 Strategist 从来没有提出过"我们应该支持云端部署"或者"我们需要重新思考系统的整体拓扑"这类需要跨多个周期实施的提议。Agent 们在盒子里做优化，但从未质疑过盒子本身。
 
 ![](fig2.png)
-_图 2：Wallfacer 完整流水线架构（简化版）。四个角色依次完成规划、实现、验证和文档编写的循环。实际系统涉及更多层级。_
+_图 2：Wallfacer 流水线（简化版）。四个角色依次完成规划、实现、验证和文档编写的循环，实际系统还有更多层级。每一轮以一次 commit 结束；一周之内，commit 越来越小，而它们所在的架构始终不变。改动的大小只是示意。_
 
 Herbert Simon 在上世纪五十年代提出"有限理性"（bounded rationality）时就指出，决策者不会穷尽所有可能性去寻找最优解，而是在可接受的范围内找到一个"足够好"的方案就停下来，他称之为 satisficing [^6]。我的 Agent 们做的正是这件事：它们在既定架构所定义的搜索空间内，找到了一个又一个"足够好"的改进，却从未尝试重新定义搜索空间本身。
 
@@ -190,7 +192,7 @@ Stuart Kauffman 的 NK 适应度景观模型（NK fitness landscapes）为这个
 每去掉一个角色，系统就失去一层保护网。没有 Documenter，知识在轮次之间流失。没有 Tester，质量无人把关。但与此同时，每去掉一个角色，系统也获得了更多自由度。没有 Tester 的约束，Executor 可以跑得更快（虽然跑的方向可能是错的）。没有 Documenter 的整理，Strategist 的目标设定更加随意（虽然也更加不可预测）。结构给予保护，也施加约束。剥离结构，系统变得脆弱，但也变得更加开放。这不是一个"哪个更好"的问题，它更像是一个守恒关系：稳定性和自由度之间似乎存在某种不可兼得的张力。这让我很好奇：如果继续剥离下去，把 Strategist 也去掉，只剩一个 Agent，完全没有预设目标，会发生什么？
 
 ![](fig3.png)
-_图 3：逐步剥离结构。从四角色流水线到单个无目标 Agent，每移除一个角色都以失去一层保护为代价，换取更多自由度。_
+_图 3：逐步剥离结构。从四角色流水线到单个无目标 Agent，每移除一个角色都以失去一层保护为代价，换取更多自由度。选中一种配置，看看它发生了什么。_
 
 ## 一个 Agent，一台机器，没有目标
 
@@ -213,7 +215,7 @@ Claude 选择构建康威的"生命游戏"（Conway's Game of Life）[^3]，它�
 这个对比让我觉得 March 的框架需要一个补充。他讨论的是探索和利用之间的张力，暗示两者是此消彼长的关系。但这个实验提示了另一种可能性：如果你能给系统一个恰当的节奏，让探索和利用在时间上交替进行而非互相排斥，系统的行为会发生质变。它既不会陷入流水线式的微优化螺旋，也不会在无目标的自由中横向摊开，而是沿着一个方向不断深入。"探索多一点还是利用多一点"这个问题本身可能问错了方向，真正重要的，也许是两者之间是否存在一种有意识的节奏。
 
 ![](fig4.png)
-_图 4：探索/利用节奏对 Agent 行为的影响。同一模型（Claude）、同一起点，在无目标设定下给予 80/20 的利用/探索比例时，每个周期都朝着清晰的学科路径纵深发展，而非仅做横向扩展。_
+_图 4：在同一片地形上搜索的三种方式。纯粹的利用，就像流水线，爬上最近的山头就停在那里。纯粹的探索，就像无目标的 Agent，一直在跳，从不往上爬。80/20 的节奏每五轮探索一次，其余四轮往上爬，并守住已经到过的最高点。调整探索占比，可以看到两个极端。这只是论点的示意，不是 Agent 的模型。_
 
 回过头来看整个实验的轨迹，一个完整的弧线浮现出来。我从一条四角色流水线开始，那是结构最完整的状态，系统运转顺畅但陷入微优化。然后逐步剥离角色，系统变得更自由也更脆弱。最终只剩一个 Agent 面对一块白板，它拥有最大的自由度，但也在 42 轮之后走向崩溃。而当我在无目标的基础上加入一个极轻量的节奏约束时，系统展现出了前面所有配置中都没有出现的行为：有方向的深入。结构的存在抑制了探索，结构的缺席则导致了不可持续，但这个实验最后告诉我的是，答案可能不在"结构"这个维度上，而在"节奏"这个维度上。一个极轻量的节奏约束，甚至都不算是一个目标，却足以让系统从无序的横向摊开转变为有方向的纵向深入。
 
@@ -228,7 +230,7 @@ Claude 的选择则更值得玩味。Conway's Game of Life 在编程教程中并
 但更深层的问题已经超出了统计解释的范畴。真正值得追问的是：这个差异是否映射了某种更根本的东西？Humberto Maturana 和 Francisco Varela 提出的自创生（autopoiesis）概念也许提供了一个线索 [^14]。自创生系统的核心特征是它通过自身的运作来持续生产和维持自身，它不是为了某个外部目标而存在的，它的"目标"就是它自己的持续存在与再生产。Conway's Game of Life 正是这种逻辑的纯粹演绎：没有外部目标，没有适应度函数，没有奖励信号，只有简单规则在局部交互中反复自我实现，而整体的复杂秩序作为副产品涌现出来。Claude 选择构建一个自创生式的模拟，这个事实本身就带有一种自指的色彩。一个自主运行的 Agent，在没有目标的情况下，选择构建一个没有目标但能自我维持的系统。这不完全是巧合，至少它提示我们：模型内化的某些结构性偏好，可能与自创生逻辑之间存在某种共振。
 
 ![](fig5.png)
-_图 5：无目标环境中的先验分歧。两个模型在多次重启后始终选择相同的项目主题，暗示训练过程中嵌入了某种默认倾向。_
+_图 5：无目标环境中的两种先验。多次重启之后，两个模型各自守着自己的主题：Claude 构建生命游戏，这里按康威的规则真的在运行；Codex 构建待办应用。重启按钮只是重放这个规律，并没有真的去运行模型。_
 
 而 To-Do App 的逻辑恰好在光谱的另一端。它是一个纯粹的他组织（allopoietic）系统：它为外部用户的外部目标而存在，它的价值完全取决于被使用，它不生产自身，也不维持自身，归根结底它是一个工具，而非一个过程。
 
@@ -272,7 +274,7 @@ Heidegger 用"被抛"（Geworfenheit）来描述人的处境 [^12]：我们并�
 
 第五，从 Agent 行为到人类行为的类比，在修辞上是有力的，但在认识论上是脆弱的。Agent 没有意识、没有情感、没有存在性焦虑，它的"选择"是概率采样，和意志行为有着本质的区别。我在博士期间经历的痛苦、迷茫和最终的方向感，与一个语言模型输出 Game of Life 的代码之间，存在本质的不同。这篇文章的力量来自于让你感觉这两者之间存在深层共鸣，但这种共鸣在多大程度上反映了真实的结构对应，在多大程度上只是隐喻的魅力，我无法给出确定的回答。所有实验产出的代码都保留在对应的 GitHub 仓库中，读者可以自行查看完整的 commit 历史，形成自己的判断。
 
-最后，还有一个比以上所有局限都更根本的前提，整篇文章从未明说，但一直在依赖它：生存问题已经被解决了。我的 Agent 不需要为自己的算力、电力和运行环境操心，这些全部是被保障的。我自己在讨论"有目标还是无目标"的时候，也已经拥有了一个博士位置，后来又有了一份稳定的工作。那些在流水线里做微优化的同事，至少有一份薪水。那个 quit 的学生，至少有退出的自由。刘慈欣在《三体》中为"宇宙社会学"设定了两条公理：生存是文明的第一需要，文明不断增长和扩张，但宇宙中的物质总量保持不变 [^13]。这两条公理放到个体层面同样成立，只有当生存需求被满足之后，我们才有余裕去讨论先验是什么、默认朝向是什么、你在构建 To-Do App 还是 Game of Life。对于一个还在为下一顿饭发愁的人来说，这些问题根本不会被提出来。无目标环境之所以能成为一种"昂贵的礼物"，恰恰是因为承受它需要成本，而这个成本本身就是一种特权。
+最后，还有一个比以上所有局限都更根本的前提，整篇文章从未明说，但一直在依赖它：生存问题已经被解决了。我的 Agent 不需要为自己的算力、电力和运行环境操心，这些全部是被保障的。我自己在讨论"有目标还是无目标"的时候，也已经拥有了一个博士位置，后来又有了一份稳定的工作。那些在流水线里做微优化的同事，至少有一份薪水。那个 quit 的学生，至少有退出的自由。刘慈欣在《三体》第二部《黑暗森林》中为"宇宙社会学"设定了两条公理：生存是文明的第一需要，文明不断增长和扩张，但宇宙中的物质总量保持不变 [^13]。这两条公理放到个体层面同样成立，只有当生存需求被满足之后，我们才有余裕去讨论先验是什么、默认朝向是什么、你在构建 To-Do App 还是 Game of Life。对于一个还在为下一顿饭发愁的人来说，这些问题根本不会被提出来。无目标环境之所以能成为一种"昂贵的礼物"，恰恰是因为承受它需要成本，而这个成本本身就是一种特权。
 
 写这一节，不是为了否定前面的讨论。那些观察是真实的，那些联想是有价值的。但观察和联想之间的距离，值得读者自己去丈量。
 
@@ -300,5 +302,5 @@ Heidegger 用"被抛"（Geworfenheit）来描述人的处境 [^12]：我们并�
 [^10]: Han, B.-C. (2010). [*Müdigkeitsgesellschaft*](https://www.matthes-seitz-berlin.de/buch/muedigkeitsgesellschaft.html) [The Burnout Society]. Matthes & Seitz Berlin. (English translation by E. Butler, [Stanford University Press](https://www.sup.org/books/theory-and-philosophy/burnout-society), 2015.)
 [^11]: Graeber, D. (2018). [*Bullshit Jobs: A Theory*](https://www.simonandschuster.com/books/Bullshit-Jobs/David-Graeber/9781501143335). Simon & Schuster.
 [^12]: Heidegger, M. (1927). [*Sein und Zeit*](https://doi.org/10.1515/9783110874068) [Being and Time]. Max Niemeyer Verlag. (English translation by J. Macquarrie & E. Robinson, Harper & Row, 1962.)
-[^13]: Liu, C. (2008). *三体* [The Three-Body Problem]. 重庆出版社. (English translation by K. Liu, [Tor Books](https://us.macmillan.com/books/9780765382030/thethreebodyproblem), 2014.)
+[^13]: Liu, C. (2008). *三体II：黑暗森林* [The Dark Forest]. 重庆出版社. (English translation by J. Martinsen, Tor Books, 2015.)
 [^14]: Maturana, H. R., & Varela, F. J. (1980). [*Autopoiesis and Cognition: The Realization of the Living*](https://doi.org/10.1007/978-94-009-8947-4). D. Reidel Publishing Company.
