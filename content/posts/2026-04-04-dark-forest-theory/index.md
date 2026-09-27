@@ -19,7 +19,7 @@ title_zh: "黑暗森林理论：一个形式化推导"
 
 The "Dark Forest Theory" proposed by Liu Cixin in the *Three-Body Problem* series is a speculative theory about interaction strategies among cosmic civilizations. This article reconstructs it formally, with tools from game theory and decision theory, starting from the axioms given in the novel [^liu].
 
-The argument proceeds in four steps. First, we show that the novel's two axioms are insufficient on their own to derive the Dark Forest. Then we add the structural conditions the novel relies on and build an incomplete-information game. From it we derive when the Dark Forest's two behaviors, silence and preemption, are equilibria. Finally we check the theory's evolutionary claim with a simulation, and discuss the limits of the conclusion. The formal claims in Sections 1, 2 and 4 to 6 are checked in Lean 4 with Mathlib; the proof file is attached as [DarkForest.lean](DarkForest.lean), and each checked claim below names its theorem. What is not checked is said where it occurs: the informal cases of Proposition 0, the equilibrium-selection result cited in Proposition 3, and the evolutionary clause of the theorem, which Section 9 tests by simulation instead. The same proofs, with a project that builds and checks them, are at [github.com/changkun/dark-forest-lean](https://github.com/changkun/dark-forest-lean).
+The argument proceeds in four steps. First, we show that the novel's two axioms are insufficient on their own to derive the Dark Forest. Then we add the structural conditions the novel relies on and build an incomplete-information game. From it we derive when the Dark Forest's two behaviors, silence and preemption, are equilibria. Finally we check the theory's evolutionary claim with a simulation, and discuss the limits of the conclusion. The formal claims in Sections 1, 2 and 4 to 6 are checked in Lean 4 with Mathlib; the proof file is attached as [DarkForest.lean](DarkForest.lean), and each checked claim below names its theorem. What is not checked is said where it occurs: the informal cases of Proposition 0, and the general forms of the equilibrium-selection and evolutionary results, of which Lean checks the versions for this model. Section 9 tests the evolutionary clause in a richer model by simulation. The same proofs, with a project that builds and checks them, are at [github.com/changkun/dark-forest-lean](https://github.com/changkun/dark-forest-lean).
 
 The short version: the two halves of the Dark Forest are not equally strong. Silence follows under weak conditions. Preemption after detection is only one of two equilibria, and it is the safer one only when strikes usually succeed.
 
@@ -31,7 +31,7 @@ Let $\mathcal{U}$ be the set of all civilizations in the universe, with $|\mathc
 
 $$S_i(o) \wedge \neg S_i(o') \;\Longrightarrow\; o \succ_i o'$$
 
-Survival has lexicographic priority. Because survival takes only two values, this order can be represented by a real-valued utility (Lean: `lex_representable`). The additive form used below, $-M$ for extinction plus the other gains, represents it exactly when those gains are bounded and $M$ exceeds twice their bound (`additive_lex_of_bounded`); if the other gains could grow without bound, no finite $M$ would do (`additive_not_lex_of_unbounded`). The model below assumes bounded gains and a very large $M$.
+Survival has lexicographic priority. Because survival takes only two values, this order can be represented by a real-valued utility (Lean: `lex_representable`), unlike the lexicographic order on pairs of real numbers, which has none (`lex_real_not_representable`). The additive form used below, $-M$ for extinction plus the other gains, represents it exactly when those gains are bounded and $M$ exceeds twice their bound (`additive_lex_of_bounded`); if the other gains could grow without bound, no finite $M$ would do (`additive_not_lex_of_unbounded`). The model below assumes bounded gains and a very large $M$.
 
 **Axiom A2 (Growth and Finite Resources):** In the novel, "civilization continuously grows and expands, but the total matter in the universe remains constant." Let $R$ be the total resource quantity of the universe and $r_i(t)$ the resources held by civilization $c_i$ at time $t$. Each civilization tends to grow, while
 
@@ -162,7 +162,7 @@ The game after exposure is therefore a stag hunt. Suppose a share $\pi$ of civil
 - Mutual restraint ($a = 0$) is an equilibrium exactly when $\pi \le r^\ast$ (`wait_equilibrium_iff`): the same condition under which the chain of suspicion stops.
 - Striking is risk-dominant [^hs], the better reply to an even chance of either, exactly when $r^\ast < (1+\pi)/2$ (`strike_risk_dominant_iff`); for large $M$ this reads $q > (1-\pi)/2$ (`strike_risk_dominant_iff_q`).
 
-Restraint is the better equilibrium for both sides, since both survive; striking is the safer bet when strikes usually succeed. When each side observes the payoffs with a little noise, players of two-by-two games like this one coordinate on the risk-dominant equilibrium [^cvd]. So the post-exposure logic of the Dark Forest holds, but for a narrower reason than an unbounded chain of suspicion: when $q > (1-\pi)/2$, preemption is the safer answer to not knowing what the other side will do. When strikes usually fail, restraint is.
+Restraint is the better equilibrium for both sides, since both survive; striking is the safer bet when strikes usually succeed. When each side observes the payoffs with a little noise, players of two-by-two games like this one coordinate on the risk-dominant equilibrium [^cvd]. Lean checks this for the game here, in the form the argument takes under a uniform prior: if each civilization sees only a noisy signal of $q$, then every symmetric equilibrium strikes exactly when the signal exceeds $(1-\pi)/2$, the boundary of risk dominance, and that threshold strategy is an equilibrium (`global_game_unique`, `threshold_is_equilibrium`, `selected_is_risk_dominant`). The noise enters through one property: a civilization whose signal sits exactly at the threshold gives even odds that the other side's signal is higher. Under a uniform prior this reduces to the fact that of two independent, identically distributed noises that do not tie, each is as likely to be the larger, which Lean proves (`noise_half`). The reduction itself, asymmetric equilibria, and other priors are not formalized here. So the post-exposure logic of the Dark Forest holds, but for a narrower reason than an unbounded chain of suspicion: when $q > (1-\pi)/2$, preemption is the safer answer to not knowing what the other side will do. When strikes usually fail, restraint is.
 
 Schelling called the underlying mechanism "the reciprocal fear of surprise attack" [^schelling], and the security-dilemma literature has long studied how its severity depends on whether offense or defense has the advantage [^jervis]. Here that advantage is $q$.
 
@@ -200,7 +200,7 @@ The condition $\rho_D > \rho_0$ asks little. Even if every non-hostile civilizat
 
 1. **Silence (robust):** if broadcasting makes detection likelier ($\lambda_R > \lambda_H$) and $M$ is large enough, hiding is better than broadcasting (Proposition 4).
 2. **Preemption (conditional):** after mutual detection, mutual striking is always an equilibrium. It is the only equilibrium when $\pi > r^\ast \approx 1 - q$. It is risk-dominant, and is the one selected when payoffs are observed with small noise, when $q > (1-\pi)/2$. Otherwise mutual restraint is the risk-dominant equilibrium (Proposition 3).
-3. **System level:** if silence raises survival, then in a population that reproduces, silent civilizations should come to dominate, and the surviving sample is selected for silence. Section 9 tests this clause in a simulation.
+3. **System level:** under the replicator dynamics, in which each strategy reproduces in proportion to its fitness, silence spreads from any start whenever hiding is fitter (`silence_spreads`). Striking is bistable: it takes over when its initial share exceeds an edge $a^\ast = (r^\ast - \pi)/(1-\pi)$, and dies out below it (`striking_takes_over`, `striking_dies_out`). It has the larger basin, $a^\ast < 1/2$, exactly when it is risk-dominant (`larger_basin_iff_risk_dominant`), and with rare random mutations evolution spends almost all its time in the risk-dominant equilibrium [^kmr]. Section 9 tests the clause in a richer model.
 
 The system is in the Dark Forest state when the first two hold with preemption selected, that is, when $q > (1-\pi)/2$. When strikes usually fail, the forest is still dark, because everyone hides, but it is no longer a hunting ground.
 
@@ -208,7 +208,7 @@ The system is in the Dark Forest state when the first two hold with preemption s
 
 - Endgame stage: once civilizations have located each other, the equilibria are those of Proposition 3. Which one is played depends on $\pi$ and $q$, not on how many levels of reasoning a civilization performs.
 - Preceding stage: whichever equilibrium is played after detection, $\rho_D \ge \pi q > \rho_0$, so by Proposition 4 hiding dominates revealing for large $M$.
-- Evolutionary level: this is a claim about dynamics rather than equilibrium, and the propositions do not prove it; Section 9 checks it. $\square$
+- Evolutionary level: this is a claim about dynamics rather than equilibrium. For the replicator dynamics it follows from the theorems in part 3; for richer dynamics, Section 9 checks it. $\square$
 
 **On uniqueness:** the theorem does not assert a unique equilibrium. Mutual restraint remains an equilibrium whenever $\pi \le 1 - q$, and it is the better one for both sides. What the Dark Forest adds is that, when strikes usually succeed, it is not the safe one.
 
@@ -285,14 +285,14 @@ Proposition 2 shows that where the chain of suspicion stops depends on how actio
 
 ## 9. A Simulation
 
-The system-level clause of the theorem is a claim about dynamics, which the propositions do not prove. Figure 2 checks it in a small universe where nothing is decided by the theorem.
+Under the replicator dynamics, the theorem's system-level clause is proved above. Figure 2 checks it in a richer universe, where detection takes time and is rarely mutual, and where nothing is decided by the theorem.
 
 One hundred civilizations sit at fixed random positions on a torus. Each has two heritable traits: whether it broadcasts, and whether it strikes whatever it detects. A share $p$ is hostile and strikes whatever it detects regardless. A civilization within range can detect another only after light from it has had time to arrive, and then detects it with probability $\lambda_R$ per step if it broadcasts and $\lambda_H \ll \lambda_R$ if it hides. Strikes travel at light speed and succeed with probability $q$. A failed strike reveals the attacker to its target, which strikes back, and any strike exposes the attacker to everyone else with probability $e$. Civilizations also die of other causes, at a low rate. Dead slots are refilled by offspring of the survivors, drawn in proportion to one plus $B$ times their number of peaceful contacts, so contact pays; traits mutate at 2% per birth.
 
 Over twelve runs with fixed seeds for each setting, each of 3,000 steps:
 
 - **Silence spreads whenever hostile civilizations exist.** With the defaults ($p = 0.1$, $q = 0.7$), broadcasting falls from 70% of civilizations to at most 5% in every run, as Proposition 4 predicts.
-- **Striking spreads only in a hunting ground.** With the defaults it dies out, to at most 2% in every run, even though with $\pi = p = 0.1$ the strike success $q = 0.7 > (1-\pi)/2 = 0.45$ makes striking the risk-dominant response after *mutual* detection. In this universe detection is rarely mutual: striking what you find mostly kills civilizations that had not found you, and the failed strikes and exposures cost the striker more than the rare preempted threat saves. Striking survives only when hostile civilizations are common, strikes almost always succeed, and strikes are invisible to others ($p = 0.3$, $q = 0.95$, $e = 0$). There it holds between 15% and 85% of non-hostile civilizations in eleven of twelve runs, and a majority in four.
+- **Striking spreads only in a hunting ground.** With the defaults it dies out, to at most 2% in every run, even though with $\pi = p = 0.1$ the strike success $q = 0.7 > (1-\pi)/2 = 0.45$ makes striking the risk-dominant response after *mutual* detection. In this universe detection is rarely mutual: striking what you find mostly kills civilizations that had not found you, and the failed strikes and exposures cost the striker more than the rare preempted threat saves. The game played here is therefore not the stag hunt that the replicator theorems describe, which is why the two disagree. Striking survives only when hostile civilizations are common, strikes almost always succeed, and strikes are invisible to others ($p = 0.3$, $q = 0.95$, $e = 0$). There it holds between 15% and 85% of non-hostile civilizations in eleven of twelve runs, and a majority in four.
 - **Without hostile civilizations, and with enough to gain from contact, the forest stays lit.** With $p = 0$ and $B \ge 1$, most civilizations keep broadcasting.
 
 The simulation leaves out most of what would matter at cosmic scale: technological explosion (capabilities are fixed), coalitions, movement, and learning within a lifetime. It is illustrative, not evidence about the universe. What it does show is that the theorem's two halves behave differently under selection too: silence emerges from local rules under weak conditions, while hunting needs the extra conditions the theorem names, and then some.
@@ -316,7 +316,7 @@ Thus, the Dark Forest Theory is less a moral judgment that "all civilizations in
 
 *Note: The formalization in this article is a theoretical reconstruction of the novel's text, not Liu Cixin's own formulation. Cosmic sociology as a discipline does not actually exist; its "axioms" can be neither verified nor falsified. The Lean file checks the mathematics of the model, not whether the model describes any real universe.*
 
-*Revised on September 27, 2026. Proposition 2 previously claimed that the chain of suspicion drives threat to certainty whenever $\pi > 0$, which holds only for uniformly spread thresholds; its note on robustness had the effect of a large $M$ backwards. Proposition 3's utilities are now symmetric, Section 1 states when the additive utility represents A1's order, the main theorem separates silence from preemption, the formal claims are checked in Lean, and Section 9 adds a simulation.*
+*Revised on September 27, 2026. Proposition 2 previously claimed that the chain of suspicion drives threat to certainty whenever $\pi > 0$, which holds only for uniformly spread thresholds; its note on robustness had the effect of a large $M$ backwards. Proposition 3's utilities are now symmetric, Section 1 states when the additive utility represents A1's order, the main theorem separates silence from preemption, the formal claims, including a global-game version of equilibrium selection and the replicator dynamics, are checked in Lean, and Section 9 adds a simulation.*
 
 {{% /en %}}
 
@@ -326,7 +326,7 @@ Thus, the Dark Forest Theory is less a moral judgment that "all civilizations in
 
 刘慈欣在《三体》系列中提出的“黑暗森林理论”是一个关于宇宙文明间交互策略的推测性理论。本文从小说给出的公理出发，运用博弈论和决策理论的工具，对该理论做一次形式化的重构[^liu]。
 
-论证分为四步：首先说明小说中的两条公理不足以单独推出黑暗森林；然后补上小说所依赖的结构性条件，构建一个不完全信息博弈；接着由此推导黑暗森林的两种行为，即沉默与先发制人，分别在什么条件下是均衡；最后用一个模拟检验理论在演化层面的主张，并讨论结论的局限。第 1、2 节以及第 4 至 6 节中的形式化结论，都已用 Lean 4 和 Mathlib 做了机器验证，证明文件附在这里：[DarkForest.lean](DarkForest.lean)。下文每一个经过验证的结论，都注明了对应的定理名；没有验证的部分，也在出现的地方说明了：命题 0 中非形式化的几种情形、命题 3 引用的均衡选择结果，以及定理在演化层面的那一条，后者改由第 9 节的模拟来检验。同样的证明，连同可以直接构建和检查它们的项目，也放在 [github.com/changkun/dark-forest-lean](https://github.com/changkun/dark-forest-lean)。
+论证分为四步：首先说明小说中的两条公理不足以单独推出黑暗森林；然后补上小说所依赖的结构性条件，构建一个不完全信息博弈；接着由此推导黑暗森林的两种行为，即沉默与先发制人，分别在什么条件下是均衡；最后用一个模拟检验理论在演化层面的主张，并讨论结论的局限。第 1、2 节以及第 4 至 6 节中的形式化结论，都已用 Lean 4 和 Mathlib 做了机器验证，证明文件附在这里：[DarkForest.lean](DarkForest.lean)。下文每一个经过验证的结论，都注明了对应的定理名；没有验证的部分，也在出现的地方说明了：命题 0 中非形式化的几种情形，以及均衡选择和演化这两个结果的一般形式，Lean 验证的是它们针对本模型的版本。第 9 节再用一个更丰富的模型，通过模拟检验演化层面的那一条。同样的证明，连同可以直接构建和检查它们的项目，也放在 [github.com/changkun/dark-forest-lean](https://github.com/changkun/dark-forest-lean)。
 
 先说结论：黑暗森林的两半并不一样结实。沉默在很弱的条件下就成立；而暴露之后的先发制人，只是两个均衡之一，并且只有在打击通常能够成功时，才是更稳妥的那一个。
 
@@ -338,7 +338,7 @@ Thus, the Dark Forest Theory is less a moral judgment that "all civilizations in
 
 $$S_i(o) \wedge \neg S_i(o') \;\Longrightarrow\; o \succ_i o'$$
 
-生存是字典序意义上的最高优先级（lexicographic priority）。由于生存只有“存续”和“不存续”两种取值，这个偏好是可以用实值效用函数来表示的（Lean：`lex_representable`）。下面所用的加法形式，即灭绝记为 $-M$、再加上其他收益，只要其他收益有界、并且 $M$ 大于其上界的两倍，就能准确地表示它（`additive_lex_of_bounded`）；如果其他收益可以无限增大，那么任何有限的 $M$ 都做不到（`additive_not_lex_of_unbounded`）。下面的模型假定收益有界、$M$ 极大。
+生存是字典序意义上的最高优先级（lexicographic priority）。由于生存只有“存续”和“不存续”两种取值，这个偏好是可以用实值效用函数来表示的（Lean：`lex_representable`）；而实数对上的字典序则根本无法这样表示（`lex_real_not_representable`）。下面所用的加法形式，即灭绝记为 $-M$、再加上其他收益，只要其他收益有界、并且 $M$ 大于其上界的两倍，就能准确地表示它（`additive_lex_of_bounded`）；如果其他收益可以无限增大，那么任何有限的 $M$ 都做不到（`additive_not_lex_of_unbounded`）。下面的模型假定收益有界、$M$ 极大。
 
 **公理 A2（增长与资源有限）：** 小说原文是“文明不断增长和扩张，但宇宙中的物质总量保持不变”。设 $R$ 为宇宙总资源量，$r_i(t)$ 为文明 $c_i$ 在时刻 $t$ 占有的资源量。每个文明都倾向于增长，而
 
@@ -469,7 +469,7 @@ $$r > r^\ast = 1 - q + \frac{K_i}{qM}$$
 - 相互克制（$a = 0$）是均衡，当且仅当 $\pi \le r^\ast$（`wait_equilibrium_iff`），这正是猜疑链停住的条件。
 - 打击是风险占优（risk-dominant）的[^hs]，也就是面对“两种可能各占一半”时的更好回应，当且仅当 $r^\ast < (1+\pi)/2$（`strike_risk_dominant_iff`）；$M$ 很大时，这个条件就是 $q > (1-\pi)/2$（`strike_risk_dominant_iff_q`）。
 
-克制对双方都是更好的均衡，因为两边都能活下来；而当打击通常能成功时，打击是更稳妥的押注。如果双方观察收益时都带一点噪声，这类二乘二博弈的参与者会协调到风险占优的均衡上[^cvd]。所以，黑暗森林在暴露之后的逻辑仍然成立，但理由比“猜疑链无限放大”要窄：当 $q > (1-\pi)/2$ 时，面对不知道对方会怎么做，先发制人是更稳妥的回答。当打击通常会失败时，克制才是。
+克制对双方都是更好的均衡，因为两边都能活下来；而当打击通常能成功时，打击是更稳妥的押注。如果双方观察收益时都带一点噪声，这类二乘二博弈的参与者会协调到风险占优的均衡上[^cvd]。Lean 针对这里的博弈，按均匀先验下这个论证的形式做了验证：如果每个文明只能看到 $q$ 的一个带噪声的信号，那么每一个对称均衡都恰好在信号超过 $(1-\pi)/2$ 时打击，而这正是风险占优的边界；这个门槛策略本身也确实是一个均衡（`global_game_unique`、`threshold_is_equilibrium`、`selected_is_risk_dominant`）。噪声只通过一个性质起作用：一个信号恰好落在门槛上的文明，会认为对方信号更高的可能性是一半。在均匀先验下，这可以归结为：两个独立同分布、不会相等的噪声，谁大谁小的可能性相同，这一点 Lean 做了证明（`noise_half`）。这一步归结本身、非对称的均衡以及其他先验，这里没有形式化。所以，黑暗森林在暴露之后的逻辑仍然成立，但理由比“猜疑链无限放大”要窄：当 $q > (1-\pi)/2$ 时，面对不知道对方会怎么做，先发制人是更稳妥的回答。当打击通常会失败时，克制才是。
 
 Schelling 把背后的机制称为“对突然袭击的相互恐惧”[^schelling]；关于安全困境的研究，长期以来讨论的就是它的严重程度如何取决于进攻和防御哪一方占优[^jervis]。在这里，这个优势就是 $q$。
 
@@ -509,7 +509,7 @@ $\rho_D > \rho_0$ 这个条件要求很低。即使所有非敌对文明在发�
 
 1. **沉默（稳健）：** 若广播使自己更容易被发现（$\lambda_R > \lambda_H$），且 $M$ 足够大，则隐藏优于广播（命题 4）。
 2. **先发制人（有条件）：** 相互定位之后，相互打击总是一个均衡。当 $\pi > r^\ast \approx 1 - q$ 时，它是唯一的均衡。当 $q > (1-\pi)/2$ 时，它是风险占优的，也是收益带有微小噪声时会被选中的那个均衡；否则，相互克制才是风险占优的均衡（命题 3）。
-3. **系统层面：** 如果沉默提高了生存率，那么在一个会繁衍的群体里，沉默的文明应当逐渐占据多数，幸存下来的样本被沉默所筛选。第 9 节用模拟检验这一条。
+3. **系统层面：** 在复制者动态（replicator dynamics）下，也就是每种策略按照自身的适应度繁衍时，只要隐藏的适应度更高，沉默就会从任何起点蔓延开来（`silence_spreads`）。打击则是双稳态的：它的初始比例超过边界 $a^\ast = (r^\ast - \pi)/(1-\pi)$ 时，打击会占据全体；低于这个边界时，打击会消亡（`striking_takes_over`、`striking_dies_out`）。打击拥有更大的吸引域，即 $a^\ast < 1/2$，当且仅当它是风险占优的（`larger_basin_iff_risk_dominant`）；而在罕见的随机突变之下，演化几乎所有的时间都停留在风险占优的均衡上[^kmr]。第 9 节在一个更丰富的模型里检验这一条。
 
 当前两条成立、并且选中的是先发制人，也就是 $q > (1-\pi)/2$ 时，系统处于黑暗森林态。当打击通常会失败时，森林依然是黑的，因为人人都在隐藏，但它已经不再是猎场。
 
@@ -517,7 +517,7 @@ $\rho_D > \rho_0$ 这个条件要求很低。即使所有非敌对文明在发�
 
 - 终局阶段：相互定位之后，均衡就是命题 3 所说的那些。选中哪一个，取决于 $\pi$ 和 $q$，而不取决于一个文明推理了多少阶。
 - 前一阶段：无论被发现之后玩的是哪个均衡，都有 $\rho_D \ge \pi q > \rho_0$，于是由命题 4，$M$ 足够大时隐藏优于公开。
-- 演化层面：这是一个关于动态的主张，不是关于均衡的，上面的命题并没有证明它；第 9 节检验它。$\square$
+- 演化层面：这是一个关于动态的主张，不是关于均衡的。在复制者动态下，它由第 3 条里的那些定理给出；对于更丰富的动态，由第 9 节来检验。$\square$
 
 **关于唯一性：** 本定理并不断言均衡唯一。只要 $\pi \le 1 - q$，相互克制就始终是一个均衡，而且对双方都是更好的那个。黑暗森林补充的是：当打击通常能成功时，它不是那个稳妥的均衡。
 
@@ -594,14 +594,14 @@ A1 将生存设为字典序最高优先级。但文明可能有更复杂的价�
 
 ## 9. 一个模拟
 
-定理的系统层面那一条，是一个关于动态的主张，上面的命题并没有证明它。图 2 在一个小宇宙里检验它，而这个宇宙里，没有任何事情是由定理决定的。
+在复制者动态下，定理的系统层面那一条已经在上面得到了证明。图 2 在一个更丰富的宇宙里检验它：在那里，发现需要时间，而且很少是相互的；并且没有任何事情是由定理决定的。
 
 一百个文明散布在一个环面（torus）上的随机位置，位置固定不动。每个文明有两个可遗传的性状：是否广播，以及是否打击自己发现的一切。比例为 $p$ 的文明是敌对的，不管性状如何，发现什么就打击什么。一个文明只有在另一个文明的光有时间抵达之后，才可能发现它；此后，对方若在广播，每一步被发现的概率是 $\lambda_R$，若在隐藏，则是远小于它的 $\lambda_H$。打击以光速飞行，成功的概率是 $q$。失败的打击会把攻击者暴露给目标，目标随即回击；任何一次打击，都会以概率 $e$ 把攻击者暴露给其他所有文明。文明也会以很低的概率死于别的原因。空出来的位置，由幸存者的后代填补，选中某个幸存者的机会，与“一加上 $B$ 乘以它的和平接触数”成正比，所以接触是有好处的；每次出生，性状有 2% 的概率突变。
 
 每种设定用固定的随机种子各跑十二次，每次 3,000 步：
 
 - **只要存在敌对文明，沉默就会蔓延。** 在默认参数下（$p = 0.1$，$q = 0.7$），每一次运行中，广播的文明都从 70% 降到了 5% 以下，正如命题 4 所预言的。
-- **只有在猎场里，打击才会蔓延。** 在默认参数下，打击这个性状会消亡，每次都降到 2% 以下，尽管在 $\pi = p = 0.1$ 时，打击成功率 $q = 0.7 > (1-\pi)/2 = 0.45$ 意味着在*相互*定位之后，打击是风险占优的回应。在这个宇宙里，定位很少是相互的：见什么打什么，杀掉的大多是还没发现自己的文明，而失败的打击和暴露给攻击者带来的代价，超过了偶尔先下手除掉一个威胁所省下的。只有当敌对文明很多、打击几乎必定成功、并且打击不会被别人看见时（$p = 0.3$，$q = 0.95$，$e = 0$），打击才能存活下来：十二次运行里有十一次，它占到非敌对文明的 15% 到 85%，其中四次过半。
+- **只有在猎场里，打击才会蔓延。** 在默认参数下，打击这个性状会消亡，每次都降到 2% 以下，尽管在 $\pi = p = 0.1$ 时，打击成功率 $q = 0.7 > (1-\pi)/2 = 0.45$ 意味着在*相互*定位之后，打击是风险占优的回应。在这个宇宙里，定位很少是相互的：见什么打什么，杀掉的大多是还没发现自己的文明，而失败的打击和暴露给攻击者带来的代价，超过了偶尔先下手除掉一个威胁所省下的。所以，这里玩的并不是复制者定理所描述的那场猎鹿博弈，这正是两者结论不同的原因。只有当敌对文明很多、打击几乎必定成功、并且打击不会被别人看见时（$p = 0.3$，$q = 0.95$，$e = 0$），打击才能存活下来：十二次运行里有十一次，它占到非敌对文明的 15% 到 85%，其中四次过半。
 - **没有敌对文明、而接触又足够有利时，森林会一直亮着。** 当 $p = 0$、$B \ge 1$ 时，大多数文明会一直广播下去。
 
 这个模拟省略了宇宙尺度上大部分要紧的东西：技术爆炸（能力是固定的）、联盟、移动，以及一生之内的学习。它只是示意，不是关于宇宙的证据。它能说明的是：定理的两半，在选择之下也表现得不一样。沉默会在很弱的条件下，从局部规则里自己长出来；而狩猎需要定理列出的那些额外条件，甚至还不止这些。
@@ -625,7 +625,7 @@ _图 2：一片小小的黑暗森林。每个点是一个文明：深蓝色的�
 
 *附注：本文中的形式化是对小说文本的理论重构，并非刘慈欣本人的表述。宇宙社会学作为一个学科本身并不存在，其“公理”的真实性无法被验证或证伪。Lean 文件验证的是这个模型的数学，而不是这个模型是否描述了某个真实的宇宙。*
 
-*2026 年 9 月 27 日修订。命题 2 原先声称，只要 $\pi > 0$，猜疑链就会把威胁推到确定无疑，这只在门槛均匀分布时成立；它关于稳健性的说明，还把巨大 $M$ 的作用方向说反了。命题 3 的效用已改为对称的形式，第 1 节说明了加法效用在什么条件下能表示 A1 的偏好，主定理把沉默和先发制人分开，形式化的结论用 Lean 做了验证，第 9 节增加了一个模拟。*
+*2026 年 9 月 27 日修订。命题 2 原先声称，只要 $\pi > 0$，猜疑链就会把威胁推到确定无疑，这只在门槛均匀分布时成立；它关于稳健性的说明，还把巨大 $M$ 的作用方向说反了。命题 3 的效用已改为对称的形式，第 1 节说明了加法效用在什么条件下能表示 A1 的偏好，主定理把沉默和先发制人分开，形式化的结论用 Lean 做了验证，包括均衡选择的全局博弈版本和复制者动态，第 9 节增加了一个模拟。*
 
 {{% /zh %}}
 
@@ -634,6 +634,7 @@ _图 2：一片小小的黑暗森林。每个点是一个文明：深蓝色的�
 [^liu]: Liu, C. (2008). *三体II：黑暗森林*. Chongqing Press. English translation: *The Dark Forest*, trans. J. Martinsen, Tor Books, 2015. The two axioms, and the concepts of the chain of suspicion and the technological explosion, are given in the prologue.
 [^fm]: Fudenberg, D., & Maskin, E. (1986). [The folk theorem in repeated games with discounting or with incomplete information](https://doi.org/10.2307/1911307). *Econometrica*, 54(3), 533–554.
 [^hs]: Harsanyi, J. C., & Selten, R. (1988). *A General Theory of Equilibrium Selection in Games*. MIT Press.
+[^kmr]: Kandori, M., Mailath, G. J., & Rob, R. (1993). [Learning, mutation, and long run equilibria in games](https://doi.org/10.2307/2951777). *Econometrica*, 61(1), 29–56; see also Young, H. P. (1993). [The evolution of conventions](https://doi.org/10.2307/2951778). *Econometrica*, 61(1), 57–84.
 [^cvd]: Carlsson, H., & van Damme, E. (1993). [Global games and equilibrium selection](https://doi.org/10.2307/2951491). *Econometrica*, 61(5), 989–1018. For two-by-two games whose payoffs each player observes with small noise, iterated dominance selects the risk-dominant equilibrium.
 [^schelling]: Schelling, T. C. (1960). *The Strategy of Conflict*. Harvard University Press, ch. 9, "The reciprocal fear of surprise attack", pp. 207–229.
 [^jervis]: Jervis, R. (1978). [Cooperation under the security dilemma](https://doi.org/10.2307/2009958). *World Politics*, 30(2), 167–214.
