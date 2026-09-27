@@ -7,6 +7,16 @@ date: 2013-03-23 18:54:55
 > Last update: {{< lastupdate >}}
 
 {{% en %}}
+## Now (2026)
+
+- Founder and CEO of [Latere AI](https://latere.ai), building AI infrastructure with human intelligence in the loop. Before that, Staff Engineer at Sixt SE (2022–2026), leading AI transformation initiatives across enterprise AI platforms.
+- Research: intelligent human-in-the-loop systems, and most recently trust calibration for agentic AI. See [research](https://changkun.de/research).
+- Writing: *AI as an Infrastructure* and *An Unverifiable World*; *Go: Under the Hood* and the *Modern C++ Tutorial* remain online. See [books](https://changkun.de/books/).
+- Open source for over a decade: open books, Go packages, and contributions to the Go project itself. See [GitHub](https://github.com/changkun).
+- Still living in Munich.
+
+*The rest of this page was written about a decade ago and is kept as it was.*
+
 ## About Changkun Ou
 
 > It is hard to introduce oneself, and it probably means that people will describe a person whom they want to establish. Individuals who point to themselves are trying to map their lifestyle to the public — all of them are mental models. To this day, I'm still seeking the answer to the most difficult philosophical problem: "WHO I AM." From my side, I am going to list some basics and let them broaden your imagination and horizons, which could help you know me better.
@@ -31,7 +41,9 @@ date: 2013-03-23 18:54:55
 - 2018, enrolled at LMU München for a Master's in Computer Science, parallel degree with HCI.
 - 2019, graduated with a Master of Science with two parallel degrees in Human-Computer Interaction and Computer Science. Started a position as research assistant and Ph.D. student at LMU München.
 - 2020, founded the [golang.design](https://golang.design) initiative.
+- 2022, joined Sixt SE as a software engineer, later becoming a Staff Engineer.
 - 2023, defended Ph.D. dissertation at LMU München.
+- 2026, left Sixt SE to lead [Latere AI](https://latere.ai) full-time as its founder and CEO.
 
 ### Personal Tags
 
@@ -61,6 +73,16 @@ A: I live in Munich and work as a research assistant and Ph.D. student at LMU M�
 {{% /en %}}
 
 {{% zh %}}
+## 现在（2026）
+
+- [Latere AI](https://latere.ai) 创始人兼 CEO，构建让人类智慧始终在回路中的 AI 基础设施。此前在 Sixt SE 担任首席工程师（2022–2026），主导企业 AI 平台的 AI 转型。
+- 研究：人在回路的智能系统，近期关注智能体 AI 的信任校准。见[研究主页](https://changkun.de/research)。
+- 写作：《AI 基建：从系统到智能体》与《在无法验证的世界里》；《Go 语言原本》与《现代 C++ 教程》仍在线。见[书籍](https://changkun.de/books/)。
+- 十余年来持续参与开源：开放书籍、Go 软件包，以及为 Go 项目本身贡献代码。见 [GitHub](https://github.com/changkun)。
+- 仍居住在慕尼黑。
+
+*本页以下内容写于大约十年前，保持原样。*
+
 ## 关于欧长坤
 
 > 自我介绍是一件困难的事情，这大概意味着人们会描述一个他们想要建立的形象。每个指向自己的人都在试图将他们的生活方式映射到公众面前，这一切都是心智模型。至今，我仍在寻找最困难的哲学问题——"我是谁"的答案。在这里，我列出一些基本信息，希望能拓宽你的想象，帮助你更好地了解我。
@@ -85,7 +107,9 @@ A: I live in Munich and work as a research assistant and Ph.D. student at LMU M�
 - 2018，同时注册慕尼黑大学计算机科学硕士，与人机交互并行攻读。
 - 2019，以人机交互和计算机科学双硕士学位毕业。入职慕尼黑大学，担任博士研究员。
 - 2020，创立 [golang.design](https://golang.design) 开源计划。
+- 2022，加入 Sixt SE 任软件工程师，后成为首席工程师。
 - 2023，在慕尼黑大学完成博士论文答辩。
+- 2026，离开 Sixt SE，全职担任 [Latere AI](https://latere.ai) 创始人兼 CEO。
 
 ### 个人标签
 
