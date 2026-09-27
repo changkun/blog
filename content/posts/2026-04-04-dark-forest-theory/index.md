@@ -19,7 +19,7 @@ title_zh: "黑暗森林理论：一个形式化推导"
 
 The "Dark Forest Theory" proposed by Liu Cixin in the *Three-Body Problem* series is a speculative theory about interaction strategies among cosmic civilizations. This article reconstructs it formally, with tools from game theory and decision theory, starting from the axioms given in the novel [^liu].
 
-The argument proceeds in four steps. First, we show that the novel's two axioms are insufficient on their own to derive the Dark Forest. Then we add the structural conditions the novel relies on and build an incomplete-information game. From it we derive when the Dark Forest's two behaviors, silence and preemption, are equilibria. Finally we check the theory's evolutionary claim with a simulation, and discuss the limits of the conclusion. The algebra of Sections 4 to 6 is checked in Lean 4 with Mathlib; the proof file is attached as [DarkForest.lean](DarkForest.lean), and each checked claim below names its theorem. The same proofs, with a project that builds and checks them, are at [github.com/changkun/dark-forest-lean](https://github.com/changkun/dark-forest-lean).
+The argument proceeds in four steps. First, we show that the novel's two axioms are insufficient on their own to derive the Dark Forest. Then we add the structural conditions the novel relies on and build an incomplete-information game. From it we derive when the Dark Forest's two behaviors, silence and preemption, are equilibria. Finally we check the theory's evolutionary claim with a simulation, and discuss the limits of the conclusion. The formal claims in Sections 1, 2 and 4 to 6 are checked in Lean 4 with Mathlib; the proof file is attached as [DarkForest.lean](DarkForest.lean), and each checked claim below names its theorem. What is not checked is said where it occurs: the informal cases of Proposition 0, the equilibrium-selection result cited in Proposition 3, and the evolutionary clause of the theorem, which Section 9 tests by simulation instead. The same proofs, with a project that builds and checks them, are at [github.com/changkun/dark-forest-lean](https://github.com/changkun/dark-forest-lean).
 
 The short version: the two halves of the Dark Forest are not equally strong. Silence follows under weak conditions. Preemption after detection is only one of two equilibria, and it is the safer one only when strikes usually succeed.
 
@@ -31,7 +31,7 @@ Let $\mathcal{U}$ be the set of all civilizations in the universe, with $|\mathc
 
 $$S_i(o) \wedge \neg S_i(o') \;\Longrightarrow\; o \succ_i o'$$
 
-Survival has lexicographic priority. A lexicographic order of this kind has no real-valued utility representation [^mwg], so the model below approximates it with a finite but very large extinction loss $M$.
+Survival has lexicographic priority. Because survival takes only two values, this order can be represented by a real-valued utility (Lean: `lex_representable`). The additive form used below, $-M$ for extinction plus the other gains, represents it exactly when those gains are bounded and $M$ exceeds twice their bound (`additive_lex_of_bounded`); if the other gains could grow without bound, no finite $M$ would do (`additive_not_lex_of_unbounded`). The model below assumes bounded gains and a very large $M$.
 
 **Axiom A2 (Growth and Finite Resources):** In the novel, "civilization continuously grows and expands, but the total matter in the universe remains constant." Let $R$ be the total resource quantity of the universe and $r_i(t)$ the resources held by civilization $c_i$ at time $t$. Each civilization tends to grow, while
 
@@ -95,7 +95,7 @@ Let the extinction loss be $M$ (taken to be extremely large), the first-strike c
 
 $$U_i = -M \cdot \mathbf{1}\{\text{extinction}\} - K_i \cdot \mathbf{1}\{\text{first strike}\} + \varepsilon G_i$$
 
-where $M \gg K_i \gg \varepsilon G_i$. This structure reflects A1: survival overrides everything, and no cooperation gain, however large, outweighs "not being annihilated." A finite $M$ is the approximation to A1's lexicographic order mentioned above; where a conclusion relies on "$M$ large", the propositions below say how large.
+where $M \gg K_i \gg \varepsilon G_i$. This structure reflects A1: survival overrides everything, and no cooperation gain, however large, outweighs "not being annihilated." With bounded gains, a finite $M$ larger than twice their bound represents A1's order exactly, as shown above; where a conclusion relies on "$M$ large", the propositions below say how large.
 
 ### 4.2 Threat Probability
 
@@ -105,7 +105,7 @@ Define the following probabilities:
 - $\gamma$: probability that the other party, currently non-hostile, evolves into a lethal threat within the verification window $\tau$ (driven by B4)
 - Base threat probability: $\pi = 1 - (1-p)(1-\gamma)$
 
-$\pi$ integrates two types of risk: the other party is dangerous now, or the other party is not dangerous now but will become so soon. By B4 ($\sigma^2 > 0$), $\gamma > 0$; by B2 (unverifiable intentions), $p$ cannot be updated to 0. Therefore $\pi > 0$.
+$\pi$ integrates two types of risk: the other party is dangerous now, or the other party is not dangerous now but will become so soon. By B4 ($\sigma^2 > 0$), $\gamma > 0$; by B2 (unverifiable intentions), $p$ cannot be updated to 0. Therefore $\pi > 0$ (Lean: `basePi_pos`), even if no civilization is hostile now.
 
 In the game after exposure, what matters is the probability that the other side strikes regardless of what we do, and we use $\pi$ for it. Counting $\gamma$ into that probability assumes that a civilization which becomes able to destroy another also becomes willing to. This is part of how we read B4, not a consequence of it.
 
@@ -115,7 +115,7 @@ In the game after exposure, what matters is the probability that the other side 
 
 By B2, signals carry no verifiable information. Any "I have no hostile intent" declaration is cheap talk: benign and hostile civilizations alike can emit identical signals.
 
-Therefore, for any peace declaration $m$, $P(\text{the other is a threat} \mid m) = \pi$, and as long as $0 < \pi < 1$:
+Therefore, for any peace declaration $m$, $P(\text{the other is a threat} \mid m) = \pi$ (Lean: `prop1_posterior_is_prior`), and as long as $0 < \pi < 1$ (`prop1_cheap_talk`):
 
 $$0 < P(\text{the other is a threat} \mid m) < 1$$
 
@@ -316,7 +316,7 @@ Thus, the Dark Forest Theory is less a moral judgment that "all civilizations in
 
 *Note: The formalization in this article is a theoretical reconstruction of the novel's text, not Liu Cixin's own formulation. Cosmic sociology as a discipline does not actually exist; its "axioms" can be neither verified nor falsified. The Lean file checks the mathematics of the model, not whether the model describes any real universe.*
 
-*Revised on September 27, 2026. Proposition 2 previously claimed that the chain of suspicion drives threat to certainty whenever $\pi > 0$, which holds only for uniformly spread thresholds; its note on robustness had the effect of a large $M$ backwards. Proposition 3's utilities are now symmetric, the main theorem separates silence from preemption, the algebra is checked in Lean, and Section 9 adds a simulation.*
+*Revised on September 27, 2026. Proposition 2 previously claimed that the chain of suspicion drives threat to certainty whenever $\pi > 0$, which holds only for uniformly spread thresholds; its note on robustness had the effect of a large $M$ backwards. Proposition 3's utilities are now symmetric, Section 1 states when the additive utility represents A1's order, the main theorem separates silence from preemption, the formal claims are checked in Lean, and Section 9 adds a simulation.*
 
 {{% /en %}}
 
@@ -326,7 +326,7 @@ Thus, the Dark Forest Theory is less a moral judgment that "all civilizations in
 
 刘慈欣在《三体》系列中提出的“黑暗森林理论”是一个关于宇宙文明间交互策略的推测性理论。本文从小说给出的公理出发，运用博弈论和决策理论的工具，对该理论做一次形式化的重构[^liu]。
 
-论证分为四步：首先说明小说中的两条公理不足以单独推出黑暗森林；然后补上小说所依赖的结构性条件，构建一个不完全信息博弈；接着由此推导黑暗森林的两种行为，即沉默与先发制人，分别在什么条件下是均衡；最后用一个模拟检验理论在演化层面的主张，并讨论结论的局限。第 4 至 6 节的代数部分已用 Lean 4 和 Mathlib 做了机器验证，证明文件附在这里：[DarkForest.lean](DarkForest.lean)。下文每一个经过验证的结论，都注明了对应的定理名。同样的证明，连同可以直接构建和检查它们的项目，也放在 [github.com/changkun/dark-forest-lean](https://github.com/changkun/dark-forest-lean)。
+论证分为四步：首先说明小说中的两条公理不足以单独推出黑暗森林；然后补上小说所依赖的结构性条件，构建一个不完全信息博弈；接着由此推导黑暗森林的两种行为，即沉默与先发制人，分别在什么条件下是均衡；最后用一个模拟检验理论在演化层面的主张，并讨论结论的局限。第 1、2 节以及第 4 至 6 节中的形式化结论，都已用 Lean 4 和 Mathlib 做了机器验证，证明文件附在这里：[DarkForest.lean](DarkForest.lean)。下文每一个经过验证的结论，都注明了对应的定理名；没有验证的部分，也在出现的地方说明了：命题 0 中非形式化的几种情形、命题 3 引用的均衡选择结果，以及定理在演化层面的那一条，后者改由第 9 节的模拟来检验。同样的证明，连同可以直接构建和检查它们的项目，也放在 [github.com/changkun/dark-forest-lean](https://github.com/changkun/dark-forest-lean)。
 
 先说结论：黑暗森林的两半并不一样结实。沉默在很弱的条件下就成立；而暴露之后的先发制人，只是两个均衡之一，并且只有在打击通常能够成功时，才是更稳妥的那一个。
 
@@ -338,7 +338,7 @@ Thus, the Dark Forest Theory is less a moral judgment that "all civilizations in
 
 $$S_i(o) \wedge \neg S_i(o') \;\Longrightarrow\; o \succ_i o'$$
 
-生存是字典序意义上的最高优先级（lexicographic priority）。这样的字典序偏好不能用实值效用函数来表示[^mwg]，所以下面的模型用一个有限但极大的灭绝损失 $M$ 来近似它。
+生存是字典序意义上的最高优先级（lexicographic priority）。由于生存只有“存续”和“不存续”两种取值，这个偏好是可以用实值效用函数来表示的（Lean：`lex_representable`）。下面所用的加法形式，即灭绝记为 $-M$、再加上其他收益，只要其他收益有界、并且 $M$ 大于其上界的两倍，就能准确地表示它（`additive_lex_of_bounded`）；如果其他收益可以无限增大，那么任何有限的 $M$ 都做不到（`additive_not_lex_of_unbounded`）。下面的模型假定收益有界、$M$ 极大。
 
 **公理 A2（增长与资源有限）：** 小说原文是“文明不断增长和扩张，但宇宙中的物质总量保持不变”。设 $R$ 为宇宙总资源量，$r_i(t)$ 为文明 $c_i$ 在时刻 $t$ 占有的资源量。每个文明都倾向于增长，而
 
@@ -402,7 +402,7 @@ $$x_i(t + \tau) = x_i(t) \cdot e^{g_i \tau + \xi_i}$$
 
 $$U_i = -M \cdot \mathbf{1}\{\text{灭绝}\} - K_i \cdot \mathbf{1}\{\text{先发打击}\} + \varepsilon G_i$$
 
-其中 $M \gg K_i \gg \varepsilon G_i$。这个结构反映了 A1：生存压倒一切，合作收益再大也比不过“别被灭掉”。有限的 $M$ 就是上面说的、对 A1 字典序偏好的近似；凡是依赖“$M$ 足够大”的结论，下面的命题都会说明要多大。
+其中 $M \gg K_i \gg \varepsilon G_i$。这个结构反映了 A1：生存压倒一切，合作收益再大也比不过“别被灭掉”。如上所述，收益有界时，一个大于其上界两倍的有限 $M$ 就能准确表示 A1 的字典序偏好；凡是依赖“$M$ 足够大”的结论，下面的命题都会说明要多大。
 
 ### 4.2 威胁概率
 
@@ -412,7 +412,7 @@ $$U_i = -M \cdot \mathbf{1}\{\text{灭绝}\} - K_i \cdot \mathbf{1}\{\text{先�
 - $\gamma$：对方当前非敌对，但在验证窗口 $\tau$ 内演化为致命威胁的概率（由 B4 驱动）
 - 基础威胁概率：$\pi = 1 - (1-p)(1-\gamma)$
 
-$\pi$ 综合了两类风险：对方现在就危险，或对方现在不危险但很快会变得危险。由 B4（$\sigma^2 > 0$），$\gamma > 0$；由 B2（意图不可验证），$p$ 无法被更新为 0。因此 $\pi > 0$。
+$\pi$ 综合了两类风险：对方现在就危险，或对方现在不危险但很快会变得危险。由 B4（$\sigma^2 > 0$），$\gamma > 0$；由 B2（意图不可验证），$p$ 无法被更新为 0。因此 $\pi > 0$（Lean：`basePi_pos`），即使眼下没有任何文明是敌对的。
 
 在暴露之后的博弈里，要紧的是对方无论如何都会打击的概率，我们就用 $\pi$ 表示它。把 $\gamma$ 算进这个概率，等于假定一个有能力毁灭别人的文明，也就有了这个意愿。这是我们对 B4 的一种解读，而不是 B4 本身推得出来的。
 
@@ -422,7 +422,7 @@ $\pi$ 综合了两类风险：对方现在就危险，或对方现在不危险�
 
 由 B2，信号不携带可验证信息。任何“我没有恶意”的声明都是廉价话语：善意文明与恶意文明都能发出完全相同的信号。
 
-因此，对任意和平声明 $m$，都有 $P(\text{对方是威胁} \mid m) = \pi$，只要 $0 < \pi < 1$：
+因此，对任意和平声明 $m$，都有 $P(\text{对方是威胁} \mid m) = \pi$（Lean：`prop1_posterior_is_prior`），只要 $0 < \pi < 1$（`prop1_cheap_talk`）：
 
 $$0 < P(\text{对方是威胁} \mid m) < 1$$
 
@@ -625,14 +625,13 @@ _图 2：一片小小的黑暗森林。每个点是一个文明：深蓝色的�
 
 *附注：本文中的形式化是对小说文本的理论重构，并非刘慈欣本人的表述。宇宙社会学作为一个学科本身并不存在，其“公理”的真实性无法被验证或证伪。Lean 文件验证的是这个模型的数学，而不是这个模型是否描述了某个真实的宇宙。*
 
-*2026 年 9 月 27 日修订。命题 2 原先声称，只要 $\pi > 0$，猜疑链就会把威胁推到确定无疑，这只在门槛均匀分布时成立；它关于稳健性的说明，还把巨大 $M$ 的作用方向说反了。命题 3 的效用已改为对称的形式，主定理把沉默和先发制人分开，代数部分用 Lean 做了验证，第 9 节增加了一个模拟。*
+*2026 年 9 月 27 日修订。命题 2 原先声称，只要 $\pi > 0$，猜疑链就会把威胁推到确定无疑，这只在门槛均匀分布时成立；它关于稳健性的说明，还把巨大 $M$ 的作用方向说反了。命题 3 的效用已改为对称的形式，第 1 节说明了加法效用在什么条件下能表示 A1 的偏好，主定理把沉默和先发制人分开，形式化的结论用 Lean 做了验证，第 9 节增加了一个模拟。*
 
 {{% /zh %}}
 
 ## References
 
 [^liu]: Liu, C. (2008). *三体II：黑暗森林*. Chongqing Press. English translation: *The Dark Forest*, trans. J. Martinsen, Tor Books, 2015. The two axioms, and the concepts of the chain of suspicion and the technological explosion, are given in the prologue.
-[^mwg]: Mas-Colell, A., Whinston, M. D., & Green, J. R. (1995). *Microeconomic Theory*. Oxford University Press, §3.C: the lexicographic preference relation has no utility representation.
 [^fm]: Fudenberg, D., & Maskin, E. (1986). [The folk theorem in repeated games with discounting or with incomplete information](https://doi.org/10.2307/1911307). *Econometrica*, 54(3), 533–554.
 [^hs]: Harsanyi, J. C., & Selten, R. (1988). *A General Theory of Equilibrium Selection in Games*. MIT Press.
 [^cvd]: Carlsson, H., & van Damme, E. (1993). [Global games and equilibrium selection](https://doi.org/10.2307/2951491). *Econometrica*, 61(5), 989–1018. For two-by-two games whose payoffs each player observes with small noise, iterated dominance selects the risk-dominant equilibrium.

@@ -23,6 +23,77 @@ namespace DarkForest
 
 open Filter Topology
 
+/-! ## Survival first (Axiom A1)
+
+An outcome is a pair: whether the civilization survives, and its gain on
+everything else. A1 orders outcomes lexicographically: survival first, then
+the gain. -/
+
+/-- A1's order on outcomes. -/
+def lexLT (a b : Bool × ℝ) : Prop :=
+  (a.1 = false ∧ b.1 = true) ∨ (a.1 = b.1 ∧ a.2 < b.2)
+
+/-- A real-valued utility for A1's order: survival adds `Real.pi`, more than
+the whole range of the arctangent of any gain. -/
+noncomputable def uLex (a : Bool × ℝ) : ℝ := (if a.1 then Real.pi else 0) + Real.arctan a.2
+
+/-- Because survival takes only two values, A1's order does have a
+real-valued utility representation, unlike the lexicographic order on pairs
+of real numbers. -/
+theorem lex_representable (a b : Bool × ℝ) : lexLT a b ↔ uLex a < uLex b := by
+  rcases a with ⟨sa, x⟩
+  rcases b with ⟨sb, y⟩
+  have hx1 := Real.arctan_lt_pi_div_two x
+  have hx0 := Real.neg_pi_div_two_lt_arctan x
+  have hy1 := Real.arctan_lt_pi_div_two y
+  have hy0 := Real.neg_pi_div_two_lt_arctan y
+  -- Same survival: simp compares the arctangents. Different survival:
+  -- the arctangents lie within (-π/2, π/2), so the π decides.
+  cases sa <;> cases sb <;> simp [lexLT, uLex] <;> linarith
+
+/-- The additive utility of Section 4.1: survival counts `M`, the rest `g`. -/
+def uAdd (M : ℝ) (a : Bool × ℝ) : ℝ := (if a.1 then M else 0) + a.2
+
+/-- If other gains can be unbounded, no finite `M` respects A1: for any `M`
+some gain makes extinction score above survival. -/
+theorem additive_not_lex_of_unbounded (M : ℝ) :
+    ∃ g : ℝ, uAdd M (true, 0) < uAdd M (false, g) :=
+  ⟨M + 1, by simp [uAdd]⟩
+
+/-- If other gains are bounded by `G`, any `M > 2G` makes the additive
+utility order outcomes exactly as A1 does. -/
+theorem additive_lex_of_bounded (M G : ℝ) (hM : 2 * G < M) (a b : Bool × ℝ)
+    (ha : |a.2| ≤ G) (hb : |b.2| ≤ G) : lexLT a b ↔ uAdd M a < uAdd M b := by
+  rcases a with ⟨sa, x⟩
+  rcases b with ⟨sb, y⟩
+  have hx := abs_le.mp ha
+  have hy := abs_le.mp hb
+  simp only at hx hy
+  cases sa <;> cases sb <;> simp [lexLT, uAdd] <;> linarith
+
+/-! ## The base threat (Section 4.2) and cheap talk (Proposition 1) -/
+
+/-- The base threat `π = 1 - (1 - p)(1 - γ)` is a probability, and positive
+whenever the technological-explosion term `γ` is, even if no civilization is
+hostile now. -/
+theorem basePi_pos (p γ : ℝ) (hp0 : 0 ≤ p) (hp1 : p ≤ 1) (hγ0 : 0 < γ) (hγ1 : γ ≤ 1) :
+    0 < 1 - (1 - p) * (1 - γ) ∧ 1 - (1 - p) * (1 - γ) ≤ 1 := by
+  have h1 : 0 ≤ p * (1 - γ) := mul_nonneg hp0 (by linarith)
+  have h2 : 0 ≤ (1 - p) * (1 - γ) := mul_nonneg (by linarith) (by linarith)
+  constructor <;> nlinarith
+
+/-- Proposition 1: B2 makes a signal independent of the sender's type,
+`P(threat ∧ m) = P(threat) P(m)`, so the threat believed after any signal is
+the prior. -/
+theorem prop1_posterior_is_prior (pThreat pM pBoth : ℝ) (hm : 0 < pM)
+    (hB2 : pBoth = pThreat * pM) : pBoth / pM = pThreat := by
+  rw [hB2]; field_simp
+
+/-- ... and so lies strictly between 0 and 1 whenever the prior does. -/
+theorem prop1_cheap_talk (pThreat pM pBoth : ℝ) (hm : 0 < pM) (hB2 : pBoth = pThreat * pM)
+    (h0 : 0 < pThreat) (h1 : pThreat < 1) : 0 < pBoth / pM ∧ pBoth / pM < 1 := by
+  rw [prop1_posterior_is_prior pThreat pM pBoth hm hB2]; exact ⟨h0, h1⟩
+
 /-! ## Utilities after mutual detection (Proposition 3)
 
 `M` is the extinction loss, `K` the cost of striking, `q` the probability
