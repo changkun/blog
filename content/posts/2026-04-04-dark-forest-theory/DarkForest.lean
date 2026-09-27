@@ -110,6 +110,12 @@ theorem basePi_pos (p γ : ℝ) (hp0 : 0 ≤ p) (hp1 : p ≤ 1) (hγ0 : 0 < γ) 
   have h2 : 0 ≤ (1 - p) * (1 - γ) := mul_nonneg (by linarith) (by linarith)
   constructor <;> nlinarith
 
+/-- Section 8.2: the base threat lies between `p` and `p + γ`, so it falls to
+`p` as `γ` does. -/
+theorem basePi_between (p γ : ℝ) (hp0 : 0 ≤ p) (hp1 : p ≤ 1) (hγ0 : 0 ≤ γ) :
+    p ≤ 1 - (1 - p) * (1 - γ) ∧ 1 - (1 - p) * (1 - γ) ≤ p + γ := by
+  constructor <;> nlinarith
+
 /-- Proposition 1: B2 makes a signal independent of the sender's type,
 `P(threat ∧ m) = P(threat) P(m)`, so the threat believed after any signal is
 the prior. -/
@@ -121,6 +127,73 @@ theorem prop1_posterior_is_prior (pThreat pM pBoth : ℝ) (hm : 0 < pM)
 theorem prop1_cheap_talk (pThreat pM pBoth : ℝ) (hm : 0 < pM) (hB2 : pBoth = pThreat * pM)
     (h0 : 0 < pThreat) (h1 : pThreat < 1) : 0 < pBoth / pM ∧ pBoth / pM < 1 := by
   rw [prop1_posterior_is_prior pThreat pM pBoth hm hB2]; exact ⟨h0, h1⟩
+
+/-! ## The technological explosion (B4)
+
+Capability grows as `x (t + τ) = x t · exp (g τ + ξ)`. `γ` is the chance that
+it reaches a lethal level `ℓ` within the window. -/
+
+section Explosion
+open MeasureTheory ProbabilityTheory
+
+/-- With a Gaussian random term of any positive variance, every lethal level
+can be reached: `γ > 0`, however far below it the capability starts. -/
+theorem explosion_possible (x g τ ℓ : ℝ) (hx : 0 < x) (v : NNReal) (hv : v ≠ 0) :
+    0 < gaussianReal 0 v {ξ | ℓ ≤ x * Real.exp (g * τ + ξ)} := by
+  set c := Real.log (|ℓ| / x) - g * τ
+  have hsub : Set.Ici c ⊆ {ξ | ℓ ≤ x * Real.exp (g * τ + ξ)} := by
+    intro ξ (hξ : c ≤ ξ)
+    show ℓ ≤ x * Real.exp (g * τ + ξ)
+    have h1 : Real.log (|ℓ| / x) ≤ g * τ + ξ := by linarith
+    have h2 : |ℓ| / x ≤ Real.exp (g * τ + ξ) := by
+      rcases eq_or_lt_of_le (div_nonneg (abs_nonneg ℓ) hx.le) with h | h
+      · rw [← h]; exact (Real.exp_pos _).le
+      · exact (Real.log_le_iff_le_exp h).mp h1
+    have h3 : |ℓ| ≤ x * Real.exp (g * τ + ξ) := by rwa [div_le_iff₀ hx, mul_comm] at h2
+    exact le_trans (le_abs_self ℓ) h3
+  refine lt_of_lt_of_le ?_ (measure_mono hsub)
+  rw [pos_iff_ne_zero]
+  intro h0
+  have := gaussianReal_absolutelyContinuous' 0 hv h0
+  rw [Real.volume_Ici] at this
+  exact ENNReal.top_ne_zero this
+
+/-- Positive variance alone is not enough: a bounded random term, however
+variable, never lifts a capability that starts far enough below the lethal
+level to reach it, and then `γ = 0`. -/
+theorem explosion_needs_reach (μ : Measure ℝ) (x g τ ℓ c : ℝ) (hx : 0 < x)
+    (hbound : ∀ᵐ ξ ∂μ, ξ ≤ c) (hfar : x * Real.exp (g * τ + c) < ℓ) :
+    μ {ξ | ℓ ≤ x * Real.exp (g * τ + ξ)} = 0 := by
+  rw [measure_eq_zero_iff_ae_notMem]
+  filter_upwards [hbound] with ξ hξ hmem
+  have : x * Real.exp (g * τ + ξ) ≤ x * Real.exp (g * τ + c) :=
+    mul_le_mul_of_nonneg_left (Real.exp_le_exp.mpr (by linarith)) hx.le
+  exact absurd (lt_of_le_of_lt (le_trans hmem this) hfar) (lt_irrefl ℓ)
+
+/-- Section 8.2: a small variance makes the explosion rare. With a random
+term of mean zero, `γ` is at most the variance over the squared gap between
+the lethal level and the capability's expected path (Chebyshev). -/
+theorem explosion_rare (μ : Measure ℝ) [IsProbabilityMeasure μ] (hL2 : MemLp id 2 μ)
+    (h0 : ∫ ξ, ξ ∂μ = 0) (x g τ ℓ : ℝ) (hx : 0 < x) (hgap : x * Real.exp (g * τ) < ℓ) :
+    μ {ξ | ℓ ≤ x * Real.exp (g * τ + ξ)} ≤
+      ENNReal.ofReal (variance id μ / (Real.log (ℓ / x) - g * τ) ^ 2) := by
+  have hℓ : 0 < ℓ := lt_trans (mul_pos hx (Real.exp_pos _)) hgap
+  set c := Real.log (ℓ / x) - g * τ
+  have hc : 0 < c := by
+    have : Real.exp (g * τ) < ℓ / x := by rw [lt_div_iff₀ hx, mul_comm]; exact hgap
+    have := Real.lt_log_iff_exp_lt (div_pos hℓ hx) |>.mpr this
+    linarith
+  have hsub : {ξ | ℓ ≤ x * Real.exp (g * τ + ξ)} ⊆ {ξ | c ≤ |id ξ - μ[id]|} := by
+    intro ξ (hξ : ℓ ≤ x * Real.exp (g * τ + ξ))
+    show c ≤ |ξ - ∫ ξ, id ξ ∂μ|
+    have hmean : ∫ ξ, id ξ ∂μ = 0 := h0
+    rw [hmean, sub_zero]
+    have h1 : ℓ / x ≤ Real.exp (g * τ + ξ) := by rw [div_le_iff₀ hx, mul_comm]; exact hξ
+    have h2 := (Real.log_le_iff_le_exp (div_pos hℓ hx)).mpr h1
+    exact le_trans (by linarith) (le_abs_self ξ)
+  exact le_trans (measure_mono hsub) (meas_ge_le_variance_div_sq hL2 hc)
+
+end Explosion
 
 /-! ## Utilities after mutual detection (Proposition 3)
 
@@ -197,6 +270,52 @@ risk-dominant exactly when `q > (1 - π) / 2`. -/
 theorem strike_risk_dominant_iff_q (π q : ℝ) :
     1 - q < pStrike π (1 / 2) ↔ (1 - π) / 2 < q := by
   unfold pStrike; constructor <;> intro h <;> linarith
+
+/-- A share `a` of non-hostile civilizations striking is an equilibrium when
+each best-replies: all strike if the other side's strike probability exceeds
+the threshold `t`, none if it falls below, any share if it equals `t`. -/
+def IsEqShare (π t a : ℝ) : Prop := (t < pStrike π a → a = 1) ∧ (pStrike π a < t → a = 0)
+
+/-- When the base threat exceeds the threshold, mutual striking is the only
+equilibrium: the other side strikes with probability at least `π` whatever
+the non-hostile do. -/
+theorem only_striking (π t a : ℝ) (hπ1 : π ≤ 1) (ht : t < π) (ha0 : 0 ≤ a) (ha1 : a ≤ 1) :
+    IsEqShare π t a ↔ a = 1 := by
+  have hge : π ≤ pStrike π a := by unfold pStrike; nlinarith
+  constructor
+  · intro h; exact h.1 (by linarith)
+  · rintro rfl
+    exact ⟨fun _ => rfl, fun h => by unfold pStrike at h; linarith⟩
+
+/-- At or below the threshold, a stag hunt. The equilibria are none striking,
+all striking, and the mixed one at the edge `(t - π)/(1 - π)` that separates
+the basins of the replicator dynamics: three when `π < t`, two when `π = t`,
+where the mixed one is none striking. -/
+theorem stag_hunt_equilibria (π t a : ℝ) (hπt : π ≤ t) (ht1 : t < 1) (ha0 : 0 ≤ a)
+    (ha1 : a ≤ 1) : IsEqShare π t a ↔ a = 0 ∨ a = (t - π) / (1 - π) ∨ a = 1 := by
+  have h1π : 0 < 1 - π := by linarith
+  have hedge : pStrike π ((t - π) / (1 - π)) = t := by unfold pStrike; field_simp; ring
+  constructor
+  · rintro ⟨hs, hw⟩
+    rcases lt_trichotomy (pStrike π a) t with h | h | h
+    · exact Or.inl (hw h)
+    · right; left
+      unfold pStrike at h; field_simp; linarith
+    · exact Or.inr (Or.inr (hs h))
+  · rintro (rfl | rfl | rfl)
+    · exact ⟨fun h => by unfold pStrike at h; linarith, fun _ => rfl⟩
+    · exact ⟨fun h => by linarith, fun h => by linarith⟩
+    · exact ⟨fun _ => rfl, fun h => by unfold pStrike at h; linarith⟩
+
+/-- Mutual striking is an equilibrium, `r* < 1`, exactly when the strike
+cost is below `q² M`: always, once the extinction loss is large enough. -/
+theorem threshold_lt_one_iff (M K q : ℝ) (hM : 0 < M) (hq : 0 < q) :
+    threshold M K q < 1 ↔ K < q ^ 2 * M := by
+  have hqM : 0 < q * M := mul_pos hq hM
+  unfold threshold
+  rw [show 1 - q + K / (q * M) < 1 ↔ K / (q * M) < q by constructor <;> intro h <;> linarith,
+    div_lt_iff₀ hqM]
+  constructor <;> intro h <;> nlinarith
 
 /-! ## The chain of suspicion (Proposition 2)
 
@@ -314,6 +433,58 @@ theorem silence_for_large_M (B C dR dH ρD ρ0 : ℝ) (hd : dH < dR) (hρ : ρ0 
   rw [prop4_hide_iff]
   have h1 : B + C < M * ((dR - dH) * (ρD - ρ0)) := (div_lt_iff₀ hpos).mp hM
   nlinarith
+
+/-! ## The Dark Forest state (Section 6) -/
+
+/-- Section 6's backward induction: whichever equilibrium is played after
+detection, a detected civilization dies with probability at least `π q`, so
+one extinction loss, the same for every such equilibrium, makes hiding
+better than revealing. -/
+theorem silence_whatever_follows (B C dR dH π q ρ0 : ℝ) (hd : dH < dR) (hπ1 : π ≤ 1)
+    (hq : 0 ≤ q) (hρ : ρ0 < π * q) :
+    ∃ M₀, ∀ M, M₀ < M → ∀ a, 0 ≤ a → a ≤ 1 →
+      uReveal M B dR (pStrike π a * q) ρ0 < uHide M C dH (pStrike π a * q) ρ0 := by
+  have hpos : 0 < (dR - dH) * (π * q - ρ0) := mul_pos (by linarith) (by linarith)
+  refine ⟨max 0 ((B + C) / ((dR - dH) * (π * q - ρ0))), fun M hM a ha0 ha1 => ?_⟩
+  have hM0 : 0 < M := lt_of_le_of_lt (le_max_left _ _) hM
+  have hM1 : B + C < M * ((dR - dH) * (π * q - ρ0)) :=
+    (div_lt_iff₀ hpos).mp (lt_of_le_of_lt (le_max_right _ _) hM)
+  have hρD : π * q ≤ pStrike π a * q := by
+    apply mul_le_mul_of_nonneg_right _ hq; unfold pStrike; nlinarith
+  rw [prop4_hide_iff]
+  have : (dR - dH) * (π * q - ρ0) * M ≤ (dR - dH) * (pStrike π a * q - ρ0) * M := by
+    apply mul_le_mul_of_nonneg_right _ hM0.le
+    exact mul_le_mul_of_nonneg_left (by linarith) (by linarith)
+  nlinarith
+
+/-- The Dark Forest state for a civilization: revealing lowers its chance of
+surviving, and after detection restraint is not risk-dominant, that is,
+waiting is not the better reply to an even chance of either. -/
+def DarkForestState (dR dH ρD ρ0 π t : ℝ) : Prop :=
+  1 - (dR * ρD + (1 - dR) * ρ0) < 1 - (dH * ρD + (1 - dH) * ρ0) ∧ ¬ pStrike π (1 / 2) < t
+
+/-- Section 6: when revealing makes detection likelier and detection is
+dangerous, the system is in the Dark Forest state for all large extinction
+losses exactly when `q > (1 - π)/2`. -/
+theorem dark_forest_state_iff (dR dH ρD ρ0 π q K : ℝ) (hd : dH < dR) (hρ : ρ0 < ρD)
+    (hq : 0 < q) (hK : 0 < K) :
+    (∀ᶠ M in atTop, DarkForestState dR dH ρD ρ0 π (threshold M K q)) ↔ (1 - π) / 2 < q := by
+  have hsurv : 1 - (dR * ρD + (1 - dR) * ρ0) < 1 - (dH * ρD + (1 - dH) * ρ0) := by
+    nlinarith [mul_pos (sub_pos.mpr hd) (sub_pos.mpr hρ)]
+  have hhalf : pStrike π (1 / 2) = (1 + π) / 2 := by unfold pStrike; ring
+  constructor
+  · intro h
+    obtain ⟨M, hM⟩ := (h.and (eventually_gt_atTop 0)).exists
+    have hM0 := hM.2
+    have hrd := hM.1.2
+    rw [hhalf, not_lt] at hrd
+    have : 0 < K / (q * M) := div_pos hK (mul_pos hq hM0)
+    unfold threshold at hrd
+    linarith
+  · intro h
+    have hlt : 1 - q < (1 + π) / 2 := by linarith
+    filter_upwards [(threshold_tendsto K q hq).eventually (gt_mem_nhds hlt)] with M hM
+    exact ⟨hsurv, by rw [hhalf, not_lt]; exact hM.le⟩
 
 /-! ## Proposition 0: the other counterexamples
 
