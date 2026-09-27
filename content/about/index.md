@@ -43,6 +43,7 @@ date: 2013-03-23 18:54:55
 - 2020, founded the [golang.design](https://golang.design) initiative.
 - 2022, joined Sixt SE as a software engineer.
 - 2023, defended Ph.D. dissertation at LMU München.
+- 2024, became a Senior Engineer at Sixt SE.
 - 2025, became a Staff Engineer at Sixt SE.
 - 2026, left Sixt SE to lead [Latere AI](https://latere.ai) full-time as its founder and CEO.
 
@@ -110,6 +111,7 @@ A: I live in Munich and work as a research assistant and Ph.D. student at LMU M�
 - 2020，创立 [golang.design](https://golang.design) 开源计划。
 - 2022，加入 Sixt SE 任软件工程师。
 - 2023，在慕尼黑大学完成博士论文答辩。
+- 2024，晋升为 Sixt SE 高级工程师。
 - 2025，晋升为 Sixt SE 首席工程师。
 - 2026，离开 Sixt SE，全职担任 [Latere AI](https://latere.ai) 创始人兼 CEO。
 
