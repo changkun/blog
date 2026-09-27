@@ -113,9 +113,9 @@ UglyUrls = false
   Icon = "linkedin"
   URL = "https://www.linkedin.com/in/changkun/"
 [[Params.Socials]]
-  Name = "Twitter"
+  Name = "X"
   Icon = "twitter"
-  URL = "https://twitter.com/ouchangkun"
+  URL = "https://x.com/changkun"
 [[Params.Socials]]
   Name = "Instagram"
   Icon = "instagram"
