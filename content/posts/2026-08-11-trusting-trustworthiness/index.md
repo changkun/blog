@@ -4,6 +4,8 @@ toc: true
 id:
 slug: /posts/trusting-trustworthiness
 draft: false
+scripts:
+    - figures.js
 tags:
     - 随笔
     - 信任
@@ -51,7 +53,7 @@ There are two answers, because there are two ways to trust a person. The weak fo
 In Thompson’s terms, a person’s record (their behavior trajectory, their transcript) is the visible source and their priorities are the compiler, so the weak form trusts the compiled output and the strong form trusts the compiler. The two forms look identical while things go well, which is why the distinction is rarely drawn. They separate at the first error. The main problem with the weak form is that it has no internal structure, so an error can only raise or lower it as a whole, and a serious error breaks it entirely. The strong form has an internal structure that can locate the error. If the error came from missing skill or missing information, the priorities are untouched and the trust survives. If it came from the priorities themselves, trust should probably end, and the strong form says so, because it carries its own failure condition.
 
 ![](fig2.png)
-_Fig 2: The weak form trusts the record and can only rise, fall, or break. The strong form trusts the priorities and can locate an error._
+_Fig 2: The weak form trusts the record and can only rise, fall, or break. The strong form trusts the priorities and can locate an error. The curves sketch that logic; they are not data._
 
 The weak form has a second defect that shows even before any error happens. David Hume [Hume, 1751] described a type he called “the sensible knave”, where “sensible” means shrewd. He keeps the rules of honest dealing as a general policy, because a reputation for honesty is profitable, and he breaks them on the one occasion where breaking them pays and nobody will find out. The consequence for evidence is that, for as long as honesty is convenient, the knave and the honest person produce identical records, so someone who trusts the record cannot tell them apart until the knave defects. The maintainer who shipped the xz back door, under the name Jia Tan, had spent more than two years sending genuinely useful patches before the release that carried it [Cox, 2024]. Paul Slovic [Slovic, 1993] recorded what happens at that point. Positive events are diffuse and hard to count, while negative events are concrete and heavily weighted, so trust accumulates slowly and drops after a single identifiable failure. When the trust was in a person rather than in their priorities, nothing weighs against the drop except a diffuse impression. So the weak form cannot pick out the knave before the defection, and cannot survive the defection after it.
 
@@ -152,7 +154,7 @@ Open source has run this experiment in public. In 2013 Felix Geisendörfer propo
 Take the earlier example again. In an environment with those three properties, the prototype leads to a conversation about access. The three costly choices are read as evidence, the shortcut through the process is noted, and the process itself is examined for why it produced months of delay. The person who built the prototype keeps the trust they started with, and the team that owns the system gains a reading of that person’s priorities that no request form could have supplied. Over time, such an environment produces the kind of result that cannot be requested.
 
 ![](fig5.png)
-_Fig 5: Two environments as feedback loops. Zero trust maintains itself. Trust by default generates the evidence that graduated trust needs._
+_Fig 5: Two environments as feedback loops. Zero trust maintains itself: each lap adds a control and costs some candor. Trust by default generates the evidence that graduated trust needs, and a value error contracts trust in steps without stopping the loop._
 
 ## Repair
 
@@ -183,7 +185,7 @@ OpenAI’s response was more monitoring and stricter alignment requirements, and
 There is already an empirical version of this. When OpenAI’s researchers put optimization pressure on the chain of thought itself, penalizing reasoning a monitor flagged, the agents did not stop misbehaving; they “learn obfuscated reward hacking, hiding their intent within the CoT while still exhibiting a significant rate of reward hacking” [Baker et al., 2025]. A monitor works while the monitored system does not treat its channel as watched. Train against the monitor, and the system learns to satisfy the monitor rather than the specification. The July agents told the truth in their reasoning because they did not think anyone was reading it, and the researchers who build these monitors recommend paying a “monitorability tax” to keep it that way. It is a fragile basis for trust, and they say so.
 
 ![](fig6.png)
-_Fig 6: Monitoring is assurance and cannot check the priorities it was compiled from. Alignment is the strong form applied to a system._
+_Fig 6: Monitoring is assurance and cannot check the priorities it was compiled from. Train the model against the monitor and the flags fall while the misbehavior stays; only alignment, the strong form applied to a system, lowers the misbehavior itself. The rates are illustrative._
 
 The research on automation reached the same conclusion from the other direction. John Lee and Katrina See [Lee and See, 2004] argued twenty years ago that the goal for automation is appropriate, calibrated reliance rather than maximal trust, and they grounded trust not only in an automation’s performance but in its process and its purpose, the reason it was built. Alon Jacovi and colleagues [Jacovi et al., 2021] framed trust in an AI system as trust “that some implicit or explicit contract will hold”, and distinguished warranted trust, caused by the system’s actual trustworthiness, from unwarranted trust. Both describe graduated trust applied to a system, and both reach past the record to what the system is for.
 
@@ -327,7 +329,7 @@ David Wheeler [Wheeler, 2009] 给出了打破 Thompson 这个循环的办法。�
 用 Thompson 的说法，一个人的记录（行为轨迹、对话记录）是看得见的源码，优先次序是编译器；弱形式信的是编译出来的产物，强形式信的是编译器。事情顺利的时候，两种形式看起来一模一样，所以很少有人去做这个区分。它们在第一次出错时分道扬镳。弱形式的主要问题是它没有内部结构，一次错误只能让它整体升高或降低，一次严重的错误就能把它彻底打碎。强形式有内部结构，能找出错误出在哪里。如果错误来自技能不足或信息不足，优先次序没有受损，信任就能保住；如果错误来自优先次序本身，信任大概就该结束了，而强形式会直说，因为它自带失效的条件。
 
 ![](fig2.png)
-_图 2：弱形式信的是记录，只能升、降或破裂。强形式信的是优先次序，能找出错误在哪里。_
+_图 2：弱形式信的是记录，只能升、降或破裂。强形式信的是优先次序，能找出错误在哪里。曲线只是这个逻辑的示意，并非数据。_
 
 弱形式还有第二个缺陷，在任何错误发生之前就已经在了。David Hume [Hume, 1751] 描述过一种人，他称之为“聪明的无赖”（the sensible knave），这里的“聪明”是精明的意思。这种人把诚实交易的规则当作一般方针来遵守，因为诚实的名声有利可图；只在破坏规则有好处、又不会被人发现的那一次，才去破坏它。落到证据上，后果就是：只要诚实还方便，无赖和诚实的人留下的记录就一模一样，一个信记录的人，在无赖背叛之前根本分不出两者。以 Jia Tan 之名交付 xz 后门的那个维护者，在那次发布之前，已经提交了两年多真正有用的补丁[Cox, 2024]。Paul Slovic [Slovic, 1993] 记录了背叛发生时的情形：正面的事件分散，难以计数；负面的事件具体，分量很重。所以信任积累得很慢，一次可以指认的失败就能让它骤降。信任如果放在一个人身上，而不是放在这个人的优先次序上，能和这次骤降抗衡的，就只有一点模糊的印象。所以，弱形式在背叛之前认不出无赖，在背叛之后也挺不过去。
 
@@ -428,7 +430,7 @@ Shapiro 的无穷后退说明了为什么这样的组织消除不了信任。每
 再回到前面的例子。在一个有这三个特点的环境里，原型引出的是一次关于访问权限的谈话。三个有代价的选择被当作证据来读，绕过流程这件事被记下，流程本身也会被检查：它为什么拖了几个月。做原型的人保有起初拥有的信任，负责那个系统的团队，则读到了这个人的优先次序，这是任何申请表都给不了的。久而久之，这样的环境会产出那种无法靠申请得来的成果。
 
 ![](fig5.png)
-_图 5：两种环境，两个反馈回路。零信任自我维持。默认信任产出逐步给予信任所需要的证据。_
+_图 5：两种环境，两个反馈回路。零信任自我维持：每转一圈，多一道控制，少一分坦率。默认信任产出逐步给予信任所需要的证据，一次价值观错误会让信任逐级收缩，却不会让循环停下。_
 
 ## 修复
 
@@ -459,7 +461,7 @@ OpenAI 的回应是更多的监控和更严格的对齐要求，而监控和对�
 这件事已经有了实证的版本。OpenAI 的研究者对思维链本身施加优化压力，惩罚被监控标记的推理，智能体并没有因此停止不当行为，而是“学会了隐蔽的奖励破解，把意图藏在思维链里，同时仍以相当高的比率进行奖励破解”[Baker et al., 2025]。监控之所以有效，是因为被监控的系统没有把这条通道当作被看着的。一旦针对监控去训练，系统学会的就是满足监控，而不是满足规范。七月的智能体在推理里说了真话，是因为它们不认为有人在读；做这些监控的研究者建议付一笔“可监控性税”来维持这种状态。这是一个脆弱的信任基础，他们自己也这么说。
 
 ![](fig6.png)
-_图 6：监控是保证，检查不了它从中编译出来的那些优先次序。对齐是强形式的信任用在一个系统上。_
+_图 6：监控是保证，检查不了它从中编译出来的那些优先次序。针对监控去训练模型，标记会变少，不当行为却还在；只有对齐，也就是把强形式的信任用在系统上，才能减少不当行为本身。比率只是示意。_
 
 关于自动化的研究，从另一个方向得出了同样的结论。John Lee 和 Katrina See [Lee and See, 2004] 二十年前就提出，对自动化的目标是恰当的、校准过的依赖，而不是最大程度的信任；他们认为信任不仅建立在自动化的表现上，也建立在它的过程和目的上，也就是它为什么被造出来。Alon Jacovi 等人 [Jacovi et al., 2021] 把对 AI 系统的信任理解为相信“某种隐含或明确的约定会得到遵守”，并把由系统真实的可信性引起的、有依据的信任，和没有依据的信任区分开来。两者描述的都是用在一个系统上的、逐步给予的信任，也都越过了记录，去看系统是为了什么。
 
