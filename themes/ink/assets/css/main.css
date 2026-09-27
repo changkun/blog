@@ -649,6 +649,17 @@ svg { width: 16px; height: 16px; flex: none; }
 
 .prose .MathJax_Display { overflow-x: auto; overflow-y: hidden; }
 
+/* Colors old posts set inline, taken into the palette without editing the
+ * posts: their red, the Bio's questions among them, becomes the navy; the
+ * plum becomes the violet; and a hard-coded black follows the text, so it
+ * does not vanish on the dark page. */
+.prose [style*="#ff0000" i],
+.prose [style*="color: red" i],
+.prose [style*="color:red" i] { color: var(--navy) !important; font-weight: 600; }
+.prose [style*="#993366" i] { color: var(--code-keyword) !important; }
+.prose [style*="#000000" i],
+.prose [style*="color: black" i] { color: inherit !important; }
+
 /* ---- Article footer ---- */
 
 .article-footer { padding: 16px 0 24px; }
@@ -762,7 +773,28 @@ svg { width: 16px; height: 16px; flex: none; }
 
 .archive-list a:hover { color: var(--navy); }
 
-.tag-cloud { padding: 24px 0 8px; }
+/* The cloud is words, no chips: sized by use, set on one baseline so a
+ * row of mixed sizes reads as a line, and centered as a block. The tags
+ * used ten times or more take the ink. */
+.tag-cloud {
+    justify-content: center;
+    align-items: baseline;
+    gap: 10px 20px;
+    padding: 32px 0 16px;
+    line-height: 1.3;
+}
+
+.archive-cloud .archive-header { text-align: center; }
+
+.cloud-tag { color: var(--text-secondary); transition: color 0.2s; }
+
+.cloud-tag-major { color: var(--text); }
+
+.cloud-tag:hover { color: var(--navy); }
+
+.cloud-tag:hover .tag-count { color: var(--navy); }
+
+.cloud-tag .tag-count { margin-left: 3px; font-size: 10.5px; vertical-align: super; line-height: 0; }
 
 /* ---- Pagination ---- */
 

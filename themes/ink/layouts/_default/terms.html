@@ -1,5 +1,5 @@
 {{ define "main" }}
-<section class="archive">
+<section class="archive archive-cloud">
   {{ if eq .Data.Plural "tags" }}
   <header class="archive-header">
     <h1 class="archive-title">{{ partial "bilingual.html" "MenuTags" }}</h1>
@@ -7,7 +7,7 @@
   </header>
   <div class="tag-cloud">
     {{ range $name, $items := .Site.Taxonomies.tags }}
-    <a class="tag" href="/tags/{{ $name | urlize | lower }}" style="font-size: {{ len $items | math.Sqrt | mul 1.5 | add 12 }}px">{{ $name }}<span class="tag-count">{{ len $items }}</span></a>
+    <a class="cloud-tag{{ if ge (len $items) 10 }} cloud-tag-major{{ end }}" href="/tags/{{ $name | urlize | lower }}" style="font-size: {{ len $items | math.Sqrt | mul 1.5 | add 12 }}px">{{ $name }}<span class="tag-count">{{ len $items }}</span></a>
     {{ end }}
   </div>
   {{ end }}
