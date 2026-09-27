@@ -48,7 +48,7 @@
     text.textContent = TOUR[0].text;
     var play = F.player(f.controls, T, function (on) { if (on) { stage = -1; clock = 99; anim.start(true); } });
     function manual() { play.set(false); steps = 0; anim.start(true); }
-    var sPi = F.slider(f.controls, { label: 'π', min: 0, max: 0.6, step: 0.01, value: pi, format: function (v) { return v.toFixed(2); }, onInput: function (v) { pi = v; manual(); } });
+    var sPi = F.slider(f.controls, { label: 'π', min: 0, max: 0.99, step: 0.01, value: pi, format: function (v) { return v.toFixed(2); }, onInput: function (v) { pi = v; manual(); } });
     var sQ = F.slider(f.controls, { label: 'q', min: 0, max: 1, step: 0.01, value: qm, format: function (v) { return v.toFixed(2); }, onInput: function (v) { qm = v; manual(); } });
     var sS = F.slider(f.controls, { label: T('spread', '分散'), min: 0, max: 0.5, step: 0.01, value: s, format: function (v) { return v.toFixed(2); }, onInput: function (v) { s = v; manual(); } });
     F.button(f.controls, T('original recurrence', '原来的递推'), function () { qm = 0.5; s = 0.5; sQ.set(qm); sS.set(s); manual(); });
@@ -89,7 +89,25 @@
       return play.playing() || steps < 40;
     });
 
-    var dragging = false;
+    var dragging = false, geo = null;
+    function local(e) {
+      var r = root.getBoundingClientRect();
+      return { x: (e.clientX - r.left) * geo.W / r.width, y: (e.clientY - r.top) * geo.H / r.height };
+    }
+    function inMap(p) { return p.x >= geo.x0 && p.x <= geo.x0 + geo.side && p.y >= geo.y0 && p.y <= geo.y0 + geo.side; }
+    function pick(e) {
+      var p = local(e);
+      pi = Math.round(clamp((p.x - geo.x0) / geo.side, 0, 0.99) * 100) / 100;
+      qm = Math.round(clamp(1 - (p.y - geo.y0) / geo.side, 0, 1) * 100) / 100;
+      sPi.set(pi); sQ.set(qm); manual();
+    }
+    root.addEventListener('pointerdown', function (e) {
+      if (!geo || !inMap(local(e))) return;
+      dragging = true; root.setPointerCapture(e.pointerId); pick(e);
+    });
+    root.addEventListener('pointermove', function (e) { if (dragging) pick(e); });
+    root.addEventListener('pointerup', function () { dragging = false; });
+    root.addEventListener('pointercancel', function () { dragging = false; });
     function draw() {
       if (!width) return;
       root.textContent = '';
@@ -119,17 +137,11 @@
         svg('text', { x: x0 - 6, y: my(v) + 4, 'text-anchor': 'end', text: String(v) }, root);
       });
       svg('circle', { cx: mx(pi), cy: my(qm), r: 6.5, fill: 'var(--navy)', stroke: 'var(--bg)', 'stroke-width': 2 }, root);
-      var hit = svg('rect', { x: mx(0), y: my(1), width: side, height: side, fill: 'transparent', style: 'cursor: crosshair; touch-action: none' }, root);
-      function pick(e) {
-        var box = hit.getBoundingClientRect();
-        pi = clamp((e.clientX - box.left) / box.width, 0, 0.6);
-        qm = clamp(1 - (e.clientY - box.top) / box.height, 0, 1);
-        pi = Math.round(pi * 100) / 100; qm = Math.round(qm * 100) / 100;
-        sPi.set(pi); sQ.set(qm); manual();
-      }
-      hit.addEventListener('pointerdown', function (e) { dragging = true; hit.setPointerCapture(e.pointerId); pick(e); });
-      hit.addEventListener('pointermove', function (e) { if (dragging) pick(e); });
-      hit.addEventListener('pointerup', function () { dragging = false; });
+      // The map is redrawn every frame while the chain animates, so the
+      // pointer is handled on the figure itself, which persists, and this
+      // rectangle only sets the cursor and stops touch scrolling.
+      svg('rect', { x: mx(0), y: my(1), width: side, height: side, fill: 'transparent', style: 'cursor: crosshair; touch-action: none' }, root);
+      geo = { x0: x0, y0: y0, side: side, W: W, H: H };
 
       // Right: the chain, as a cobweb on r ↦ π + (1 − π) F(r).
       var cx0 = wide ? x0 + side + gap + 44 : L, cy0 = wide ? Tp : Tp + side + 44 + 12;
