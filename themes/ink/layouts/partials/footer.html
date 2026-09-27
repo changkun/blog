@@ -1,0 +1,28 @@
+{{- /* The profiles and friends the old sidebar showed, under every page.
+       Profiles are matched to the sprite by name, so config.toml's Font
+       Awesome icon names are no longer read. */ -}}
+{{- $icons := dict "homepage" "home" "github" "github" "email" "email" "institution" "lmu" "google scholar" "scholar" "linkedin" "linkedin" "x" "x" "instagram" "instagram" "youtube" "youtube" "stack overflow" "stackoverflow" "zhihu" "zhihu" "facebook" "facebook" "telegram" "telegram" -}}
+<footer class="site-footer">
+  <div class="footer-inner">
+    {{ with .Site.Params.Socials }}
+    <nav class="footer-profiles" aria-label="Profiles">
+      {{ range . }}
+      {{ $icon := index $icons (lower .Name) }}
+      <a href="{{ .URL }}" title="{{ .Name }}" aria-label="{{ .Name }}"{{ if not (hasPrefix .URL "mailto:") }} target="_blank" rel="noopener"{{ end }}>
+        {{ if $icon }}<svg aria-hidden="true"><use href="#i-{{ $icon }}"/></svg>{{ else }}{{ .Name }}{{ end }}
+      </a>
+      {{ end }}
+    </nav>
+    {{ end }}
+    {{ with .Site.Params.Links }}
+    <p class="footer-friends">
+      <span class="footer-label">{{ partial "bilingual.html" "Link" }}</span>
+      {{ range $i, $l := . }}{{ if $i }} · {{ end }}<a href="{{ $l.URL }}" target="_blank" rel="noopener">{{ $l.Name }}</a>{{ end }}
+    </p>
+    {{ end }}
+    <p class="footer-copyright">
+      &copy; 2008&ndash;{{ now.Year }} <a href="https://changkun.de">Changkun Ou</a>. {{ partial "bilingual.html" "Copyright" }}
+      <span class="footer-stat">PV/UV <span id="urlstat-site-pv"></span>/<span id="urlstat-site-uv"></span></span>
+    </p>
+  </div>
+</footer>

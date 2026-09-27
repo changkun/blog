@@ -1,0 +1,81 @@
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>{{ if ne .Permalink " / " }}{{ .Title }} - {{ end }}{{ .Site.Title }}</title>
+    {{ if .Keywords }}<meta name="keywords" content="{{ range .Keywords }}{{ . }},{{ end }}">
+    {{ else }}<meta name="keywords" content="{{ .Site.Params.Keywords }}">{{ end }}
+    {{ with .Site.Params.Author.Name }}<meta name="author" content="{{ . }}">{{ end }}
+    {{- $title := cond (ne .Permalink " / ") .Title .Site.Title -}}
+    {{- $autoDesc := .Content | replaceRE `(?s)<div class="idea-augmented">.*?</div>` "" | replaceRE `(?s)<div class="lang-zh">.*` "" | plainify | replaceRE `https?://\S+` "" | replaceRE `\s+` " " | strings.TrimLeft " " | truncate 200 -}}
+    {{- $desc := .Description | default $autoDesc | default .Site.Params.Description -}}
+    {{- $image := .Params.image | default "https://changkun.de/logo.png" -}}
+    {{- $url := .Permalink -}}
+    <meta name="title" content="{{ $title }} - {{ .Site.Title }}" />
+    <meta name="description" content="{{ $desc }}" />
+    <!-- Open Graph -->
+    <meta property="og:type" content="{{ if .IsPage }}article{{ else }}website{{ end }}">
+    <meta property="og:url" content="{{ $url }}">
+    <meta property="og:title" content="{{ $title }}">
+    <meta property="og:description" content="{{ $desc }}">
+    <meta property="og:site_name" content="{{ .Site.Title }}">
+    <meta property="og:image" content="{{ $image }}">
+    {{- if .IsPage }}
+    <meta property="article:published_time" content="{{ .Date.Format "2006-01-02T15:04:05Z07:00" }}">
+    {{- if .Lastmod }}<meta property="article:modified_time" content="{{ .Lastmod.Format "2006-01-02T15:04:05Z07:00" }}">{{ end }}
+    {{- end }}
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:url" content="{{ $url }}">
+    <meta name="twitter:title" content="{{ $title }}">
+    <meta name="twitter:description" content="{{ $desc }}">
+    <meta name="twitter:image" content="{{ $image }}">
+    <link rel="icon" href="https://changkun.de/logo.png" />
+    {{ with .OutputFormats.Get "RSS" }}<link rel="alternate" type="application/rss+xml" href="{{ .Permalink }}" title="{{ $.Site.Title }}">{{ end }}
+    <style>[data-lang="en"] .lang-zh{display:none!important}[data-lang="zh"] .lang-en{display:none!important}html{background:#fff}html[data-theme="dark"]{background:#161616}</style>
+    <script>
+      // Before the stylesheet, so a dark page never paints light first.
+      // The theme key is the one changkun.de and its research page read:
+      // "light" or "dark" when chosen, absent to follow the system.
+      (function() {
+        var pref = null;
+        try {
+          pref = localStorage.getItem('theme');
+          if (!pref) {
+            var old = localStorage.getItem('dark-mode');
+            if (old === 'true') pref = 'dark';
+            else if (old === 'false') pref = 'light';
+            localStorage.removeItem('dark-mode');
+            if (pref) localStorage.setItem('theme', pref);
+          }
+          if (pref !== 'light' && pref !== 'dark') {
+            if (pref) localStorage.removeItem('theme');
+            pref = null;
+          }
+        } catch (e) {}
+        var dark = pref ? pref === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+        function detectZh() {
+          if (/MicroMessenger/i.test(navigator.userAgent)) return true;
+          var langs = navigator.languages || [navigator.language || navigator.userLanguage || ''];
+          for (var i = 0; i < langs.length; i++) { if (langs[i].indexOf('zh') === 0) return true; }
+          return false;
+        }
+        var qp = new URLSearchParams(window.location.search).get('lang');
+        var lang = null;
+        try {
+          if (qp === 'zh' || qp === 'en') localStorage.setItem('lang', qp);
+          lang = localStorage.getItem('lang');
+        } catch (e) {}
+        lang = qp === 'zh' || qp === 'en' ? qp : (lang || (detectZh() ? 'zh' : 'en'));
+        document.documentElement.setAttribute('data-lang', lang);
+        document.documentElement.setAttribute('lang', lang === 'zh' ? 'zh-CN' : 'en-US');
+      })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+    {{- $css := slice (resources.Get "css/main.css") (resources.Get "css/syntax.css") | resources.Concat "css/ink.css" | minify | fingerprint }}
+    <link rel="stylesheet" href="{{ $css.RelPermalink }}">
+    <script async src="https://www.changkun.de/urlstat/client.js"></script>
+</head>

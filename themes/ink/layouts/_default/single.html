@@ -1,0 +1,56 @@
+{{ define "main" }}
+{{- $toc := and (isset .Params "toc") (findRE `<li>` .TableOfContents 1) -}}
+{{- if $toc }}{{ .Scratch.Set "toc" true }}{{ end -}}
+{{- $dated := or (eq .Section "posts") (eq .Section "ideas") -}}
+<div class="page{{ if $toc }} has-toc{{ end }}">
+  <article class="article post-type-normal">
+    <header class="article-header">
+      {{ if $dated }}
+      <div class="eyebrow">{{ if eq .Section "ideas" }}{{ partial "bilingual.html" "Idea" }}{{ else }}{{ partial "bilingual.html" "Post" }}{{ end }}</div>
+      {{ end }}
+      <h1 class="article-title">{{ partial "bilingual_title.html" . }}</h1>
+      {{ if $dated }}
+      <div class="article-meta">
+        <time datetime="{{ .Date.Format "2006-01-02T15:04:05Z07:00" }}">{{ .Date.Format .Site.Params.DateFormat }}</time>
+        {{ if eq .Section "posts" }}<span>{{ .ReadingTime }} min</span>{{ end }}
+        <span>PV/UV <span id="urlstat-page-pv"></span>/<span id="urlstat-page-uv"></span></span>
+      </div>
+      {{ end }}
+    </header>
+    {{ if $toc }}
+    <details class="toc-inline">
+      <summary>{{ partial "bilingual.html" "Contents" }}</summary>
+      {{ partial "toc.html" . }}
+    </details>
+    {{ end }}
+    <div class="prose post-body">
+    {{ .Content }}
+    </div>
+    <footer class="article-footer">
+      {{ partial "post/tags.html" . }}
+      {{ if eq .Section "posts" }}
+      <dl class="article-license">
+        <dt>{{ partial "bilingual.html" "Author" }}</dt><dd>Changkun Ou</dd>
+        <dt>{{ partial "bilingual.html" "LinkLabel" }}</dt><dd><a href="{{ .Permalink }}">{{ .Permalink }}</a></dd>
+        <dd class="article-license-note">{{ partial "bilingual.html" "License" }} <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/">CC BY-NC-ND 4.0</a> {{ partial "bilingual.html" "LicenseEnd" }}</dd>
+      </dl>
+      {{ partial "post/prenext.html" . }}
+      {{ end }}
+      <aside class="feedback">
+        <svg aria-hidden="true"><use href="#i-email"/></svg>
+        <div>
+          <p class="feedback-heading">{{ partial "bilingual.html" "FeedbackHeading" }}</p>
+          <p class="feedback-desc">{{ partial "bilingual.html" "FeedbackDesc" }}</p>
+          <a href="mailto:hi@changkun.de">hi@changkun.de &rarr;</a>
+        </div>
+      </aside>
+    </footer>
+  </article>
+  {{ if $toc }}
+  <aside class="toc-rail" aria-label="Contents">
+    <div class="toc-label">{{ partial "bilingual.html" "Contents" }}</div>
+    {{ partial "toc.html" . }}
+  </aside>
+  {{ end }}
+</div>
+{{ end }}

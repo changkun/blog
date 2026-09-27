@@ -1,0 +1,5 @@
+{{- if .Params.title_zh -}}
+<span class="lang-en">{{ .Title }}</span><span class="lang-zh">{{ .Params.title_zh }}</span>
+{{- else -}}
+{{ .Title }}
+{{- end -}}

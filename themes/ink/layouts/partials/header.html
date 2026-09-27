@@ -1,0 +1,24 @@
+{{- $section := .Section -}}
+{{- $current := dict "Home" .IsHome "Ideas" (eq $section "ideas") "Posts" (eq $section "posts") "Tags" (eq $section "tags") "Bio" (eq $section "about") -}}
+<header class="site-header">
+  <div class="header-inner">
+    <a class="brand" href="{{ .Site.BaseURL }}" rel="start">{{ partial "bilingual.html" "SiteTitle" }}</a>
+    <nav class="site-nav" aria-label="Main">
+      {{- range .Site.Menus.main }}
+      <a href="{{ .URL }}"{{ if index $current .Name }} aria-current="page"{{ end }}>{{ partial "bilingual.html" (printf "Menu%s" .Name) }}</a>
+      {{- end }}
+    </nav>
+    <div class="header-actions">
+      <button id="lang-toggle" class="lang-toggle" type="button" onclick="toggleLang()" aria-label="Switch language">
+        <span class="lang-en" lang="zh-CN">中文</span><span class="lang-zh" lang="en">EN</span>
+      </button>
+      {{ with .Site.Home.OutputFormats.Get "RSS" }}
+      <a class="icon-button" href="{{ .Permalink }}" title="RSS" aria-label="RSS"><svg aria-hidden="true"><use href="#i-rss"/></svg></a>
+      {{ end }}
+      <button class="icon-button theme-toggle" type="button" aria-label="Toggle theme">
+        <svg class="icon-moon" aria-hidden="true"><use href="#i-moon"/></svg>
+        <svg class="icon-sun" aria-hidden="true"><use href="#i-sun"/></svg>
+      </button>
+    </div>
+  </div>
+</header>

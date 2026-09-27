@@ -1,0 +1,15 @@
+{{ define "main_class" }}page-home{{ end }}
+{{ define "main" }}
+<section class="intro">
+  <img class="intro-portrait" src="{{ .Site.Params.AuthorImg }}" alt="{{ .Site.Params.Author.Name }}" width="96" height="96">
+  <div class="intro-name-block">
+    <div class="eyebrow">{{ partial "bilingual.html" "SiteSubtitle" }}</div>
+    <h1 class="intro-name">{{ .Site.Params.Author.Name }}</h1>
+  </div>
+  <div class="intro-about">
+    <p class="intro-role">{{ partial "bilingual.html" "Introduce" }}</p>
+    <p class="intro-bio">{{ partial "bilingual.html" "Description" }}</p>
+  </div>
+</section>
+{{ partial "post_list.html" . }}
+{{ end }}

@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en-US">
+{{ partial "head.html" . }}
+<body>
+{{ partial "icons.html" . }}
+{{ partial "header.html" . }}
+<main id="main" class="main {{ block "main_class" . }}{{ end }}">
+{{ block "main" . }}{{ end }}
+</main>
+{{ partial "footer.html" . }}
+{{ partial "scripts.html" . }}
+</body>
+</html>

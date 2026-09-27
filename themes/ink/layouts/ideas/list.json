@@ -1,0 +1,3 @@
+{{- $ideas := .Pages.ByDate.Reverse -}}
+[{{ range $i, $p := $ideas }}{{ if $i }},{{ end }}
+{"title":{{ $p.Title | jsonify }},"title_zh":{{ $p.Params.title_zh | default "" | jsonify }},"plain":{{ $p.Plain | truncate 500 | jsonify }},"url":{{ $p.RelPermalink | jsonify }},"date":{{ $p.Date.Format "2006-01-02" | jsonify }}}{{ end }}]

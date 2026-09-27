@@ -1,0 +1,49 @@
+{{ $posts := where .Site.RegularPages "Section" "posts" }}
+{{ $ideas := where .Site.RegularPages "Section" "ideas" }}
+{{ $all := union $posts $ideas }}
+{{ $paginator := .Paginate ($all.ByDate.Reverse) }}
+<section class="stream">
+{{ range $paginator.Pages }}
+  {{ if eq .Section "posts" }}
+  <article class="entry">
+    <div class="entry-meta">
+      <span class="kind">{{ partial "bilingual.html" "Post" }}</span>
+      <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format .Site.Params.DateFormat }}</time>
+      <span>{{ .ReadingTime }} min</span>
+    </div>
+    <h2 class="entry-title"><a href="{{ .Permalink }}">{{ partial "bilingual_title.html" . }}</a></h2>
+    <div class="entry-summary">
+    {{ if .Params.title_zh }}
+      {{- $c := .Content -}}
+      {{- $enText := $c | replaceRE `(?s)<div class="lang-zh">.*` "" | plainify | htmlUnescape | replaceRE `^\s+` "" | truncate 300 -}}
+      {{- $zhText := $c | replaceRE `(?s).*?<div class="lang-zh">` "" | plainify | htmlUnescape | replaceRE `^\s+` "" | truncate 200 -}}
+      <p class="lang-en">{{ $enText }}</p>
+      <p class="lang-zh">{{ $zhText }}</p>
+    {{ else }}
+      <p>{{ .Summary | plainify | htmlUnescape }}</p>
+    {{ end }}
+    </div>
+    {{ if .Truncated }}
+    <a class="entry-more" href="{{ .Permalink }}" rel="contents">{{ partial "bilingual.html" "ReadMore" }} &rarr;</a>
+    {{ end }}
+  </article>
+  {{ else if eq .Section "ideas" }}
+  <article class="idea-card" id="idea-{{ .File.ContentBaseName }}">
+    <div class="idea-meta">
+      <span class="kind">{{ partial "bilingual.html" "Idea" }}</span>
+      <time class="idea-date" datetime="{{ .Date.Format "2006-01-02T15:04:05" }}">{{ .Date.Format "2006-01-02 15:04:05" }}</time>
+      {{ partial "share.html" . }}
+    </div>
+    <h2 class="idea-title"><a href="{{ .Permalink }}">{{ partial "bilingual_title.html" . }}</a></h2>
+    <div class="idea-body prose">
+      {{ .Content }}
+    </div>
+    {{ if findRE `idea-augmented` .Content }}
+    <button class="idea-toggle" type="button" onclick="toggleAugmented(this)"><span class="lang-en">Show deep dive</span><span class="lang-zh">展开深度分析</span></button>
+    {{ end }}
+  </article>
+  {{ end }}
+{{ end }}
+</section>
+{{ partial "pagination.html" . }}
+{{ partial "idea_scripts.html" . }}

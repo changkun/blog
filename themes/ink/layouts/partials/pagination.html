@@ -1,0 +1,28 @@
+{{ $pag := .Paginator }}
+{{ if gt $pag.TotalPages 1 }}
+{{ $tps := $pag.TotalPages }}
+{{ $begin := sub $pag.PageNumber 4 }}
+{{ $.Scratch.Set "begin" $begin }}
+{{ $end := add $pag.PageNumber 4 }}
+{{ $.Scratch.Set "end" $end }}
+{{ if lt $begin 0 }}
+  {{ $end := sub $end $begin }}
+  {{ $.Scratch.Set "end" $end }}
+{{ end }}
+{{ $end := $.Scratch.Get "end" }}
+{{ $over := sub $tps $end }}
+{{ if lt $over 0 }}
+  {{ $begin := add $begin $over }}
+  {{ $.Scratch.Set "begin" $begin }}
+{{ end }}
+{{ $begin := $.Scratch.Get "begin" }}
+<nav class="pagination" aria-label="Pages">
+  {{ if $pag.HasPrev }}<a class="page-step" rel="prev" href="{{ $pag.Prev.URL }}" aria-label="Previous page">&larr;</a>{{ end }}
+  {{ range $p := $pag.Pagers }}
+    {{ if and (ge $p.PageNumber $begin) (le $p.PageNumber $end) }}
+    {{ if eq $p $pag }}<span class="page-number" aria-current="page">{{ $p.PageNumber }}</span>{{ else }}<a class="page-number" href="{{ $p.URL }}">{{ $p.PageNumber }}</a>{{ end }}
+    {{ end }}
+  {{ end }}
+  {{ if $pag.HasNext }}<a class="page-step" rel="next" href="{{ $pag.Next.URL }}" aria-label="Next page">&rarr;</a>{{ end }}
+</nav>
+{{ end }}
