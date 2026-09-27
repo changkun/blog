@@ -339,8 +339,8 @@
   F.register('fig1-quadrants.png', function (f) {
     var T = f.T, width = 0, active = null, clock = 3;  // the first corner lights at once
     var CELLS = [
-      { gx: 0, gy: 1, title: T('Closed yet long-lived', '封闭却长寿'), eg: T('out-of-print rules; an old fighting-game scene', '绝版规则；老格斗游戏圈'),
-        text: T('Low generativity, high lock-in: a long-lived culture on closed rules, like an out-of-print game whose competitive scene lasts decades.', '低生成性、高锁定：在封闭规则上长期延续的文化，比如一款绝版游戏，竞技圈却延续了几十年。') },
+      { gx: 0, gy: 1, title: T('Closed yet long-lived', '封闭却长寿'), eg: T('frozen rules; an old fighting-game scene', '冻结的规则；老格斗游戏圈'),
+        text: T('Low generativity, high lock-in: a long-lived culture on closed rules, like a game whose code stopped changing decades ago and whose competitive scene is still going.', '低生成性、高锁定：在封闭规则上长期延续的文化，比如一款代码几十年前就不再变动的游戏，竞技圈却一直延续到今天。') },
       { gx: 1, gy: 1, title: T('Open yet closed off', '开放却自我设限'), eg: T('speedrunning glitchless', '无 glitch 速通'),
         text: T('High generativity, high lock-in: an open community deliberately bounding itself, like speedrunning a still-rich game under glitchless rules.', '高生成性、高锁定：一个开放的社区主动给自己设界，比如在内容仍然丰富的游戏里按"无 glitch"规则速通。') },
       { gx: 0, gy: 0, title: T('Seen through and dead', '被看穿即消亡'), eg: T('flash-in-the-pan fad', '昙花一现的爆款'),
