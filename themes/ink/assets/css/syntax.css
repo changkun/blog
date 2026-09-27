@@ -1,0 +1,63 @@
+/* Code colors for Hugo's highlighter (pygmentsUseClasses), the ones
+ * latere.ai sets its code blocks in: keywords violet, strings green,
+ * numbers and literals amber, names blue, variables red, comments the
+ * muted text. Each is one of the palette's tones, per theme. */
+:root {
+    --code-comment: #666666;
+    --code-keyword: #5b4a8f;
+    --code-string: #356342;
+    --code-number: #7d5019;
+    --code-name: #38538f;
+    --code-variable: #96372e;
+    --code-line: rgba(56, 83, 143, 0.08);
+}
+
+[data-theme="dark"] {
+    --code-comment: #9a9a9a;
+    --code-keyword: #b8a9ea;
+    --code-string: #86ba93;
+    --code-number: #d1a56b;
+    --code-name: #9bb0e4;
+    --code-variable: #e99a90;
+    --code-line: rgba(155, 176, 228, 0.1);
+}
+
+.chroma { color: var(--text); }
+.chroma .hl { display: block; background: var(--code-line); }
+.chroma .ln,
+.chroma .lnt { color: var(--text-muted); }
+.chroma .err { color: var(--code-variable); }
+
+/* Comments */
+.chroma .c, .chroma .ch, .chroma .cm, .chroma .c1, .chroma .cs { color: var(--code-comment); font-style: italic; }
+.chroma .cp, .chroma .cpf { color: var(--code-keyword); }
+
+/* Keywords and built-ins */
+.chroma .k, .chroma .kc, .chroma .kd, .chroma .kn, .chroma .kp, .chroma .kr,
+.chroma .ow, .chroma .nb, .chroma .bp { color: var(--code-keyword); }
+.chroma .kt { color: var(--code-number); }
+
+/* Names */
+.chroma .na, .chroma .nc, .chroma .nd, .chroma .ne, .chroma .nf, .chroma .fm,
+.chroma .ni, .chroma .nl, .chroma .nn, .chroma .nt, .chroma .no { color: var(--code-name); }
+.chroma .nv, .chroma .vc, .chroma .vg, .chroma .vi, .chroma .vm { color: var(--code-variable); }
+
+/* Literals */
+.chroma .s, .chroma .sa, .chroma .sb, .chroma .sc, .chroma .dl, .chroma .sd,
+.chroma .s2, .chroma .sh, .chroma .si, .chroma .sx, .chroma .s1, .chroma .ss { color: var(--code-string); }
+.chroma .se, .chroma .sr { color: var(--code-number); }
+.chroma .m, .chroma .mb, .chroma .mf, .chroma .mh, .chroma .mi, .chroma .il,
+.chroma .mo, .chroma .l, .chroma .ld { color: var(--code-number); }
+
+/* Operators and punctuation recede. */
+.chroma .o, .chroma .p { color: var(--text-secondary); }
+
+/* Diffs and shell sessions */
+.chroma .gd { color: var(--code-variable); }
+.chroma .gi { color: var(--code-string); }
+.chroma .gh, .chroma .gu { color: var(--code-name); font-weight: 600; }
+.chroma .ge { font-style: italic; }
+.chroma .gs { font-weight: 600; }
+.chroma .gp { color: var(--text-muted); user-select: none; }
+.chroma .go { color: var(--text-secondary); }
+.chroma .gr, .chroma .gt { color: var(--code-variable); }

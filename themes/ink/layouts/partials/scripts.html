@@ -1,0 +1,79 @@
+{{ if .Site.Params.GoogleAnalytics }}
+<script async src="https://www.googletagmanager.com/gtag/js?id={{ .Site.Params.GoogleAnalytics }}"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', '{{ .Site.Params.GoogleAnalytics }}');
+</script>
+{{ end }}
+<script>
+  // The theme toggle of changkun.de: a choice is stored as "light" or
+  // "dark"; with none stored, the page follows the system.
+  (function() {
+    var root = document.documentElement;
+    var toggle = document.querySelector('.theme-toggle');
+    if (toggle) toggle.addEventListener('click', function() {
+      var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      try { localStorage.setItem('theme', next); } catch (e) {}
+    });
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
+      var saved = null;
+      try { saved = localStorage.getItem('theme'); } catch (err) {}
+      if (saved !== 'light' && saved !== 'dark') root.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+    });
+  })();
+</script>
+<script src="/js/lang.js"></script>
+{{ if .Scratch.Get "toc" }}
+<script>
+  // The contents rail marks the section being read: the last heading that
+  // has scrolled up past the top of the page. It scrolls only itself to
+  // keep that link in view, never the page.
+  (function() {
+    var rail = document.querySelector('.toc-rail');
+    if (!rail) return;
+    var links = Array.prototype.slice.call(rail.querySelectorAll('a[href^="#"]'));
+    var targets = links.map(function(a) {
+      return document.getElementById(decodeURIComponent(a.getAttribute('href').slice(1)));
+    });
+    var marked = -2, ticking = false;
+    function mark() {
+      ticking = false;
+      var current = -1;
+      targets.forEach(function(t, i) {
+        if (t && t.offsetParent !== null && t.getBoundingClientRect().top <= 96) current = i;
+      });
+      if (current === marked) return;
+      marked = current;
+      links.forEach(function(a, i) {
+        if (i !== current) { a.removeAttribute('aria-current'); return; }
+        a.setAttribute('aria-current', 'true');
+        var r = rail.getBoundingClientRect(), l = a.getBoundingClientRect();
+        if (l.top < r.top) rail.scrollTop -= r.top - l.top + 24;
+        else if (l.bottom > r.bottom) rail.scrollTop += l.bottom - r.bottom + 24;
+      });
+    }
+    window.addEventListener('scroll', function() {
+      if (!ticking) { ticking = true; requestAnimationFrame(mark); }
+    }, {passive: true});
+    mark();
+  })();
+</script>
+{{ end }}
+{{ if or (not .IsPage) (findRE `\$` .Content 1) }}
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX", "output/HTML-CSS"],
+    tex2jax: {
+      inlineMath: [ ['$','$'] ],
+      displayMath: [ ['$$','$$'] ],
+      processEscapes: true
+    },
+    "HTML-CSS": { fonts: ["TeX"] }
+  });
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async></script>
+{{ end }}

@@ -1,0 +1,8 @@
+<ul class="archive-list">
+{{ range .Pages }}
+  <li>
+    <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format .Site.Params.MonthFormat }}</time>
+    <a href="{{ lower .Permalink }}">{{ partial "bilingual_title.html" . }}</a>
+  </li>
+{{ end }}
+</ul>

@@ -1,0 +1,14 @@
+{{ define "main" }}
+<section class="archive">
+  <header class="archive-header">
+    <div class="eyebrow">{{ partial "bilingual.html" "Tag" }}</div>
+    <h1 class="archive-title">#{{ .Title }}</h1>
+    <p class="archive-count">{{ len .Data.Pages }}</p>
+  </header>
+  {{ range (.Paginate (.Data.Pages.GroupByDate "2006") 50).PageGroups }}
+  <h2 class="archive-year" id="archive-year-{{ .Key }}">{{ .Key }}</h2>
+  {{ partial "post_simple_list.html" . }}
+  {{ end }}
+</section>
+{{ partial "pagination.html" . }}
+{{ end }}

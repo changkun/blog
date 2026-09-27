@@ -1,0 +1,28 @@
+<script>
+function shareIdea(btn, url) {
+  navigator.clipboard.writeText(url).then(function() {
+    var icon = btn.querySelector('.idea-share-icon');
+    var check = btn.querySelector('.idea-share-check');
+    icon.style.display = 'none';
+    check.style.display = '';
+    setTimeout(function() {
+      check.style.display = 'none';
+      icon.style.display = '';
+    }, 1500);
+  });
+}
+
+function toggleAugmented(btn) {
+  var card = btn.closest('.idea-card');
+  var augs = card.querySelectorAll('.idea-augmented');
+  if (!augs.length) return;
+  var hidden = augs[0].style.display === 'none' || !augs[0].style.display;
+  for (var i = 0; i < augs.length; i++) {
+    augs[i].style.display = hidden ? 'block' : 'none';
+  }
+  var enLabel = btn.querySelector('.lang-en');
+  var zhLabel = btn.querySelector('.lang-zh');
+  if (enLabel) enLabel.textContent = hidden ? 'Hide deep dive' : 'Show deep dive';
+  if (zhLabel) zhLabel.textContent = hidden ? '收起深度分析' : '展开深度分析';
+}
+</script>

@@ -1,0 +1,24 @@
+{{- /* The page's contents, without the id Hugo gives the nav, since the
+       page draws it twice: once inline for narrow screens, once as the
+       rail for wide ones. Entries under a heading in one language's block
+       take that language's class, so switching language hides the rest. */ -}}
+<div class="toc">
+{{ .TableOfContents | replaceRE `<nav id="TableOfContents">` `<nav>` | safeHTML }}
+</div>
+{{- if not (.Scratch.Get "tocscript") }}{{ .Scratch.Set "tocscript" true }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var links = document.querySelectorAll('.toc a');
+  for (var i = 0; i < links.length; i++) {
+    var href = links[i].getAttribute('href');
+    if (!href || href.charAt(0) !== '#') continue;
+    var target = document.getElementById(decodeURIComponent(href.slice(1)));
+    if (!target) continue;
+    var langBlock = target.closest('.lang-en, .lang-zh');
+    if (!langBlock) continue;
+    var li = links[i].closest('li');
+    if (li) li.classList.add(langBlock.classList.contains('lang-en') ? 'lang-en' : 'lang-zh');
+  }
+});
+</script>
+{{- end }}

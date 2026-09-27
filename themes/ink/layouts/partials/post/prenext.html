@@ -1,0 +1,10 @@
+{{ if or .NextInSection .PrevInSection }}
+<nav class="prenext" aria-label="More posts">
+  <div class="prenext-item prenext-newer">
+    {{ with .NextInSection }}<a href="{{ .Permalink }}" rel="next"><span class="prenext-dir">&larr;</span> {{ partial "bilingual_title.html" . }}</a>{{ end }}
+  </div>
+  <div class="prenext-item prenext-older">
+    {{ with .PrevInSection }}<a href="{{ .Permalink }}" rel="prev">{{ partial "bilingual_title.html" . }} <span class="prenext-dir">&rarr;</span></a>{{ end }}
+  </div>
+</nav>
+{{ end }}
