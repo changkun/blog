@@ -315,6 +315,207 @@ theorem silence_for_large_M (B C dR dH ρD ρ0 : ℝ) (hd : dH < dR) (hρ : ρ0 
   have h1 : B + C < M * ((dR - dH) * (ρD - ρ0)) := (div_lt_iff₀ hpos).mp hM
   nlinarith
 
+/-! ## Proposition 0: the other counterexamples
+
+Case (c) is `prop0_no_preemption_when_strikes_fail` above. Each of the
+others adds one mechanism to the model of Section 5, whose utility respects A1
+(Section 1) and in which A2 changes nothing, and shows that a conclusion of
+the Dark Forest then fails. -/
+
+/-- Proposition 0 (a), verifiable intentions: once the other side's goodwill
+is verified, its strike probability is 0, and waiting is strictly better than
+striking whenever striking costs anything. -/
+theorem prop0_verified (M K q : ℝ) (hM : 0 ≤ M) (hq0 : 0 ≤ q) (hq1 : q ≤ 1) (hK : 0 < K) :
+    uAttack M K q < uWait M q 0 := by
+  have : 0 ≤ (1 - q) * q * M := mul_nonneg (mul_nonneg (by linarith) hq0) hM
+  unfold uAttack uWait; simp; linarith
+
+/-- ... and with no hostile share (`π = 0`) and everyone waiting (`a = 0`), a
+detected civilization is no likelier to die than an undetected one, so
+revealing is strictly better than hiding whenever it brings any benefit or
+hiding costs anything. -/
+theorem prop0_verified_reveal (M B C dR dH q : ℝ) (hBC : 0 < B + C) :
+    uHide M C dH (pStrike 0 0 * q) 0 < uReveal M B dR (pStrike 0 0 * q) 0 := by
+  unfold uHide uReveal pStrike; simp; linarith
+
+/-- An enforcer that destroys violators adds `φ` to the attacker's extinction
+risk, which A1 makes as costly as any other death. -/
+def uEnforced (M K q φ : ℝ) : ℝ := -(((1 - q) * q + φ) * M) - K
+
+/-- Proposition 0 (b), enforceable contracts: if the enforcer's risk is at
+least `q²`, waiting is strictly better than striking whatever the other side
+does, so mutual restraint is the only equilibrium. -/
+theorem prop0_enforced (M K q φ r : ℝ) (hM : 0 ≤ M) (hq0 : 0 ≤ q) (hK : 0 < K)
+    (hφ : q ^ 2 ≤ φ) (hr1 : r ≤ 1) :
+    uEnforced M K q φ < uWait M q r := by
+  -- Striking now risks at least `q`, the most that waiting can risk.
+  have h1 : q * M ≤ ((1 - q) * q + φ) * M := mul_le_mul_of_nonneg_right (by nlinarith) hM
+  have h2 : r * q * M ≤ q * M := by
+    have := mul_nonneg hq0 hM
+    nlinarith
+  unfold uEnforced uWait; linarith
+
+/-! Proposition 0 (d), repeated interaction. Each period both sides restrain
+or strike. My stage payoff is `w` for mutual restraint, `g` for striking a
+restrained other, `l` for being struck while restraining, and `p` for mutual
+striking. The other side plays grim trigger: it restrains until my first
+strike, then strikes forever. Against a strategy that does not randomize,
+every plan of mine is a sequence of actions, so sequences are all the
+deviations there are. -/
+
+/-- My stage payoff, given whether I strike and whether the other side does. -/
+def stagePay (w g l p : ℝ) : Bool → Bool → ℝ
+  | false, false => w
+  | true, false => g
+  | false, true => l
+  | true, true => p
+
+/-- Grim trigger: strike at `t` if I struck at any earlier period. -/
+def grim (a : ℕ → Bool) (t : ℕ) : Bool := decide (∃ s < t, a s = true)
+
+/-- My discounted payoff from the action sequence `a`, against grim trigger. -/
+noncomputable def grimPay (w g l p δ : ℝ) (a : ℕ → Bool) : ℝ :=
+  ∑' t, δ ^ t * stagePay w g l p (a t) (grim a t)
+
+section Repeated
+variable (w g l p δ : ℝ)
+
+/-- Restraint before period `T`, one strike at `T`, punishment after it, with
+the geometric sums added up. -/
+lemma hasSum_path (hδ0 : 0 ≤ δ) (hδ1 : δ < 1) (T : ℕ) :
+    HasSum (fun t => δ ^ t * (if t < T then w else if t = T then g else p))
+      (p / (1 - δ) + (w - p) * (1 - δ ^ T) / (1 - δ) + (g - p) * δ ^ T) := by
+  have h1 : HasSum (fun t : ℕ => p * δ ^ t) (p * (1 - δ)⁻¹) :=
+    (hasSum_geometric_of_lt_one hδ0 hδ1).mul_left p
+  have h2 : HasSum (fun t : ℕ => if t < T then (w - p) * δ ^ t else 0)
+      (∑ t ∈ Finset.range T, if t < T then (w - p) * δ ^ t else 0) :=
+    hasSum_sum_of_ne_finset_zero fun t ht => by
+      simp only [Finset.mem_range] at ht; simp [ht]
+  have h3 : HasSum (fun t : ℕ => if t = T then (g - p) * δ ^ T else 0) ((g - p) * δ ^ T) :=
+    hasSum_ite_eq T _
+  have hsum : (∑ t ∈ Finset.range T, if t < T then (w - p) * δ ^ t else 0) =
+      (w - p) * (1 - δ ^ T) / (1 - δ) := by
+    have hc : (∑ t ∈ Finset.range T, if t < T then (w - p) * δ ^ t else 0) =
+        ∑ t ∈ Finset.range T, (w - p) * δ ^ t :=
+      Finset.sum_congr rfl fun t ht => by simp [Finset.mem_range.mp ht]
+    rw [hc, ← Finset.mul_sum, geom_sum_eq (by linarith : δ ≠ 1)]
+    have : δ - 1 ≠ 0 := by linarith
+    have : 1 - δ ≠ 0 := by linarith
+    field_simp; ring
+  rw [hsum] at h2
+  convert (h1.add h2).add h3 using 1
+  · funext t
+    by_cases hlt : t < T
+    · simp [hlt, Nat.ne_of_lt hlt]; ring
+    · by_cases heq : t = T
+      · subst heq; simp; ring
+      · simp [hlt, heq]; ring
+  · rw [div_eq_mul_inv]
+
+/-- The payoff of never striking is `w / (1 - δ)`. -/
+theorem restraint_pay (hδ0 : 0 ≤ δ) (hδ1 : δ < 1) :
+    grimPay w g l p δ (fun _ => false) = w / (1 - δ) := by
+  have hg : ∀ t, grim (fun _ => false) t = false := fun t => by simp [grim]
+  simp only [grimPay, hg, stagePay]
+  rw [tsum_mul_right, tsum_geometric_of_lt_one hδ0 hδ1, div_eq_mul_inv, mul_comm]
+
+/-- Every sequence of actions has a summable payoff stream. -/
+lemma summable_pay (hδ0 : 0 ≤ δ) (hδ1 : δ < 1) (a : ℕ → Bool) :
+    Summable (fun t => δ ^ t * stagePay w g l p (a t) (grim a t)) := by
+  refine Summable.of_norm_bounded
+    ((summable_geometric_of_lt_one hδ0 hδ1).mul_left (|w| + |g| + |l| + |p|)) fun t => ?_
+  rw [Real.norm_eq_abs, abs_mul, abs_of_nonneg (pow_nonneg hδ0 t), mul_comm]
+  apply mul_le_mul_of_nonneg_right _ (pow_nonneg hδ0 t)
+  have := abs_nonneg w; have := abs_nonneg g; have := abs_nonneg l; have := abs_nonneg p
+  cases a t <;> cases grim a t <;> simp [stagePay] <;> linarith
+
+/-- Restraint is a best reply to grim trigger, and so mutual grim trigger an
+equilibrium, exactly when `δ ≥ (g - w)/(g - p)`: the one-period gain from
+striking, `g - w`, must not exceed what the punishment then costs,
+`δ (g - p)` in present value. -/
+theorem grim_sustains (hδ0 : 0 ≤ δ) (hδ1 : δ < 1) (hpw : p < w) (hwg : w < g) (hlp : l ≤ p) :
+    (∀ a, grimPay w g l p δ a ≤ w / (1 - δ)) ↔ (g - w) / (g - p) ≤ δ := by
+  have h1δ : 0 < 1 - δ := by linarith
+  have hgp : 0 < g - p := by linarith
+  rw [div_le_iff₀ hgp]
+  constructor
+  · -- Striking from the start earns `g`, then `p` forever.
+    intro h
+    have hpath := hasSum_path w g p δ hδ0 hδ1 0
+    have hall : grimPay w g l p δ (fun _ => true) =
+        p / (1 - δ) + (w - p) * (1 - δ ^ 0) / (1 - δ) + (g - p) * δ ^ 0 := by
+      rw [← hpath.tsum_eq, grimPay]
+      congr 1; funext t
+      rcases Nat.eq_zero_or_pos t with ht | ht
+      · subst ht; simp [grim, stagePay]
+      · have : grim (fun _ => true) t = true := by simp [grim]; exact ⟨0, ht⟩
+        simp [this, stagePay, Nat.pos_iff_ne_zero.mp ht]
+    have := h (fun _ => true)
+    rw [hall, pow_zero, sub_self, mul_zero, zero_div, add_zero, mul_one,
+      div_add' _ _ _ h1δ.ne', div_le_div_iff_of_pos_right h1δ] at this
+    nlinarith
+  · intro hδ a
+    by_cases hex : ∃ t, a t = true
+    · -- Up to the first strike `T`, restraint pays `w`; at `T`, `g`; after it, at most `p`.
+      classical
+      set T := Nat.find hex
+      have hpath := hasSum_path w g p δ hδ0 hδ1 T
+      have hle : ∀ t, δ ^ t * stagePay w g l p (a t) (grim a t) ≤
+          δ ^ t * (if t < T then w else if t = T then g else p) := by
+        intro t
+        apply mul_le_mul_of_nonneg_left _ (pow_nonneg hδ0 t)
+        by_cases hlt : t < T
+        · have hat : a t = false := by simpa using Nat.find_min hex hlt
+          have hgt : grim a t = false := by
+            simp only [grim, decide_eq_false_iff_not, not_exists, not_and]
+            intro s hs; simpa using Nat.find_min hex (lt_trans hs hlt)
+          simp [hlt, hat, hgt, stagePay]
+        · by_cases heq : t = T
+          · have hat : a T = true := Nat.find_spec hex
+            have hgt : grim a T = false := by
+              simp only [grim, decide_eq_false_iff_not, not_exists, not_and]
+              intro s hs; simpa using Nat.find_min hex hs
+            rw [heq]; simp [hat, hgt, stagePay]
+          · have hgt : grim a t = true := by
+              simp only [grim, decide_eq_true_eq]
+              exact ⟨T, by omega, Nat.find_spec hex⟩
+            simp only [hlt, heq, hgt, ↓reduceIte]
+            cases a t <;> simp [stagePay, hlp]
+      have hpay := hasSum_le hle (summable_pay w g l p δ hδ0 hδ1 a).hasSum hpath
+      refine le_trans hpay ?_
+      -- The deviation loses `δ^T ((w - p) - (g - p)(1 - δ))`, which is not negative.
+      have hT : 0 ≤ δ ^ T := pow_nonneg hδ0 T
+      have key : 0 ≤ δ ^ T * ((w - p) - (g - p) * (1 - δ)) := mul_nonneg hT (by nlinarith)
+      rw [← add_div, div_add' _ _ _ h1δ.ne', div_le_div_iff_of_pos_right h1δ]
+      nlinarith
+    · -- Never striking earns exactly `w / (1 - δ)`.
+      push Not at hex
+      have ha : a = fun _ => false := funext fun t => by simpa using hex t
+      rw [ha, restraint_pay w g l p δ hδ0 hδ1]
+
+/-- The threshold `(g - w)/(g - p)` lies strictly between 0 and 1, so
+patient enough civilizations can sustain restraint. -/
+theorem grim_threshold_lt_one (hpw : p < w) (hwg : w < g) :
+    0 < (g - w) / (g - p) ∧ (g - w) / (g - p) < 1 := by
+  have hgp : 0 < g - p := by linarith
+  exact ⟨div_pos (by linarith) hgp, (div_lt_one hgp).mpr (by linarith)⟩
+
+/-- B3, light-speed lag: with interest rate `ι` and round-trip delay `τ`, the
+discount per round is `exp (-ι τ)`, and restraint can be sustained exactly
+when `ι τ ≤ log ((g - p)/(g - w))`. A long delay needs a long horizon. -/
+theorem grim_delay (hpw : p < w) (hwg : w < g) (hlp : l ≤ p) (ι τ : ℝ) (hι : 0 < ι)
+    (hτ : 0 < τ) :
+    (∀ a, grimPay w g l p (Real.exp (-(ι * τ))) a ≤ w / (1 - Real.exp (-(ι * τ)))) ↔
+      ι * τ ≤ Real.log ((g - p) / (g - w)) := by
+  have hιτ : 0 < ι * τ := mul_pos hι hτ
+  have hδ1 : Real.exp (-(ι * τ)) < 1 := Real.exp_lt_one_iff.mpr (by linarith)
+  rw [grim_sustains w g l p _ (Real.exp_pos _).le hδ1 hpw hwg hlp,
+    ← Real.log_le_iff_le_exp (grim_threshold_lt_one w g p hpw hwg).1,
+    show (g - p) / (g - w) = ((g - w) / (g - p))⁻¹ by rw [inv_div], Real.log_inv]
+  constructor <;> intro h <;> linarith
+
+end Repeated
+
 /-! ## Equilibrium selection in a global game (Proposition 3)
 
 The strike success `q` is not known exactly: each civilization sees a noisy
@@ -326,10 +527,11 @@ form of the payoff for large `M`.
 
 The general theorem, `global_game`, takes any pair of equilibrium strategies,
 one per side, and beliefs that may differ between the sides and need only be
-close to those of a uniform prior. The exact cases follow from it: noise with
-a flat prior (`global_game_pair`, `global_game_unique`), and a proper uniform
-prior on an interval (`uniform_prior_selects`), whose beliefs are derived from
-the noise law rather than assumed. -/
+close to those of a uniform prior. The cases follow from it: noise with a
+flat prior (`global_game_pair`, `global_game_unique`); a proper uniform prior on
+an interval (`uniform_prior_selects`), whose beliefs are derived from the noise
+law rather than assumed; and a smooth prior, where the switch lies in a band
+that vanishes with the noise (`smooth_prior_selects`, `smooth_prior_limit`). -/
 
 /-- The threshold of the risk-dominant choice: strike when q > (1 - π)/2. -/
 noncomputable def kStar (π : ℝ) : ℝ := (1 - π) / 2
@@ -1002,6 +1204,387 @@ theorem uniform_prior_selects (π : ℝ) (hatom : ∀ c, ν {c} = 0) (hsupp : �
 
 end Noise
 
+/-! ## Other priors: the limit of small noise
+
+A prior with density `p`, at least `m` and `L`-Lipschitz on `[a, b]`.
+Bayes' rule gives the posterior law of the two noises given one's own
+signal (`conditional_of_density`). At interior signals it is within a
+factor `1 ± Lσ/m` of the noises' own law, so beliefs are within
+`2Lσ/(m - Lσ)` of the flat prior's, and the band around `(1 - π)/2` in
+which an equilibrium may switch shrinks to nothing with the noise. -/
+
+section Smooth
+open MeasureTheory ProbabilityTheory
+open scoped ENNReal
+
+section SmoothPrior
+variable (ν : Measure ℝ) [IsProbabilityMeasure ν] (p : ℝ → ℝ)
+variable {Ω : Type*} [MeasurableSpace Ω] (P : Measure Ω) [IsProbabilityMeasure P]
+  (Q E₁ E₂ : Ω → ℝ)
+
+theorem joint_law_density (hp : Measurable p) (hQ : Measurable Q)
+    (hE : Measurable (fun ω => (E₁ ω, E₂ ω)))
+    (hind : IndepFun Q (fun ω => (E₁ ω, E₂ ω)) P)
+    (hlawQ : P.map Q = volume.withDensity (fun q => ENNReal.ofReal (p q)))
+    (hlawE : P.map (fun ω => (E₁ ω, E₂ ω)) = ν.prod ν) :
+    P.map (fun ω => (Q ω + E₁ ω, (E₁ ω, E₂ ω))) =
+      (volume.prod (ν.prod ν)).withDensity (fun z => ENNReal.ofReal (p (z.1 - z.2.1))) := by
+  have hf : Measurable (fun q => ENNReal.ofReal (p q)) := ENNReal.measurable_ofReal.comp hp
+  have hF : Measurable (fun z : ℝ × (ℝ × ℝ) => ENNReal.ofReal (p (z.1 - z.2.1))) :=
+    hf.comp (by fun_prop)
+  have hjoint : P.map (fun ω => (Q ω, (E₁ ω, E₂ ω))) =
+      (volume.withDensity (fun q => ENNReal.ofReal (p q))).prod (ν.prod ν) := by
+    rw [(indepFun_iff_map_prod_eq_prod_map_map hQ.aemeasurable hE.aemeasurable).mp hind,
+      hlawQ, hlawE]
+  have hg : Measurable (fun z : ℝ × (ℝ × ℝ) => (z.1 + z.2.1, z.2)) := by fun_prop
+  have hmap : P.map (fun ω => (Q ω + E₁ ω, (E₁ ω, E₂ ω))) =
+      (P.map (fun ω => (Q ω, (E₁ ω, E₂ ω)))).map (fun z => (z.1 + z.2.1, z.2)) := by
+    rw [Measure.map_map hg (hQ.prodMk hE)]; rfl
+  ext S hS
+  rw [hmap, hjoint, Measure.map_apply hg hS, withDensity_apply _ hS,
+    Measure.prod_apply_symm (hg hS), ← lintegral_indicator hS,
+    lintegral_prod_symm _ (hF.indicator hS).aemeasurable]
+  apply lintegral_congr; intro e
+  have hT : MeasurableSet ((fun q => (q, e)) ⁻¹' ((fun z : ℝ × (ℝ × ℝ) => (z.1 + z.2.1, z.2)) ⁻¹' S)) :=
+    measurable_prodMk_right (hg hS)
+  rw [withDensity_apply _ hT, ← lintegral_indicator hT,
+    ← lintegral_sub_right_eq_self _ e.1]
+  apply lintegral_congr; intro x
+  by_cases h : (x, e) ∈ S <;> simp [Set.indicator, h]
+
+/-- Bayes' weight on a noise pair `e`, given one's own signal `x`: the prior
+density at the `q = x - e₁` that they imply. -/
+noncomputable def postW (x : ℝ) (e : ℝ × ℝ) : ℝ≥0∞ := ENNReal.ofReal (p (x - e.1))
+
+/-- The total weight, the density of one's own signal at `x`. -/
+noncomputable def postZ (x : ℝ) : ℝ≥0∞ := ∫⁻ e, postW p x e ∂(ν.prod ν)
+
+/-- The posterior law of the two noises, given one's own signal `x`. -/
+noncomputable def post (x : ℝ) : Measure (ℝ × ℝ) :=
+  (postZ ν p x)⁻¹ • (ν.prod ν).withDensity (postW p x)
+
+theorem signal_law_density (hp : Measurable p) (hQ : Measurable Q)
+    (hE : Measurable (fun ω => (E₁ ω, E₂ ω)))
+    (hind : IndepFun Q (fun ω => (E₁ ω, E₂ ω)) P)
+    (hlawQ : P.map Q = volume.withDensity (fun q => ENNReal.ofReal (p q)))
+    (hlawE : P.map (fun ω => (E₁ ω, E₂ ω)) = ν.prod ν) :
+    P.map (fun ω => Q ω + E₁ ω) = volume.withDensity (postZ ν p) := by
+  have hF : Measurable (fun z : ℝ × (ℝ × ℝ) => ENNReal.ofReal (p (z.1 - z.2.1))) :=
+    (ENNReal.measurable_ofReal.comp hp).comp (by fun_prop)
+  have hX : Measurable (fun ω => (Q ω + E₁ ω, (E₁ ω, E₂ ω))) :=
+    (hQ.add (measurable_fst.comp hE)).prodMk hE
+  have hmap : P.map (fun ω => Q ω + E₁ ω) =
+      (P.map (fun ω => (Q ω + E₁ ω, (E₁ ω, E₂ ω)))).map Prod.fst := by
+    rw [Measure.map_map measurable_fst hX]; rfl
+  ext T hT
+  rw [hmap, joint_law_density ν p P Q E₁ E₂ hp hQ hE hind hlawQ hlawE,
+    Measure.map_apply measurable_fst hT, withDensity_apply _ (measurable_fst hT),
+    withDensity_apply _ hT,
+    show Prod.fst ⁻¹' T = T ×ˢ (Set.univ : Set (ℝ × ℝ)) from by ext; simp,
+    ← Measure.restrict_prod_eq_prod_univ, lintegral_prod _ hF.aemeasurable]
+  rfl
+
+theorem conditional_of_density (hp : Measurable p) (hQ : Measurable Q)
+    (hE : Measurable (fun ω => (E₁ ω, E₂ ω)))
+    (hind : IndepFun Q (fun ω => (E₁ ω, E₂ ω)) P)
+    (hlawQ : P.map Q = volume.withDensity (fun q => ENNReal.ofReal (p q)))
+    (hlawE : P.map (fun ω => (E₁ ω, E₂ ω)) = ν.prod ν)
+    (A : Set ℝ) (hA : MeasurableSet A) (hZ : ∀ x ∈ A, postZ ν p x ≠ 0 ∧ postZ ν p x ≠ ∞)
+    (R : Set (ℝ × (ℝ × ℝ))) (hR : MeasurableSet R) :
+    P {ω | Q ω + E₁ ω ∈ A ∧ (Q ω + E₁ ω, (E₁ ω, E₂ ω)) ∈ R} =
+      ∫⁻ x in A, post ν p x {e | (x, e) ∈ R} ∂(P.map (fun ω => Q ω + E₁ ω)) := by
+  set F := fun z : ℝ × (ℝ × ℝ) => ENNReal.ofReal (p (z.1 - z.2.1))
+  have hF : Measurable F := (ENNReal.measurable_ofReal.comp hp).comp (by fun_prop)
+  set X := fun ω => (Q ω + E₁ ω, (E₁ ω, E₂ ω))
+  have hX : Measurable X := (hQ.add (measurable_fst.comp hE)).prodMk hE
+  have hAu : MeasurableSet (A ×ˢ (Set.univ : Set (ℝ × ℝ))) := hA.prod MeasurableSet.univ
+  have hevent : {ω | Q ω + E₁ ω ∈ A ∧ X ω ∈ R} = X ⁻¹' (R ∩ A ×ˢ Set.univ) := by
+    ext ω; simp [X, and_comm]
+  -- Numerator of Bayes' rule, as a function of the signal.
+  set K := fun x => ∫⁻ e, (R.indicator F) (x, e) ∂(ν.prod ν)
+  have hK : Measurable K := (hF.indicator hR).lintegral_prod_right'
+  have hZm : Measurable (postZ ν p) := hF.lintegral_prod_right'
+  have hpost : ∀ x, post ν p x {e | (x, e) ∈ R} = (postZ ν p x)⁻¹ * K x := by
+    intro x
+    have hRx : MeasurableSet {e | (x, e) ∈ R} := measurable_prodMk_left hR
+    rw [post, Measure.smul_apply, withDensity_apply _ hRx, smul_eq_mul, ← lintegral_indicator hRx]
+    rfl
+  rw [hevent, ← Measure.map_apply hX (hR.inter hAu),
+    joint_law_density ν p P Q E₁ E₂ hp hQ hE hind hlawQ hlawE, withDensity_apply _ (hR.inter hAu),
+    ← lintegral_indicator (hR.inter hAu), lintegral_prod _ ((hF.indicator (hR.inter hAu)).aemeasurable),
+    signal_law_density ν p P Q E₁ E₂ hp hQ hE hind hlawQ hlawE]
+  simp_rw [hpost]
+  rw [show (fun x => (postZ ν p x)⁻¹ * K x) = (postZ ν p)⁻¹ * K from rfl,
+    setLIntegral_withDensity_eq_setLIntegral_mul _ hZm ((hZm.inv).mul hK) hA,
+    ← lintegral_indicator hA]
+  apply lintegral_congr; intro x
+  by_cases hx : x ∈ A
+  · rw [Set.indicator_of_mem hx, Pi.mul_apply, Pi.mul_apply, Pi.inv_apply,
+      ENNReal.mul_inv_cancel_left (hZ x hx).1 (hZ x hx).2]
+    apply lintegral_congr; intro e
+    by_cases he : (x, e) ∈ R <;> simp [Set.indicator, he, hx]
+  · rw [Set.indicator_of_notMem hx]
+    convert lintegral_zero with e
+    simp [Set.indicator, hx]
+
+/-- If a count lies within `d` of `c` per unit and the total within `d` of
+`c`, their ratio lies within `2d/(c - d)` of the unit share. -/
+lemma ratio_near (c d r n z : ℝ) (hd0 : 0 ≤ d) (hdc : d < c) (hr0 : 0 ≤ r) (hr1 : r ≤ 1)
+    (hn1 : (c - d) * r ≤ n) (hn2 : n ≤ (c + d) * r) (hz1 : c - d ≤ z) (hz2 : z ≤ c + d) :
+    |n / z - r| ≤ 2 * d / (c - d) := by
+  have hcd : 0 < c - d := by linarith
+  have hz : 0 < z := by linarith
+  set k := 2 * d / (c - d) with hk_def
+  have hk : k * (c - d) = 2 * d := by rw [hk_def]; field_simp
+  have hk0 : 0 ≤ k := by positivity
+  rw [abs_le]; constructor
+  · rw [le_sub_iff_add_le, le_div_iff₀ hz]
+    rcases le_or_gt (-k + r) 0 with h | h
+    · nlinarith
+    · nlinarith
+  · rw [sub_le_iff_le_add, div_le_iff₀ hz]
+    nlinarith
+
+variable (a b σ L m : ℝ)
+
+/-- At an interior signal, every possible noise pair gets a Bayes weight
+within `Lσ` of the prior density at the signal. -/
+lemma postW_near (hsupp : ∀ᵐ e ∂ν, |e| ≤ σ)
+    (hpL : ∀ u ∈ Set.Icc a b, ∀ v ∈ Set.Icc a b, |p u - p v| ≤ L * |u - v|) (hL : 0 ≤ L)
+    (x : ℝ) (hx : x ∈ Set.Icc (a + σ) (b - σ)) :
+    ∀ᵐ e ∂(ν.prod ν), ENNReal.ofReal (p x - L * σ) ≤ postW p x e ∧
+      postW p x e ≤ ENNReal.ofReal (p x + L * σ) := by
+  filter_upwards [Measure.quasiMeasurePreserving_fst.ae hsupp] with e he
+  have he' := abs_le.mp he
+  have hσ : 0 ≤ σ := le_trans (abs_nonneg _) he
+  have hu : x - e.1 ∈ Set.Icc a b := ⟨by linarith [hx.1], by linarith [hx.2]⟩
+  have hxab : x ∈ Set.Icc a b := ⟨by linarith [hx.1], by linarith [hx.2]⟩
+  have hLip := abs_le.mp (hpL (x - e.1) hu x hxab)
+  have hd : L * |x - e.1 - x| ≤ L * σ := by
+    apply mul_le_mul_of_nonneg_left _ hL; rw [show x - e.1 - x = -e.1 by ring, abs_neg]; exact he
+  exact ⟨ENNReal.ofReal_le_ofReal (by linarith), ENNReal.ofReal_le_ofReal (by linarith)⟩
+
+/-- The same bounds, integrated over a set of noise pairs. -/
+lemma setLIntegral_postW (hsupp : ∀ᵐ e ∂ν, |e| ≤ σ)
+    (hpL : ∀ u ∈ Set.Icc a b, ∀ v ∈ Set.Icc a b, |p u - p v| ≤ L * |u - v|) (hL : 0 ≤ L)
+    (x : ℝ) (hx : x ∈ Set.Icc (a + σ) (b - σ)) (S : Set (ℝ × ℝ)) :
+    ENNReal.ofReal (p x - L * σ) * (ν.prod ν) S ≤ ∫⁻ e in S, postW p x e ∂(ν.prod ν) ∧
+      ∫⁻ e in S, postW p x e ∂(ν.prod ν) ≤ ENNReal.ofReal (p x + L * σ) * (ν.prod ν) S := by
+  have h := postW_near ν p a b σ L hsupp hpL hL x hx
+  constructor
+  · rw [← setLIntegral_const]
+    exact lintegral_mono_ae (ae_restrict_of_ae (h.mono fun e he => he.1))
+  · rw [← setLIntegral_const]
+    exact lintegral_mono_ae (ae_restrict_of_ae (h.mono fun e he => he.2))
+
+section Core
+variable (hsupp : ∀ᵐ e ∂ν, |e| ≤ σ) (hpm : ∀ u ∈ Set.Icc a b, m ≤ p u)
+  (hpL : ∀ u ∈ Set.Icc a b, ∀ v ∈ Set.Icc a b, |p u - p v| ≤ L * |u - v|) (hL : 0 ≤ L)
+  (hσ : 0 ≤ σ) (hLσ : L * σ < m) (x : ℝ) (hx : x ∈ Set.Icc (a + σ) (b - σ))
+include hsupp hpm hpL hL hσ hLσ hx
+
+omit hpm hσ hLσ in
+lemma postZ_bounds :
+    ENNReal.ofReal (p x - L * σ) ≤ postZ ν p x ∧ postZ ν p x ≤ ENNReal.ofReal (p x + L * σ) := by
+  have h := setLIntegral_postW ν p a b σ L hsupp hpL hL x hx Set.univ
+  rw [Measure.restrict_univ, measure_univ, mul_one, mul_one] at h
+  exact h
+
+omit [IsProbabilityMeasure ν] hsupp hpL hL hLσ in
+lemma prior_at_signal : m ≤ p x := hpm x ⟨by linarith [hx.1], by linarith [hx.2]⟩
+
+lemma postZ_ne : postZ ν p x ≠ 0 ∧ postZ ν p x ≠ ∞ := by
+  have hb := postZ_bounds ν p a b σ L hsupp hpL hL x hx
+  have hm := prior_at_signal p a b σ m hpm hσ x hx
+  refine ⟨?_, ne_top_of_le_ne_top ENNReal.ofReal_ne_top hb.2⟩
+  exact (lt_of_lt_of_le (ENNReal.ofReal_pos.mpr (by linarith)) hb.1).ne'
+
+/-- At an interior signal, the posterior is a probability law. -/
+lemma post_univ : post ν p x Set.univ = 1 := by
+  have h := postZ_ne ν p a b σ L m hsupp hpm hpL hL hσ hLσ x hx
+  rw [post, Measure.smul_apply, withDensity_apply _ MeasurableSet.univ, Measure.restrict_univ,
+    smul_eq_mul]
+  exact ENNReal.inv_mul_cancel h.1 h.2
+
+/-- At an interior signal, the posterior probability of any set of noise pairs
+lies within `2Lσ/(m - Lσ)` of its prior probability. -/
+lemma post_near (S : Set (ℝ × ℝ)) (hS : MeasurableSet S) :
+    |(post ν p x S).toReal - (ν.prod ν).real S| ≤ 2 * (L * σ) / (m - L * σ) := by
+  have hm := prior_at_signal p a b σ m hpm hσ x hx
+  have hZ := postZ_bounds ν p a b σ L hsupp hpL hL x hx
+  have hZne := postZ_ne ν p a b σ L m hsupp hpm hpL hL hσ hLσ x hx
+  have hN := setLIntegral_postW ν p a b σ L hsupp hpL hL x hx S
+  set N := ∫⁻ e in S, postW p x e ∂(ν.prod ν)
+  have hNtop : N ≠ ∞ :=
+    ne_top_of_le_ne_top (ENNReal.mul_ne_top ENNReal.ofReal_ne_top (measure_ne_top _ _)) hN.2
+  have hLσ0 : 0 ≤ L * σ := mul_nonneg hL hσ
+  have hc : 0 ≤ p x - L * σ := by linarith
+  have hpost : (post ν p x S).toReal = N.toReal / (postZ ν p x).toReal := by
+    rw [post, Measure.smul_apply, withDensity_apply _ hS, smul_eq_mul, ENNReal.toReal_mul,
+      ENNReal.toReal_inv, div_eq_inv_mul]
+  have hn1 : (p x - L * σ) * (ν.prod ν).real S ≤ N.toReal := by
+    have := ENNReal.toReal_mono hNtop hN.1
+    rwa [ENNReal.toReal_mul, ENNReal.toReal_ofReal hc] at this
+  have hn2 : N.toReal ≤ (p x + L * σ) * (ν.prod ν).real S := by
+    have := ENNReal.toReal_mono (ENNReal.mul_ne_top ENNReal.ofReal_ne_top (measure_ne_top _ _)) hN.2
+    rwa [ENNReal.toReal_mul, ENNReal.toReal_ofReal (by linarith)] at this
+  have hz1 : p x - L * σ ≤ (postZ ν p x).toReal := by
+    have := ENNReal.toReal_mono hZne.2 hZ.1; rwa [ENNReal.toReal_ofReal hc] at this
+  have hz2 : (postZ ν p x).toReal ≤ p x + L * σ := by
+    have := ENNReal.toReal_mono ENNReal.ofReal_ne_top hZ.2
+    rwa [ENNReal.toReal_ofReal (by linarith)] at this
+  rw [hpost]
+  calc |N.toReal / (postZ ν p x).toReal - (ν.prod ν).real S|
+      ≤ 2 * (L * σ) / (p x - L * σ) :=
+        ratio_near (p x) (L * σ) _ _ _ hLσ0 (by linarith) measureReal_nonneg measureReal_le_one
+          hn1 hn2 hz1 hz2
+    _ ≤ 2 * (L * σ) / (m - L * σ) :=
+        div_le_div_of_nonneg_left (by linarith) (by linarith) (by linarith)
+
+/-- At an interior signal, the posterior mean of `q` lies within `σ` of the
+signal, because `q = x - e₁` and the noise lies within `σ`. -/
+lemma post_mean_near : |∫ e, (x - e.1) ∂(post ν p x) - x| ≤ σ := by
+  have : IsProbabilityMeasure (post ν p x) :=
+    ⟨post_univ ν p a b σ L m hsupp hpm hpL hL hσ hLσ x hx⟩
+  have hac : post ν p x ≪ ν.prod ν :=
+    (withDensity_absolutelyContinuous _ _).smul_left _
+  have hae : ∀ᵐ e ∂(post ν p x), |e.1| ≤ σ :=
+    hac.ae_le (Measure.quasiMeasurePreserving_fst.ae hsupp)
+  have hi : Integrable (fun e : ℝ × ℝ => e.1) (post ν p x) :=
+    Integrable.of_bound (C := σ) measurable_fst.aestronglyMeasurable (by simpa using hae)
+  rw [integral_sub (integrable_const x) hi, integral_const, measureReal_def, measure_univ,
+    ENNReal.toReal_one, one_smul, sub_sub_cancel_left, abs_neg]
+  have := norm_integral_le_of_norm_le_const (μ := post ν p x) (f := fun e : ℝ × ℝ => e.1)
+    (by simpa using hae)
+  simpa [measureReal_def] using this
+
+end Core
+
+open Classical in
+/-- A civilization's view under a prior with density `p` on `[a, b]`, at least
+`m` and `L`-Lipschitz there, with atomless noise on `[-σ, σ]`: at interior
+signals, the belief and the posterior mean are those of the posterior `post`
+(`conditional_of_density`); near the edges they are `E`'s. -/
+noncomputable def smoothView (hsupp : ∀ᵐ e ∂ν, |e| ≤ σ) (hpm : ∀ u ∈ Set.Icc a b, m ≤ p u)
+    (hpL : ∀ u ∈ Set.Icc a b, ∀ v ∈ Set.Icc a b, |p u - p v| ≤ L * |u - v|) (hL : 0 ≤ L)
+    (hσ : 0 ≤ σ) (hLσ : L * σ < m) (hatom : ∀ c, ν {c} = 0)
+    (E : Edge (Set.Icc (a - σ) (b + σ)) σ) :
+    View (Set.Icc (a - σ) (b + σ)) (max σ (2 * (L * σ) / (m - L * σ))) σ where
+  core := Set.Icc (a + σ) (b - σ)
+  mean x := if x ∈ Set.Icc (a + σ) (b - σ) then ∫ e, (x - e.1) ∂(post ν p x) else E.mean x
+  bel s x := if x ∈ Set.Icc (a + σ) (b - σ) then (post ν p x {e | s (x - e.1 + e.2)}).toReal
+    else E.bel s x
+  G := flatG ν
+  mean_core x hx := by
+    simp only [hx, ↓reduceIte]
+    exact (post_mean_near ν p a b σ L m hsupp hpm hpL hL hσ hLσ x hx).trans (le_max_left _ _)
+  mean_sig x hx := by
+    split_ifs with h
+    · exact post_mean_near ν p a b σ L m hsupp hpm hpL hL hσ hLσ x h
+    · exact E.mean_near x hx
+  bel_mono s s' x h := by
+    split_ifs with hx
+    · have : IsProbabilityMeasure (post ν p x) :=
+        ⟨post_univ ν p a b σ L m hsupp hpm hpL hL hσ hLσ x hx⟩
+      have hac : post ν p x ≪ ν.prod ν := (withDensity_absolutelyContinuous _ _).smul_left _
+      have h1 := hac.ae_le (Measure.quasiMeasurePreserving_fst.ae hsupp)
+      have h2 := hac.ae_le (Measure.quasiMeasurePreserving_snd.ae hsupp)
+      apply ENNReal.toReal_mono (measure_ne_top _ _)
+      apply measure_mono_ae
+      filter_upwards [h1, h2] with e he1 he2 hse
+      have := abs_le.mp he1; have := abs_le.mp he2
+      exact h _ ⟨by linarith [hx.1], by linarith [hx.2]⟩ hse
+    · exact E.bel_mono s s' x h
+  bel_gt h x hx := by
+    simp only [hx, ↓reduceIte]
+    rw [← flatBel_gt ν h x, flatBel]
+    exact (post_near ν p a b σ L m hsupp hpm hpL hL hσ hLσ x hx _
+      (measurableSet_lt measurable_const (by fun_prop))).trans (le_max_right _ _)
+  bel_ge h x hx := by
+    simp only [hx, ↓reduceIte]
+    rw [← flatBel_ge ν hatom h x, flatBel]
+    exact (post_near ν p a b σ L m hsupp hpm hpL hL hσ hLσ x hx _
+      (measurableSet_le measurable_const (by fun_prop))).trans (le_max_right _ _)
+  bel_nonneg s x := by split_ifs; exacts [ENNReal.toReal_nonneg, E.bel_nonneg s x]
+  bel_le_one s x := by
+    split_ifs with hx
+    · have h := measure_mono (μ := post ν p x) (Set.subset_univ {e : ℝ × ℝ | s (x - e.1 + e.2)})
+      rw [post_univ ν p a b σ L m hsupp hpm hpL hL hσ hLσ x hx] at h
+      simpa using ENNReal.toReal_mono ENNReal.one_ne_top h
+    · exact E.bel_le_one s x
+  G_zero := flatG_zero ν hatom
+  G_cont := flatG_cont ν hatom
+
+/-- Equilibrium selection under a smooth prior, at a given noise level: every
+equilibrium pair switches within `(2 - π) max(σ, 2Lσ/(m - Lσ))` of `(1 - π)/2`. -/
+theorem smooth_prior_selects (π : ℝ) (hsupp : ∀ᵐ e ∂ν, |e| ≤ σ)
+    (hpm : ∀ u ∈ Set.Icc a b, m ≤ p u)
+    (hpL : ∀ u ∈ Set.Icc a b, ∀ v ∈ Set.Icc a b, |p u - p v| ≤ L * |u - v|) (hL : 0 ≤ L)
+    (hσ : 0 < σ) (hLσ : L * σ < m) (hatom : ∀ c, ν {c} = 0)
+    (hπ1 : π < 1) (ha : a ≤ -2 * σ) (hb : 1 - π + 2 * σ ≤ b)
+    (E₁ E₂ : Edge (Set.Icc (a - σ) (b + σ)) σ) (s₁ s₂ : ℝ → Prop)
+    (h : IsEqPair π (smoothView ν p a b σ L m hsupp hpm hpL hL hσ.le hLσ hatom E₁)
+      (smoothView ν p a b σ L m hsupp hpm hpL hL hσ.le hLσ hatom E₂) s₁ s₂) :
+    ∀ x ∈ Set.Icc (a - σ) (b + σ),
+      (kStar π + (2 - π) * max σ (2 * (L * σ) / (m - L * σ)) < x → s₁ x ∧ s₂ x) ∧
+      (x < kStar π - (2 - π) * max σ (2 * (L * σ) / (m - L * σ)) → ¬ s₁ x ∧ ¬ s₂ x) := by
+  have hcore : ∀ x ∈ Set.Icc (a - σ) (b + σ), -σ ≤ x → x ≤ 1 - π + σ →
+      x ∈ Set.Icc (a + σ) (b - σ) := fun x _ h1 h2 => ⟨by linarith, by linarith⟩
+  exact global_game π (smoothView ν p a b σ L m hsupp hpm hpL hL hσ.le hLσ hatom E₁)
+    (smoothView ν p a b σ L m hsupp hpm hpL hL hσ.le hLσ hatom E₂) hπ1
+    (le_trans hσ.le (le_max_left _ _)) hcore hcore
+    ⟨a - σ, ⟨le_rfl, by linarith⟩, by linarith⟩ ⟨b + σ, ⟨by linarith, le_rfl⟩, by linarith⟩ s₁ s₂ h
+
+end SmoothPrior
+
+/-- The limit of small noise, the step of Carlsson and van Damme: for a prior
+with a density bounded below and Lipschitz on `[a, b]`, reaching past both
+dominance regions, every equilibrium pair switches as close to `(1 - π)/2` as
+one likes once the noise is small enough, whatever its law. -/
+theorem smooth_prior_limit (p : ℝ → ℝ) (a b L m π : ℝ) (hpm : ∀ u ∈ Set.Icc a b, m ≤ p u)
+    (hpL : ∀ u ∈ Set.Icc a b, ∀ v ∈ Set.Icc a b, |p u - p v| ≤ L * |u - v|) (hL : 0 ≤ L)
+    (hm : 0 < m) (hπ1 : π < 1) (ha : a < 0) (hb : 1 - π < b) (ε : ℝ) (hε : 0 < ε) :
+    ∃ σ₀ > 0, ∀ σ (hσ : 0 < σ), σ < σ₀ → ∃ (hLσ : L * σ < m), a ≤ -2 * σ ∧ 1 - π + 2 * σ ≤ b ∧
+      ∀ (ν : Measure ℝ) [IsProbabilityMeasure ν] (hsupp : ∀ᵐ e ∂ν, |e| ≤ σ)
+        (hatom : ∀ c, ν {c} = 0) (E₁ E₂ : Edge (Set.Icc (a - σ) (b + σ)) σ) (s₁ s₂ : ℝ → Prop),
+        IsEqPair π (smoothView ν p a b σ L m hsupp hpm hpL hL hσ.le hLσ hatom E₁)
+          (smoothView ν p a b σ L m hsupp hpm hpL hL hσ.le hLσ hatom E₂) s₁ s₂ →
+        ∀ x ∈ Set.Icc (a - σ) (b + σ),
+          (kStar π + ε < x → s₁ x ∧ s₂ x) ∧ (x < kStar π - ε → ¬ s₁ x ∧ ¬ s₂ x) := by
+  -- The band's half-width is continuous in σ and vanishes at 0.
+  set f := fun σ : ℝ => (2 - π) * max σ (2 * (L * σ) / (m - L * σ))
+  have hdiv : ContinuousAt (fun σ : ℝ => 2 * (L * σ) / (m - L * σ)) 0 :=
+    ContinuousAt.div (by fun_prop) (by fun_prop) (by simp; exact hm.ne')
+  have hmax : ContinuousAt (fun σ : ℝ => max σ (2 * (L * σ) / (m - L * σ))) 0 :=
+    continuous_max.continuousAt.comp (continuousAt_id.prodMk hdiv)
+  have hf : ContinuousAt f 0 := continuousAt_const.mul hmax
+  have hf0 : f 0 = 0 := by simp [f]
+  obtain ⟨δ, hδ, hfδ⟩ := Metric.continuousAt_iff.mp hf ε hε
+  refine ⟨min δ (min (m / (L + 1)) (min (-a / 2) ((b - (1 - π)) / 2))), ?_, ?_⟩
+  · have : 0 < m / (L + 1) := div_pos hm (by linarith)
+    exact lt_min hδ (lt_min this (lt_min (by linarith) (by linarith)))
+  intro σ hσ hσ₀
+  have h1 : σ < δ := lt_of_lt_of_le hσ₀ (min_le_left _ _)
+  have h2 : σ < m / (L + 1) := lt_of_lt_of_le hσ₀ ((min_le_right _ _).trans (min_le_left _ _))
+  have h3 : σ < -a / 2 :=
+    lt_of_lt_of_le hσ₀ ((min_le_right _ _).trans ((min_le_right _ _).trans (min_le_left _ _)))
+  have h4 : σ < (b - (1 - π)) / 2 :=
+    lt_of_lt_of_le hσ₀ ((min_le_right _ _).trans ((min_le_right _ _).trans (min_le_right _ _)))
+  have hLσ : L * σ < m := by
+    rw [lt_div_iff₀ (by linarith)] at h2; nlinarith
+  refine ⟨hLσ, by linarith, by linarith, ?_⟩
+  intro ν _ hsupp hatom E₁ E₂ s₁ s₂ h x hx
+  have hband : f σ < ε := by
+    have := hfδ (show dist σ 0 < δ by rw [Real.dist_eq, sub_zero, abs_of_pos hσ]; exact h1)
+    rw [hf0, Real.dist_eq, sub_zero] at this
+    exact lt_of_le_of_lt (le_abs_self _) this
+  have hsel := smooth_prior_selects ν p a b σ L m π hsupp hpm hpL hL hσ hLσ hatom hπ1
+    (by linarith) (by linarith) E₁ E₂ s₁ s₂ h x hx
+  exact ⟨fun hlt => hsel.1 (by simp only [f] at hband; linarith),
+    fun hlt => hsel.2 (by simp only [f] at hband; linarith)⟩
+
+end Smooth
+
 /-! ## Evolution (the theorem's system-level clause)
 
 The clause is a claim about how a population changes, so it can be proved
@@ -1206,5 +1789,386 @@ theorem striking_dies_out (a0 : ℝ) (ha0 : 0 < a0) (ha : a0 < edge π t) :
     · exact absurd h hg
   rw [← hLz]; exact hlim
 end
+
+
+/-! ## Long-run selection with mutations (Kandori, Mailath and Rob)
+
+`N` civilizations play the post-exposure game as a population. Each period,
+every civilization best-replies to how many struck the period before; then
+each, independently, switches with a small probability `ε`, a mutation.
+Without mutations the population locks into all waiting or all striking.
+With them it moves between the two, and as `ε → 0` it spends almost all its
+time in the one that takes more mutations to leave. The state is the number
+of strikers `z ≤ N`, and everyone strikes after state `z` exactly when
+`k ≤ z`. -/
+
+/-- The probability that exactly `j` of `N` civilizations do something that
+each does independently with probability `p`. -/
+noncomputable def binom (N j : ℕ) (p : ℝ) : ℝ := (N.choose j : ℝ) * p ^ j * (1 - p) ^ (N - j)
+
+/-- The probability that at least `k` of them do. -/
+noncomputable def atLeast (N k : ℕ) (p : ℝ) : ℝ :=
+  ∑ j ∈ (Finset.range (N + 1)).filter (fun j => k ≤ j), binom N j p
+
+/-- The probability that fewer than `k` of them do. -/
+noncomputable def fewerThan (N k : ℕ) (p : ℝ) : ℝ :=
+  ∑ j ∈ (Finset.range (N + 1)).filter (fun j => ¬ k ≤ j), binom N j p
+
+/-- One period, from `z` strikers to `z'`. After a period in which enough
+struck (`k ≤ z`), everyone strikes and each keeps striking with probability
+`1 - ε`; otherwise everyone waits and each starts striking with probability
+`ε`. -/
+noncomputable def kmrT (N k : ℕ) (ε : ℝ) (z z' : ℕ) : ℝ :=
+  if k ≤ z then binom N z' (1 - ε) else binom N z' ε
+
+/-- A stationary distribution of the chain: the long-run frequencies of its
+states. -/
+def IsStationary (N k : ℕ) (ε : ℝ) (μ : ℕ → ℝ) : Prop :=
+  (∀ z, 0 ≤ μ z) ∧ ∑ z ∈ Finset.range (N + 1), μ z = 1 ∧
+    ∀ z' ∈ Finset.range (N + 1), μ z' = ∑ z ∈ Finset.range (N + 1), μ z * kmrT N k ε z z'
+
+/-- The long-run share of periods after which everyone strikes. -/
+def strikeMass (N k : ℕ) (μ : ℕ → ℝ) : ℝ :=
+  ∑ z ∈ (Finset.range (N + 1)).filter (fun z => k ≤ z), μ z
+
+/-- `atLeast N k ε` is the chance that mutations tip a waiting population into
+striking, `fewerThan N k (1 - ε)` the chance that they tip a striking one into
+waiting; this is the first over the sum of both. -/
+noncomputable def kmrShare (N k : ℕ) (ε : ℝ) : ℝ :=
+  atLeast N k ε / (atLeast N k ε + fewerThan N k (1 - ε))
+
+lemma binom_nonneg (N j : ℕ) (p : ℝ) (h0 : 0 ≤ p) (h1 : p ≤ 1) : 0 ≤ binom N j p := by
+  unfold binom
+  have : 0 ≤ 1 - p := by linarith
+  positivity
+
+lemma binom_sum (N : ℕ) (p : ℝ) : ∑ j ∈ Finset.range (N + 1), binom N j p = 1 := by
+  have h := (add_pow p (1 - p) N).symm
+  rw [show p + (1 - p) = 1 by ring, one_pow] at h
+  rw [← h]
+  exact Finset.sum_congr rfl fun j _ => by unfold binom; ring
+
+lemma atLeast_add_fewerThan (N k : ℕ) (p : ℝ) : atLeast N k p + fewerThan N k p = 1 := by
+  unfold atLeast fewerThan
+  rw [Finset.sum_filter_add_sum_filter_not, binom_sum]
+
+lemma atLeast_nonneg (N k : ℕ) (p : ℝ) (h0 : 0 ≤ p) (h1 : p ≤ 1) : 0 ≤ atLeast N k p :=
+  Finset.sum_nonneg fun j _ => binom_nonneg N j p h0 h1
+
+lemma fewerThan_nonneg (N k : ℕ) (p : ℝ) (h0 : 0 ≤ p) (h1 : p ≤ 1) : 0 ≤ fewerThan N k p :=
+  Finset.sum_nonneg fun j _ => binom_nonneg N j p h0 h1
+
+/-- One term of the upper tail: at least `p^k (1 - p)^N`. -/
+lemma atLeast_ge (N k : ℕ) (hk : k ≤ N) (p : ℝ) (h0 : 0 ≤ p) (h1 : p ≤ 1) :
+    p ^ k * (1 - p) ^ N ≤ atLeast N k p := by
+  have hmem : k ∈ (Finset.range (N + 1)).filter (fun j => k ≤ j) :=
+    Finset.mem_filter.mpr ⟨Finset.mem_range.mpr (by omega), le_rfl⟩
+  refine le_trans ?_ (Finset.single_le_sum (fun j _ => binom_nonneg N j p h0 h1) hmem)
+  unfold binom
+  have hc : (1 : ℝ) ≤ N.choose k := by exact_mod_cast Nat.choose_pos hk
+  have hp : (1 - p) ^ N ≤ (1 - p) ^ (N - k) := pow_le_pow_of_le_one (by linarith) (by linarith) (by omega)
+  have hpk : 0 ≤ p ^ k := pow_nonneg h0 k
+  have hq : 0 ≤ (1 - p) ^ (N - k) := pow_nonneg (by linarith) _
+  calc p ^ k * (1 - p) ^ N ≤ p ^ k * (1 - p) ^ (N - k) := mul_le_mul_of_nonneg_left hp hpk
+    _ = 1 * p ^ k * (1 - p) ^ (N - k) := by ring
+    _ ≤ (N.choose k : ℝ) * p ^ k * (1 - p) ^ (N - k) :=
+        mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_right hc hpk) hq
+
+/-- The upper tail is at most `2^N p^k`. -/
+lemma atLeast_le (N k : ℕ) (p : ℝ) (h0 : 0 ≤ p) (h1 : p ≤ 1) : atLeast N k p ≤ 2 ^ N * p ^ k := by
+  unfold atLeast
+  calc ∑ j ∈ (Finset.range (N + 1)).filter (fun j => k ≤ j), binom N j p
+      ≤ ∑ j ∈ (Finset.range (N + 1)).filter (fun j => k ≤ j), (N.choose j : ℝ) * p ^ k := by
+        refine Finset.sum_le_sum fun j hj => ?_
+        have hkj := (Finset.mem_filter.mp hj).2
+        unfold binom
+        have hpj : p ^ j ≤ p ^ k := pow_le_pow_of_le_one h0 h1 hkj
+        have hq : (1 - p) ^ (N - j) ≤ 1 := pow_le_one₀ (by linarith) (by linarith)
+        have hc : (0 : ℝ) ≤ N.choose j := Nat.cast_nonneg _
+        have : 0 ≤ p ^ j := pow_nonneg h0 j
+        calc (N.choose j : ℝ) * p ^ j * (1 - p) ^ (N - j) ≤ (N.choose j : ℝ) * p ^ j * 1 :=
+              mul_le_mul_of_nonneg_left hq (mul_nonneg hc this)
+          _ ≤ (N.choose j : ℝ) * p ^ k := by rw [mul_one]; exact mul_le_mul_of_nonneg_left hpj hc
+    _ ≤ ∑ j ∈ Finset.range (N + 1), (N.choose j : ℝ) * p ^ k :=
+        Finset.sum_le_sum_of_subset_of_nonneg (Finset.filter_subset _ _)
+          fun j _ _ => mul_nonneg (Nat.cast_nonneg _) (pow_nonneg h0 k)
+    _ = 2 ^ N * p ^ k := by
+        rw [← Finset.sum_mul]; congr 1; exact_mod_cast Nat.sum_range_choose N
+
+/-- One term of the lower tail: at least `p^N (1 - p)^(N + 1 - k)`. -/
+lemma fewerThan_ge (N k : ℕ) (hk1 : 1 ≤ k) (hk : k ≤ N + 1) (p : ℝ) (h0 : 0 ≤ p) (h1 : p ≤ 1) :
+    p ^ N * (1 - p) ^ (N + 1 - k) ≤ fewerThan N k p := by
+  have hmem : k - 1 ∈ (Finset.range (N + 1)).filter (fun j => ¬ k ≤ j) :=
+    Finset.mem_filter.mpr ⟨Finset.mem_range.mpr (by omega), by omega⟩
+  refine le_trans ?_ (Finset.single_le_sum (fun j _ => binom_nonneg N j p h0 h1) hmem)
+  unfold binom
+  rw [show N - (k - 1) = N + 1 - k by omega]
+  have hc : (1 : ℝ) ≤ N.choose (k - 1) := by exact_mod_cast Nat.choose_pos (by omega)
+  have hp : p ^ N ≤ p ^ (k - 1) := pow_le_pow_of_le_one h0 h1 (by omega)
+  have hq : 0 ≤ (1 - p) ^ (N + 1 - k) := pow_nonneg (by linarith) _
+  have hpk : 0 ≤ p ^ (k - 1) := pow_nonneg h0 _
+  calc p ^ N * (1 - p) ^ (N + 1 - k) ≤ p ^ (k - 1) * (1 - p) ^ (N + 1 - k) :=
+        mul_le_mul_of_nonneg_right hp hq
+    _ = 1 * p ^ (k - 1) * (1 - p) ^ (N + 1 - k) := by ring
+    _ ≤ (N.choose (k - 1) : ℝ) * p ^ (k - 1) * (1 - p) ^ (N + 1 - k) :=
+        mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_right hc hpk) hq
+
+/-- The lower tail is at most `2^N (1 - p)^(N + 1 - k)`. -/
+lemma fewerThan_le (N k : ℕ) (p : ℝ) (h0 : 0 ≤ p) (h1 : p ≤ 1) :
+    fewerThan N k p ≤ 2 ^ N * (1 - p) ^ (N + 1 - k) := by
+  unfold fewerThan
+  calc ∑ j ∈ (Finset.range (N + 1)).filter (fun j => ¬ k ≤ j), binom N j p
+      ≤ ∑ j ∈ (Finset.range (N + 1)).filter (fun j => ¬ k ≤ j),
+          (N.choose j : ℝ) * (1 - p) ^ (N + 1 - k) := by
+        refine Finset.sum_le_sum fun j hj => ?_
+        have hjk := (Finset.mem_filter.mp hj).2
+        unfold binom
+        have hq : (1 - p) ^ (N - j) ≤ (1 - p) ^ (N + 1 - k) :=
+          pow_le_pow_of_le_one (by linarith) (by linarith) (by omega)
+        have hpj : p ^ j ≤ 1 := pow_le_one₀ h0 h1
+        have hc : (0 : ℝ) ≤ N.choose j := Nat.cast_nonneg _
+        have : 0 ≤ (1 - p) ^ (N - j) := pow_nonneg (by linarith) _
+        calc (N.choose j : ℝ) * p ^ j * (1 - p) ^ (N - j)
+            ≤ (N.choose j : ℝ) * 1 * (1 - p) ^ (N - j) :=
+              mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_left hpj hc) this
+          _ ≤ (N.choose j : ℝ) * (1 - p) ^ (N + 1 - k) := by
+              rw [mul_one]; exact mul_le_mul_of_nonneg_left hq hc
+    _ ≤ ∑ j ∈ Finset.range (N + 1), (N.choose j : ℝ) * (1 - p) ^ (N + 1 - k) :=
+        Finset.sum_le_sum_of_subset_of_nonneg (Finset.filter_subset _ _)
+          fun j _ _ => mul_nonneg (Nat.cast_nonneg _) (pow_nonneg (by linarith) _)
+    _ = 2 ^ N * (1 - p) ^ (N + 1 - k) := by
+        rw [← Finset.sum_mul]; congr 1; exact_mod_cast Nat.sum_range_choose N
+
+/-- With mutations, the two tipping chances are positive. -/
+lemma kmr_pos (N k : ℕ) (hk : k ≤ N) (ε : ℝ) (hε0 : 0 < ε) (hε1 : ε < 1) :
+    0 < atLeast N k ε ∧ 0 ≤ fewerThan N k (1 - ε) := by
+  refine ⟨lt_of_lt_of_le ?_ (atLeast_ge N k hk ε hε0.le hε1.le), fewerThan_nonneg N k _ (by linarith) (by linarith)⟩
+  exact mul_pos (pow_pos hε0 k) (pow_pos (by linarith) N)
+
+/-- In every stationary distribution, the long-run share of striking periods
+is the chance of tipping into striking over the sum of both tipping chances:
+the next period's play depends only on whether the last one struck. -/
+theorem kmr_stationary (N k : ℕ) (ε : ℝ) (μ : ℕ → ℝ) (hμ : IsStationary N k ε μ)
+    (hpos : 0 < atLeast N k ε + fewerThan N k (1 - ε)) :
+    strikeMass N k μ = kmrShare N k ε := by
+  obtain ⟨_, hsum, hstat⟩ := hμ
+  have hW : ∑ z ∈ (Finset.range (N + 1)).filter (fun z => ¬ k ≤ z), μ z = 1 - strikeMass N k μ := by
+    rw [← hsum, ← Finset.sum_filter_add_sum_filter_not (Finset.range (N + 1)) (fun z => k ≤ z)]
+    unfold strikeMass; ring
+  -- The chance that the next period strikes, from each state.
+  have hrow : ∀ z, ∑ z' ∈ (Finset.range (N + 1)).filter (fun z' => k ≤ z'), kmrT N k ε z z' =
+      if k ≤ z then 1 - fewerThan N k (1 - ε) else atLeast N k ε := by
+    intro z
+    by_cases hz : k ≤ z
+    · simp only [kmrT, hz, ↓reduceIte]
+      have := atLeast_add_fewerThan N k (1 - ε)
+      unfold atLeast at this; linarith
+    · simp only [kmrT, hz, ↓reduceIte]; rfl
+  have key : strikeMass N k μ =
+      strikeMass N k μ * (1 - fewerThan N k (1 - ε)) + (1 - strikeMass N k μ) * atLeast N k ε := by
+    calc strikeMass N k μ
+        = ∑ z' ∈ (Finset.range (N + 1)).filter (fun z' => k ≤ z'),
+            ∑ z ∈ Finset.range (N + 1), μ z * kmrT N k ε z z' :=
+          Finset.sum_congr rfl fun z' hz' => hstat z' (Finset.mem_filter.mp hz').1
+      _ = ∑ z ∈ Finset.range (N + 1),
+            μ z * (if k ≤ z then 1 - fewerThan N k (1 - ε) else atLeast N k ε) := by
+          rw [Finset.sum_comm]
+          exact Finset.sum_congr rfl fun z _ => by rw [← hrow z, Finset.mul_sum]
+      _ = strikeMass N k μ * (1 - fewerThan N k (1 - ε)) + (1 - strikeMass N k μ) * atLeast N k ε := by
+          rw [← Finset.sum_filter_add_sum_filter_not (Finset.range (N + 1)) (fun z => k ≤ z), ← hW]
+          unfold strikeMass
+          rw [Finset.sum_mul, Finset.sum_mul]
+          congr 1
+          · exact Finset.sum_congr rfl fun z hz => by simp [(Finset.mem_filter.mp hz).2]
+          · exact Finset.sum_congr rfl fun z hz => by simp [(Finset.mem_filter.mp hz).2]
+  unfold kmrShare
+  rw [eq_div_iff hpos.ne']
+  linarith
+
+/-- The chain has a stationary distribution, so the statement above is not
+vacuous: mix the two post-mutation laws in the proportion `kmrShare`. -/
+theorem kmr_exists_stationary (N k : ℕ) (ε : ℝ) (hε0 : 0 ≤ ε) (hε1 : ε ≤ 1)
+    (hpos : 0 < atLeast N k ε + fewerThan N k (1 - ε)) : ∃ μ, IsStationary N k ε μ := by
+  set s := kmrShare N k ε with hs
+  have hu := atLeast_nonneg N k ε hε0 hε1
+  have hl := fewerThan_nonneg N k (1 - ε) (by linarith) (by linarith)
+  have hs0 : 0 ≤ s := div_nonneg hu hpos.le
+  have hs1 : s ≤ 1 := (div_le_one hpos).mpr (by linarith)
+  have hsα : s * (atLeast N k ε + fewerThan N k (1 - ε)) = atLeast N k ε := div_mul_cancel₀ _ hpos.ne'
+  set μ : ℕ → ℝ := fun z => (1 - s) * binom N z ε + s * binom N z (1 - ε) with hμ
+  have hmass : strikeMass N k μ = s := by
+    unfold strikeMass
+    simp only [hμ, Finset.sum_add_distrib, ← Finset.mul_sum]
+    have := atLeast_add_fewerThan N k (1 - ε)
+    change (1 - s) * atLeast N k ε + s * atLeast N k (1 - ε) = s
+    nlinarith
+  have hW : ∑ z ∈ (Finset.range (N + 1)).filter (fun z => ¬ k ≤ z), μ z = 1 - s := by
+    have hall : ∑ z ∈ Finset.range (N + 1), μ z = 1 := by
+      simp only [hμ, Finset.sum_add_distrib, ← Finset.mul_sum, binom_sum]; ring
+    rw [← hmass, ← hall, ← Finset.sum_filter_add_sum_filter_not (Finset.range (N + 1)) (fun z => k ≤ z)]
+    unfold strikeMass; ring
+  refine ⟨μ, fun z => ?_, ?_, fun z' _ => ?_⟩
+  · exact add_nonneg (mul_nonneg (by linarith) (binom_nonneg N z ε hε0 hε1))
+      (mul_nonneg hs0 (binom_nonneg N z (1 - ε) (by linarith) (by linarith)))
+  · simp only [hμ, Finset.sum_add_distrib, ← Finset.mul_sum, binom_sum]; ring
+  · -- Next period's law depends only on whether the last one struck.
+    rw [← Finset.sum_filter_add_sum_filter_not (Finset.range (N + 1)) (fun z => k ≤ z)]
+    have h1 : ∑ z ∈ (Finset.range (N + 1)).filter (fun z => k ≤ z), μ z * kmrT N k ε z z' =
+        s * binom N z' (1 - ε) := by
+      rw [← hmass]; unfold strikeMass; rw [Finset.sum_mul]
+      exact Finset.sum_congr rfl fun z hz => by simp [kmrT, (Finset.mem_filter.mp hz).2]
+    have h2 : ∑ z ∈ (Finset.range (N + 1)).filter (fun z => ¬ k ≤ z), μ z * kmrT N k ε z z' =
+        (1 - s) * binom N z' ε := by
+      rw [← hW, Finset.sum_mul]
+      exact Finset.sum_congr rfl fun z hz => by simp [kmrT, (Finset.mem_filter.mp hz).2]
+    rw [h1, h2]; ring
+
+/-- `2^N ε^m / (1 - ε)^N` vanishes as `ε → 0⁺` when `m ≥ 1`. -/
+lemma bound_tendsto (N m : ℕ) (hm : 1 ≤ m) :
+    Tendsto (fun ε : ℝ => 2 ^ N * ε ^ m / (1 - ε) ^ N) (𝓝[>] 0) (𝓝 0) := by
+  have hc : ContinuousAt (fun ε : ℝ => 2 ^ N * ε ^ m / (1 - ε) ^ N) 0 :=
+    ((continuous_const.mul (continuous_pow m)).continuousAt).div
+      ((continuous_const.sub continuous_id).pow N).continuousAt (by simp)
+  have h0 : (2 : ℝ) ^ N * 0 ^ m / (1 - 0) ^ N = 0 := by
+    simp [zero_pow (by omega : m ≠ 0)]
+  have := hc.tendsto; rw [h0] at this
+  exact tendsto_nhdsWithin_of_tendsto_nhds this
+
+/-- If leaving the striking state takes more mutations than entering it
+(`2k ≤ N`), the long-run share of striking periods tends to 1 as mutations
+become rare. -/
+theorem kmr_limit (N k : ℕ) (hk1 : 1 ≤ k) (h2k : 2 * k ≤ N) :
+    Tendsto (kmrShare N k) (𝓝[>] 0) (𝓝 1) := by
+  set m := N + 1 - 2 * k
+  have hlow : Tendsto (fun ε : ℝ => 1 - 2 ^ N * ε ^ m / (1 - ε) ^ N) (𝓝[>] 0) (𝓝 1) := by
+    simpa using (bound_tendsto N m (by omega)).const_sub (1 : ℝ)
+  refine tendsto_of_tendsto_of_tendsto_of_le_of_le' hlow tendsto_const_nhds ?_ ?_
+  · filter_upwards [Ioo_mem_nhdsGT (show (0 : ℝ) < 1 by norm_num)] with ε ⟨hε0, hε1⟩
+    obtain ⟨hα, hβ⟩ := kmr_pos N k (by omega) ε hε0 hε1
+    have hαlow := atLeast_ge N k (by omega) ε hε0.le hε1.le
+    have hβup := fewerThan_le N k (1 - ε) (by linarith) (by linarith)
+    rw [sub_sub_cancel] at hβup
+    have hq : 0 < (1 - ε) ^ N := pow_pos (by linarith) N
+    have hεk : 0 < ε ^ k := pow_pos hε0 k
+    -- One minus the share is at most β / α.
+    have hgap : 1 - kmrShare N k ε ≤ fewerThan N k (1 - ε) / atLeast N k ε := by
+      unfold kmrShare
+      rw [one_sub_div (show atLeast N k ε + fewerThan N k (1 - ε) ≠ 0 by linarith)]
+      simp only [add_sub_cancel_left]
+      exact div_le_div_of_nonneg_left hβ hα (by linarith)
+    have hsplit : ε ^ (N + 1 - k) = ε ^ k * ε ^ m := by rw [← pow_add]; congr 1; omega
+    have hratio : fewerThan N k (1 - ε) / atLeast N k ε ≤ 2 ^ N * ε ^ m / (1 - ε) ^ N := by
+      rw [div_le_div_iff₀ hα hq]
+      rw [hsplit] at hβup
+      have : 0 ≤ 2 ^ N * ε ^ m := by positivity
+      nlinarith [mul_le_mul_of_nonneg_left hαlow this, mul_le_mul_of_nonneg_right hβup hq.le]
+    linarith
+  · filter_upwards [Ioo_mem_nhdsGT (show (0 : ℝ) < 1 by norm_num)] with ε ⟨hε0, hε1⟩
+    obtain ⟨hα, hβ⟩ := kmr_pos N k (by omega) ε hε0 hε1
+    unfold kmrShare
+    exact (div_le_one (by linarith)).mpr (by linarith)
+
+/-- The mirror: if entering the striking state takes more mutations than
+leaving it (`2k ≥ N + 2`), the long-run share of striking periods tends to 0. -/
+theorem kmr_limit_zero (N k : ℕ) (hkN : k ≤ N) (h2k : N + 2 ≤ 2 * k) :
+    Tendsto (kmrShare N k) (𝓝[>] 0) (𝓝 0) := by
+  set m := 2 * k - (N + 1)
+  refine tendsto_of_tendsto_of_tendsto_of_le_of_le' tendsto_const_nhds (bound_tendsto N m (by omega)) ?_ ?_
+  · filter_upwards [Ioo_mem_nhdsGT (show (0 : ℝ) < 1 by norm_num)] with ε ⟨hε0, hε1⟩
+    obtain ⟨hα, hβ⟩ := kmr_pos N k hkN ε hε0 hε1
+    exact div_nonneg hα.le (by linarith)
+  · filter_upwards [Ioo_mem_nhdsGT (show (0 : ℝ) < 1 by norm_num)] with ε ⟨hε0, hε1⟩
+    obtain ⟨hα, _⟩ := kmr_pos N k hkN ε hε0 hε1
+    have hαup := atLeast_le N k ε hε0.le hε1.le
+    have hβlow := fewerThan_ge N k (by omega) (by omega) (1 - ε) (by linarith) (by linarith)
+    rw [sub_sub_cancel] at hβlow
+    have hq : 0 < (1 - ε) ^ N := pow_pos (by linarith) N
+    have hεn : 0 < ε ^ (N + 1 - k) := pow_pos hε0 _
+    have hβ : 0 < fewerThan N k (1 - ε) := lt_of_lt_of_le (mul_pos hq hεn) hβlow
+    have hsplit : ε ^ k = ε ^ (N + 1 - k) * ε ^ m := by rw [← pow_add]; congr 1; omega
+    -- The share is at most α / β.
+    have hle : kmrShare N k ε ≤ atLeast N k ε / fewerThan N k (1 - ε) := by
+      unfold kmrShare
+      exact div_le_div_of_nonneg_left hα.le hβ (by linarith)
+    have hratio : atLeast N k ε / fewerThan N k (1 - ε) ≤ 2 ^ N * ε ^ m / (1 - ε) ^ N := by
+      rw [div_le_div_iff₀ hβ hq]
+      rw [hsplit] at hαup
+      have : 0 ≤ 2 ^ N * ε ^ m := by positivity
+      nlinarith [mul_le_mul_of_nonneg_left hβlow this, mul_le_mul_of_nonneg_right hαup hq.le]
+    linarith
+
+/-! The chain above is the game's: a civilization best-replies to a share
+`z / N` of strikers by striking exactly when `z` reaches `kmrK`. -/
+
+/-- The fewest strikers to which striking is the best reply. -/
+noncomputable def kmrK (π t : ℝ) (N : ℕ) : ℕ := ⌊edge π t * N⌋₊ + 1
+
+theorem kmrK_best_reply (π t : ℝ) (hπt : π < t) (ht1 : t < 1) (N : ℕ) (hN : 0 < N) (z : ℕ) :
+    kmrK π t N ≤ z ↔ 0 < strikeGain π t (z / N) := by
+  have he : 0 ≤ edge π t := div_nonneg (by linarith) (by linarith)
+  have hNr : (0 : ℝ) < N := by exact_mod_cast hN
+  rw [gain_pos_iff π t hπt ht1, lt_div_iff₀ hNr, kmrK, Nat.add_one_le_iff,
+    Nat.floor_lt (mul_nonneg he hNr.le)]
+
+/-- Kandori, Mailath and Rob for this game: if striking is risk-dominant,
+then in every large enough population, as mutations become rare, every
+stationary distribution puts almost all its weight on striking. -/
+theorem kmr_selects_risk_dominant (π t : ℝ) (hπt : π < t) (hrd : t < (1 + π) / 2) :
+    ∃ N₀ : ℕ, ∀ N ≥ N₀, ∀ δ > 0, ∀ᶠ ε in 𝓝[>] 0, ∀ μ,
+      IsStationary N (kmrK π t N) ε μ → 1 - δ < strikeMass N (kmrK π t N) μ := by
+  have hπ1 : π < 1 := by linarith
+  have he : 0 ≤ edge π t := div_nonneg (by linarith) (by linarith)
+  have he2 : edge π t < 1 / 2 := (larger_basin_iff_risk_dominant π t hπ1).mpr hrd
+  refine ⟨⌈2 / (1 - 2 * edge π t)⌉₊, fun N hN δ hδ => ?_⟩
+  have hNr : 2 / (1 - 2 * edge π t) ≤ N := le_trans (Nat.le_ceil _) (by exact_mod_cast hN)
+  have hbig : 2 ≤ (1 - 2 * edge π t) * N := by
+    rw [div_le_iff₀ (by linarith)] at hNr; linarith
+  have hfl := Nat.floor_le (mul_nonneg he (Nat.cast_nonneg N : (0 : ℝ) ≤ N))
+  have h2k : 2 * kmrK π t N ≤ N := by
+    have : (2 * (⌊edge π t * N⌋₊ + 1 : ℕ) : ℝ) ≤ N := by push_cast; nlinarith
+    exact_mod_cast this
+  have hlim := kmr_limit N (kmrK π t N) (by simp [kmrK]) h2k
+  filter_upwards [(tendsto_order.1 hlim).1 (1 - δ) (by linarith),
+    Ioo_mem_nhdsGT (show (0 : ℝ) < 1 by norm_num)] with ε hε ⟨hε0, hε1⟩ μ hμ
+  obtain ⟨hα, hβ⟩ := kmr_pos N (kmrK π t N) (by omega) ε hε0 hε1
+  rw [kmr_stationary N _ ε μ hμ (by linarith)]
+  exact hε
+
+/-- The mirror: if restraint is risk-dominant, in every large enough
+population, as mutations become rare, every stationary distribution puts
+almost no weight on striking. -/
+theorem kmr_selects_restraint (π t : ℝ) (hπ1 : π < 1) (hrd : (1 + π) / 2 < t) (ht1 : t < 1) :
+    ∃ N₀ : ℕ, ∀ N ≥ N₀, ∀ δ > 0, ∀ᶠ ε in 𝓝[>] 0, ∀ μ,
+      IsStationary N (kmrK π t N) ε μ → strikeMass N (kmrK π t N) μ < δ := by
+  have h1π : 0 < 1 - π := by linarith
+  have he2 : 1 / 2 < edge π t := by
+    by_contra h
+    have := (larger_basin_iff_risk_dominant π t hπ1).mp
+      (lt_of_le_of_ne (not_lt.mp h) (fun heq => by
+        unfold edge at heq; rw [div_eq_iff h1π.ne'] at heq; linarith))
+    linarith
+  have he1 : edge π t < 1 := by unfold edge; rw [div_lt_one h1π]; linarith
+  refine ⟨⌈2 / (2 * edge π t - 1)⌉₊, fun N hN δ hδ => ?_⟩
+  have hNr : 2 / (2 * edge π t - 1) ≤ N := le_trans (Nat.le_ceil _) (by exact_mod_cast hN)
+  have hbig : 2 ≤ (2 * edge π t - 1) * N := by
+    rw [div_le_iff₀ (by linarith)] at hNr; linarith
+  have hN0 : (0 : ℝ) < N := by nlinarith
+  have hx : 0 ≤ edge π t * N := by nlinarith
+  have hfl := Nat.floor_le hx
+  have hfl' := Nat.lt_floor_add_one (edge π t * N)
+  have hkN : kmrK π t N ≤ N := by
+    have : (⌊edge π t * N⌋₊ : ℝ) < N := by nlinarith
+    have : ⌊edge π t * N⌋₊ < N := by exact_mod_cast this
+    unfold kmrK; omega
+  have h2k : N + 2 ≤ 2 * kmrK π t N := by
+    have : ((N + 2 : ℕ) : ℝ) < 2 * (⌊edge π t * N⌋₊ + 1 : ℕ) := by push_cast; nlinarith
+    have : N + 2 < 2 * (⌊edge π t * N⌋₊ + 1) := by exact_mod_cast this
+    unfold kmrK; omega
+  have hlim := kmr_limit_zero N (kmrK π t N) hkN h2k
+  filter_upwards [(tendsto_order.1 hlim).2 δ hδ,
+    Ioo_mem_nhdsGT (show (0 : ℝ) < 1 by norm_num)] with ε hε ⟨hε0, hε1⟩ μ hμ
+  obtain ⟨hα, hβ⟩ := kmr_pos N (kmrK π t N) hkN ε hε0 hε1
+  rw [kmr_stationary N _ ε μ hμ (by linarith)]
+  exact hε
 
 end DarkForest
