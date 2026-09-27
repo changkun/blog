@@ -293,7 +293,7 @@ Lean checks that each theorem follows from its assumptions. It relies on Lean's 
 - **Whether a theorem says what the sentence beside it says.** Lean checks the formal statement, not its match with the prose. That match is checked only by reading the statements in the attached file, which is worth doing for any claim that matters to you.
 - **The readings the model builds in.** Counting $\gamma$ into the strike probability assumes that a civilization able to destroy another is also willing to (Section 4.2). A1 enters as an additive utility with bounded gains and a large $M$. The global game uses the payoff normalized for large $M$, and lets $q$ range below 0 so that waiting dominates there. Enforcement in Proposition 0 (b) is an added chance of being destroyed, and the repeated game in (d) has abstract payoffs. The models of Sections 8.1 and 8.5 are the simplest that make their points: two types and one signal; strikes, sightings and allies that act independently. In the dynamics with mutations, a population exactly at the tipping share counts as waiting, and when civilizations revise one at a time, a mistake plays the opposite action. A2 never enters the model at all, so its role in the conclusion is an informal reading. Throughout the main argument there are two civilizations. Each of these choices can be argued for or against, not proved.
 - **Whether B1–B5 are logically independent.** Each is shown to be used (`each_condition_used`), but whether informal conditions are independent of one another is not a formal question.
-- **The simulation.** Section 9 reports twelve runs per setting of a model that the theorems do not describe, since detection there is rarely mutual. It illustrates; it cannot prove.
+- **The simulation.** Section 9 reports twelve runs per setting of two models. In the reasoning one, civilizations apply Propositions 3 and 4, but the world, with one-sided detection, learned beliefs and growth, is not the one the theorems describe, and its settings are ours. Among them are the prior that almost no one strikes, a Beta(0.1, 20); the age of 100 steps at which a civilization counts as established; and the strike cost $K/M = 0.0005$, on which its preemption depends. It illustrates; it cannot prove.
 - **The analogies of Section 7.** The comparisons with Hobbes and with the Fermi paradox are interpretations.
 
 **Not proved here, though they could be:** the parts of the cited theorems beyond the classes checked above.
@@ -304,9 +304,9 @@ Lean checks that each theorem follows from its assumptions. It relies on Lean's 
 
 ## 9. A Simulation
 
-Under the replicator dynamics, the theorem's system-level clause is proved above. Figure 2 checks it in a richer universe, where detection takes time and is rarely mutual, and where nothing is decided by the theorem.
+Figure 2 runs two models of a small universe. In the first, behaviours are inherited and culled, which tests the theorem's system-level clause. In the second, civilizations decide by Propositions 3 and 4, which tests whether the behaviours the theory derives appear when civilizations reason as it says, in a world closer to the novel's.
 
-One hundred civilizations sit at fixed random positions on a torus. Each has two heritable traits: whether it broadcasts, and whether it strikes whatever it detects. A share $p$ is hostile and strikes whatever it detects regardless. A civilization within range can detect another only after light from it has had time to arrive, and then detects it with probability $\lambda_R$ per step if it broadcasts and $\lambda_H \ll \lambda_R$ if it hides. Strikes travel at light speed and succeed with probability $q$. A failed strike reveals the attacker to its target, which strikes back, and any strike exposes the attacker to everyone else with probability $e$. Civilizations also die of other causes, at a low rate. Dead slots are refilled by offspring of the survivors, drawn in proportion to one plus $B$ times their number of peaceful contacts, so contact pays; traits mutate at 2% per birth.
+**Selection.** One hundred civilizations live on a torus, each at a random position for its lifetime. Each has two heritable traits: whether it broadcasts, and whether it strikes whatever it detects. A share $p$ is hostile and strikes whatever it detects regardless. A civilization within range can detect another only after light from it has had time to arrive, and then detects it with probability $\lambda_R$ per step if it broadcasts and $\lambda_H \ll \lambda_R$ if it hides. Strikes travel at light speed and succeed with probability $q$. A failed strike reveals the attacker to its target, which strikes back, and any strike exposes the attacker to everyone else with probability $e$. Civilizations also die of other causes, at a low rate. Dead slots are refilled by offspring of the survivors, drawn in proportion to one plus $B$ times their number of peaceful contacts, so contact pays; traits mutate at 2% per birth. Two assumptions are built in: the population stays at one hundred, since every death is followed by a birth, and newcomers copy the strategies of survivors. This is selection acting on strategies, the reading of the replicator dynamics, not an account of how civilizations arise.
 
 Over twelve runs with fixed seeds for each setting, each of 3,000 steps:
 
@@ -314,10 +314,23 @@ Over twelve runs with fixed seeds for each setting, each of 3,000 steps:
 - **Striking spreads only in a hunting ground.** With the defaults it dies out, to at most 2% in every run, even though with $\pi = p = 0.1$ the strike success $q = 0.7 > (1-\pi)/2 = 0.45$ makes striking the risk-dominant response after *mutual* detection. In this universe detection is rarely mutual: striking what you find mostly kills civilizations that had not found you, and the failed strikes and exposures cost the striker more than the rare preempted threat saves. The game played here is therefore not the stag hunt that the replicator theorems describe, which is why the two disagree. Striking survives only when hostile civilizations are common, strikes almost always succeed, and strikes are invisible to others ($p = 0.3$, $q = 0.95$, $e = 0$). There it holds between 15% and 85% of non-hostile civilizations in eleven of twelve runs, and a majority in four.
 - **Without hostile civilizations, and with enough to gain from contact, the forest stays lit.** With $p = 0$ and $B \ge 1$, most civilizations keep broadcasting.
 
-The simulation leaves out most of what would matter at cosmic scale: technological explosion (capabilities are fixed), coalitions, movement, and learning within a lifetime. It is illustrative, not evidence about the universe. What it does show is that the theorem's two halves behave differently under selection too: silence emerges from local rules under weak conditions, while hunting needs the extra conditions the theorem names, and then some.
+While traits mutate, the state never settles, but its statistics do. Over 30,000 steps with four seeds, the defaults keep broadcasting at 0–1% and striking at 1–3% in every 3,000-step window, while in the hunting ground striking wanders between 17% and 79% from one window to the next. With mutation switched off there are absorbing states, reached within 3,000 steps: broadcasting always dies out, and in the hunting ground striking ends at all or nothing, all in one run of four and nothing in three, the bistability of the replicator theorems.
+
+**Reasoning.** Here civilizations arise independently, at random places and times, and only where no living civilization's territory already lies, so the finite universe of A2 sets how many there are. A newcomer is small, and hostile with probability $p$, a type no one else can see (B2). Capability grows on resources shared with overlapping neighbours, territory grows with it, and a larger civilization is easier to find, whether it hides or not. With a small probability per step, capability jumps fivefold (B4). Finding, strikes and exposure work as in the first model, with the same light delays (B3), but a strike succeeds more often the more capable the attacker is relative to its target (B5). Each civilization learns from what it sees: of the civilizations it has found and not struck itself, the share destroyed by a strike within a horizon, starting from the belief that almost no one strikes. It then decides by the post's formulas: it hides when Proposition 4 says so, and on finding another it strikes when Proposition 3 says so, extended to one-sided detection, unequal capability and exposure. Hostile civilizations strike whatever they find. The figure's source states the rules in full.
+
+Over twelve runs with fixed seeds for each setting, each of 3,000 steps:
+
+- **Silence is learned.** Established civilizations, those that have lived 100 steps, mostly hide: a median of 10% broadcast. Those that hide have seen strikes, with a median belief of 0.13 that a found civilization is destroyed, while those still broadcasting are still at their prior of 0.005. With beliefs frozen at the prior, every civilization broadcasts.
+- **Preemption follows the capability gap.** A non-hostile civilization strikes 68% of the civilizations it finds that are at least five times smaller, 60% of those two to five times smaller, 1% of its peers, and none that are larger: a median of 36% of all it finds. Peers wait, as in the first model, because striking an equal risks a return strike. The weak are struck because striking them costs almost nothing: success is nearly certain, and the return strike weak. So preemption does not need hostile civilizations; without any, the median is 37%. It needs strikes that cost the strong little, here $K/M = 0.0005$: at $K/M = 0.05$ it stops, at a median of 1%, which is the $K/(qM)$ term of Proposition 3 doing what it says. Technological explosion doubles it (a median of 18% without), visible strikes cut it (14% at $e = 0.6$), and learning adds to it (14% with beliefs frozen at the prior).
+- **Newcomers rarely survive.** They arrive broadcasting, since their prior says it is safe, and a median of 13% live 100 steps; most are found and struck before they have found anyone. About 20 civilizations are alive at a time.
+- **Without growth, the forest is quiet and peaceful.** With capabilities fixed and equal, a median of 1% of established civilizations broadcast, none strikes first, 87% of newcomers survive, and about 160 civilizations are alive.
+
+This universe settles in the same sense as the first: births and deaths never stop, but over 30,000 steps with four seeds the share of findings that end in a strike stays between 30% and 42% in every 3,000-step window, with about 20 civilizations alive; without growth, about 160, and silent.
+
+The two models agree on silence and differ on preemption. Under selection, striking what one finds rarely pays, because those found rarely know about the finder. With reasoning and growth it pays against the small, and the forest of the novel, in which the grown clear away the young, appears when capabilities differ and strikes are cheap for the strong, whether or not anyone is hostile. Neither model is the world the theorems describe: detection is rarely mutual, beliefs are learned rather than given, and in the second, capability grows. Both leave out coalitions, movement and cosmic scale, and the first also leaves out growth and technological explosion. They illustrate; they are not evidence about the universe.
 
 ![](fig-forest.png)
-_Fig 2: A small dark forest. Dots are civilizations: navy ones broadcast, grey ones hide, and a ring marks those that strike what they detect. Lines are strikes in flight. The chart tracks the share that broadcasts and the share of non-hostile civilizations that strike. The presets set the parameters for the cases in the text; the sliders change them. Rules are stated in Section 9; the numbers are illustrative, not data._
+_Fig 2: A small dark forest, in two modes. Dots are civilizations: navy ones broadcast, grey ones hide, and a ring marks hostile ones and those that strike (in the reasoning mode, those that have struck first). Faint discs are territories, lines are strikes in flight, and spreading rings are strikes that hit. In the selection mode the chart tracks the share that broadcasts and the share of non-hostile civilizations that strike; in the reasoning mode, the share of established civilizations that broadcast, the share of findings that end in a first strike, and the share of newcomers that live their first 100 steps. The presets set the parameters for the cases in the text; the sliders change them. The numbers are illustrative, not data._
 
 ## 10. Conclusion
 
@@ -335,7 +348,7 @@ Thus, the Dark Forest Theory is less a moral judgment that "all civilizations in
 
 *Note: The formalization in this article is a theoretical reconstruction of the novel's text, not Liu Cixin's own formulation. Cosmic sociology as a discipline does not actually exist; its "axioms" can be neither verified nor falsified. The Lean file checks the mathematics of the model, not whether the model describes any real universe.*
 
-*Revised on September 27, 2026. Proposition 2 previously claimed that the chain of suspicion drives threat to certainty whenever $\pi > 0$, which holds only for uniformly spread thresholds; its note on robustness had the effect of a large $M$ backwards. Section 4.2 derived $\gamma > 0$ from positive variance alone, which does not suffice. Proposition 3's utilities are now symmetric, Section 1 states when the additive utility represents A1's order, the main theorem separates silence from preemption, the formal claims, including the counterexamples of Proposition 0, equilibrium selection in the global game for every equilibrium and every smooth prior, long-run selection under the replicator dynamics and under mutations, and the cited theorems of Friedman, of Carlsson and van Damme, and of Kandori, Mailath and Rob for broad classes of games, are checked in Lean, Section 8.7 says what the proofs cannot settle, and Section 9 adds a simulation.*
+*Revised on September 27, 2026. Proposition 2 previously claimed that the chain of suspicion drives threat to certainty whenever $\pi > 0$, which holds only for uniformly spread thresholds; its note on robustness had the effect of a large $M$ backwards. Section 4.2 derived $\gamma > 0$ from positive variance alone, which does not suffice. Proposition 3's utilities are now symmetric, Section 1 states when the additive utility represents A1's order, the main theorem separates silence from preemption, the formal claims, including the counterexamples of Proposition 0, equilibrium selection in the global game for every equilibrium and every smooth prior, long-run selection under the replicator dynamics and under mutations, and the cited theorems of Friedman, of Carlsson and van Damme, and of Kandori, Mailath and Rob for broad classes of games, are checked in Lean, Section 8.7 says what the proofs cannot settle, and Section 9 adds a simulation in two modes, one in which behaviours are selected and one in which civilizations reason by the theory's own rules.*
 
 {{% /en %}}
 
@@ -621,7 +634,7 @@ Lean 检查的是每个定理都能从它的前提推出。它所依赖的是 Le
 - **一个定理说的，是否就是它旁边那句话说的。** Lean 检查的是形式化的命题，而不是它与文字是否相符。这种相符只能靠阅读附带文件里的命题来检查；对你在意的结论，值得亲自读一读。
 - **模型里内置的解读。** 把 $\gamma$ 算进打击概率，假设了一个有能力摧毁对方的文明也有意愿这样做（第 4.2 节）。A1 以加法效用的形式进入模型，并要求其他收益有界、$M$ 很大。全局博弈用的是按大 $M$ 归一化的收益，并允许 $q$ 取负值，好让等待在那里占优。命题 0 (b) 中的执行机制，被表示为额外的一份被摧毁的概率；(d) 中的重复博弈，用的是抽象的收益。第 8.1 节和第 8.5 节的模型，是足以说明问题的最简单的模型：两类文明和一种信号；打击、目击和盟友都彼此独立地起作用。在带突变的动态里，恰好处在临界比例上的种群算作等待；而在一次只有一个文明调整的动态里，一次失误就是采取相反的行动。A2 根本没有进入模型，所以它在结论中的作用只是一种非形式的解读。主论证里自始至终只有两个文明。这些选择都可以辩护或反驳，但无法证明。
 - **B1–B5 在逻辑上是否彼此独立。** 已经证明每个条件都用得上（`each_condition_used`），但非形式的条件是否彼此独立，不是一个形式问题。
-- **模拟。** 第 9 节报告的是每种设定下十二次运行的结果，而它的模型并不是定理所描述的那个，因为在那里发现很少是相互的。它只能说明，不能证明。
+- **模拟。** 第 9 节报告的是两种模型在每种设定下十二次运行的结果。在推理模型里，文明运用命题 3 和命题 4，但那个世界，有单方面的发现、学来的信念和增长，并不是定理所描述的世界，而且它的设定是我们选的。其中包括：几乎没有谁会打击的先验，即 Beta(0.1, 20)；一个文明算作已成形的年龄，100 步；以及打击成本 $K/M = 0.0005$，先发打击的结果依赖于它。它只能说明，不能证明。
 - **第 7 节的类比。** 与霍布斯和费米悖论的比较，都是解读。
 
 **这里没有证明、但原则上可以证明的：** 所引用的定理中，超出上面已验证的那些博弈类的部分。
@@ -632,9 +645,9 @@ Lean 检查的是每个定理都能从它的前提推出。它所依赖的是 Le
 
 ## 9. 一个模拟
 
-在复制者动态下，定理的系统层面那一条已经在上面得到了证明。图 2 在一个更丰富的宇宙里检验它：在那里，发现需要时间，而且很少是相互的；并且没有任何事情是由定理决定的。
+图 2 运行的是一个小宇宙的两种模型。在第一种里，行为可以遗传，并被淘汰，它检验的是定理在系统层面的那一条。在第二种里，文明按照命题 3 和命题 4 做决定，它检验的是：当文明像理论所说的那样推理时，在一个更接近小说的世界里，理论推出的那些行为会不会出现。
 
-一百个文明散布在一个环面（torus）上的随机位置，位置固定不动。每个文明有两个可遗传的性状：是否广播，以及是否打击自己发现的一切。比例为 $p$ 的文明是敌对的，不管性状如何，发现什么就打击什么。一个文明只有在另一个文明的光有时间抵达之后，才可能发现它；此后，对方若在广播，每一步被发现的概率是 $\lambda_R$，若在隐藏，则是远小于它的 $\lambda_H$。打击以光速飞行，成功的概率是 $q$。失败的打击会把攻击者暴露给目标，目标随即回击；任何一次打击，都会以概率 $e$ 把攻击者暴露给其他所有文明。文明也会以很低的概率死于别的原因。空出来的位置，由幸存者的后代填补，选中某个幸存者的机会，与“一加上 $B$ 乘以它的和平接触数”成正比，所以接触是有好处的；每次出生，性状有 2% 的概率突变。
+**选择。** 一百个文明生活在一个环面（torus）上，每个文明在一生之中都待在一个随机的位置上。每个文明有两个可遗传的性状：是否广播，以及是否打击自己发现的一切。比例为 $p$ 的文明是敌对的，不管性状如何，发现什么就打击什么。一个文明只有在另一个文明的光有时间抵达之后，才可能发现它；此后，对方若在广播，每一步被发现的概率是 $\lambda_R$，若在隐藏，则是远小于它的 $\lambda_H$。打击以光速飞行，成功的概率是 $q$。失败的打击会把攻击者暴露给目标，目标随即回击；任何一次打击，都会以概率 $e$ 把攻击者暴露给其他所有文明。文明也会以很低的概率死于别的原因。空出来的位置，由幸存者的后代填补，选中某个幸存者的机会，与“一加上 $B$ 乘以它的和平接触数”成正比，所以接触是有好处的；每次出生，性状有 2% 的概率突变。这里内置了两个假设：每一次死亡之后都跟着一次出生，所以总数始终是一百；新文明照搬幸存者的策略。这是作用在策略上的选择，也就是复制者动态的读法，而不是在讲文明如何诞生。
 
 每种设定用固定的随机种子各跑十二次，每次 3,000 步：
 
@@ -642,10 +655,23 @@ Lean 检查的是每个定理都能从它的前提推出。它所依赖的是 Le
 - **只有在猎场里，打击才会蔓延。** 在默认参数下，打击这个性状会消亡，每次都降到 2% 以下，尽管在 $\pi = p = 0.1$ 时，打击成功率 $q = 0.7 > (1-\pi)/2 = 0.45$ 意味着在*相互*定位之后，打击是风险占优的回应。在这个宇宙里，定位很少是相互的：见什么打什么，杀掉的大多是还没发现自己的文明，而失败的打击和暴露给攻击者带来的代价，超过了偶尔先下手除掉一个威胁所省下的。所以，这里玩的并不是复制者定理所描述的那场猎鹿博弈，这正是两者结论不同的原因。只有当敌对文明很多、打击几乎必定成功、并且打击不会被别人看见时（$p = 0.3$，$q = 0.95$，$e = 0$），打击才能存活下来：十二次运行里有十一次，它占到非敌对文明的 15% 到 85%，其中四次过半。
 - **没有敌对文明、而接触又足够有利时，森林会一直亮着。** 当 $p = 0$、$B \ge 1$ 时，大多数文明会一直广播下去。
 
-这个模拟省略了宇宙尺度上大部分要紧的东西：技术爆炸（能力是固定的）、联盟、移动，以及一生之内的学习。它只是示意，不是关于宇宙的证据。它能说明的是：定理的两半，在选择之下也表现得不一样。沉默会在很弱的条件下，从局部规则里自己长出来；而狩猎需要定理列出的那些额外条件，甚至还不止这些。
+只要性状还会突变，状态就永远不会停下来，但它的统计会稳定下来。用四个种子各跑 30,000 步，在默认参数下，每个 3,000 步的窗口里，广播都保持在 0–1%，打击保持在 1–3%；而在猎场里，打击在相邻的窗口之间游荡于 17% 和 79% 之间。关掉突变，就出现了吸收态，而且在 3,000 步以内就会到达：广播总会消失；在猎场里，打击最后要么全有、要么全无，四次运行里一次全有、三次全无，这正是复制者定理所说的双稳态。
+
+**推理。** 在这里，文明在随机的时间、随机的地点各自独立地诞生，而且只在没有任何活着的文明占据的地方诞生，所以 A2 所说的有限宇宙决定了文明的数目。新文明很小，以概率 $p$ 是敌对的，而这种类型别人看不见（B2）。能力依靠与相邻文明共享的资源增长，领地随之扩大；越大的文明越容易被发现，不管它隐藏与否。每一步都有一个很小的概率，让能力一下子增长到五倍（B4）。发现、打击和暴露的规则与第一种模型相同，光的延迟也相同（B3），只是攻击者相对于目标的能力越强，打击就越容易成功（B5）。每个文明都从自己看到的东西中学习：在它发现、而不是由它自己打击的那些文明中，有多大比例在一段时间之内被打击摧毁；起初，它相信几乎没有谁会打击。然后，它按本文的公式做决定：命题 4 说该隐藏时就隐藏；发现另一个文明时，命题 3 说该打击时就打击，这里把命题 3 推广到了单方面发现、能力不等以及暴露的情形。敌对文明发现什么就打击什么。完整的规则写在这张图的源代码里。
+
+每种设定用固定的随机种子各跑十二次，每次 3,000 步：
+
+- **沉默是学来的。** 已成形的文明，也就是活过了 100 步的文明，大多在隐藏：广播的比例中位数是 10%。隐藏的那些都见过打击，它们认为一个被发现的文明会被摧毁的信念，中位数是 0.13；还在广播的那些，信念仍停留在 0.005 的先验上。把信念冻结在先验上，所有文明都会广播。
+- **先发打击跟着能力差距走。** 一个非敌对文明，对自己发现的、比自己小五倍以上的文明，有 68% 会打击；对小二到五倍的，有 60%；对势均力敌的，只有 1%；对比自己大的，一个也不打击。在它发现的全部文明中，打击的比例中位数是 36%。势均力敌的双方会等待，这与第一种模型相同，因为打击一个同等的对手，要冒遭到回击的风险。弱者会被打击，是因为打击它们几乎没有代价：成功几乎是必然的，回击也很弱。所以，先发打击并不需要敌对文明；没有任何敌对文明时，中位数是 37%。它需要的是：打击对强者来说代价很小，这里 $K/M = 0.0005$；当 $K/M = 0.05$ 时，先发打击就停止了，中位数是 1%，这正是命题 3 中 $K/(qM)$ 那一项在起作用。技术爆炸让它翻了一倍（没有爆炸时中位数是 18%），可见的打击会压低它（$e = 0.6$ 时是 14%），学习也会推高它（信念冻结在先验上时是 14%）。
+- **新文明很少活下来。** 它们一诞生就在广播，因为先验告诉它们这样是安全的；活过 100 步的比例中位数只有 13%，大多数在发现任何别的文明之前，就已经被发现、被打击了。同一时间活着的文明大约有 20 个。
+- **没有增长时，森林安静而和平。** 当能力固定且相等时，已成形文明中广播的比例中位数是 1%，没有谁先发打击，87% 的新文明活了下来，同时活着的文明大约有 160 个。
+
+这个宇宙也会稳定下来，意义与第一种相同：出生和死亡永不停止，但用四个种子各跑 30,000 步，每个 3,000 步的窗口里，以打击告终的发现所占的比例都保持在 30% 到 42% 之间，同时活着的文明大约有 20 个；没有增长时，大约有 160 个，而且一片沉默。
+
+两种模型在沉默上一致，在先发打击上不同。在选择之下，见什么打什么很少划算，因为被发现的一方很少知道发现者的存在。有了推理和增长，打击弱小就是划算的；小说里那种成长起来的文明清除年轻文明的森林，只要能力有差距、打击对强者又很便宜，就会出现，不管有没有谁是敌对的。两种模型都不是定理所描述的那个世界：发现很少是相互的，信念是学来的而不是给定的，而在第二种模型里，能力还会增长。两种模型都省略了联盟、移动和宇宙尺度，第一种还省略了增长和技术爆炸。它们只是示意，不是关于宇宙的证据。
 
 ![](fig-forest.png)
-_图 2：一片小小的黑暗森林。每个点是一个文明：深蓝色的在广播，灰色的在隐藏，外圈标记的是会打击自己所发现文明的那些。线条是正在飞行的打击。右边的图记录广播文明的比例，以及非敌对文明中会打击者的比例。预设对应正文里的几种情形，滑块可以改变参数。规则见第 9 节；数字只是示意，并非数据。_
+_图 2：一片小小的黑暗森林，两种模式。每个点是一个文明：深蓝色的在广播，灰色的在隐藏；外圈标记的是敌对文明，以及会打击的文明（在推理模式里，是先发打击过的文明）。淡色的圆盘是领地，线条是正在飞行的打击，扩散的圆环是命中的打击。在选择模式里，右边的图记录广播文明的比例，以及非敌对文明中会打击者的比例；在推理模式里，记录已成形文明中广播的比例、以先发打击告终的发现所占的比例，以及活过最初 100 步的新文明的比例。预设对应正文里的几种情形，滑块可以改变参数。数字只是示意，并非数据。_
 
 ## 10. 结论
 
@@ -663,7 +689,7 @@ _图 2：一片小小的黑暗森林。每个点是一个文明：深蓝色的�
 
 *附注：本文中的形式化是对小说文本的理论重构，并非刘慈欣本人的表述。宇宙社会学作为一个学科本身并不存在，其“公理”的真实性无法被验证或证伪。Lean 文件验证的是这个模型的数学，而不是这个模型是否描述了某个真实的宇宙。*
 
-*2026 年 9 月 27 日修订。命题 2 原先声称，只要 $\pi > 0$，猜疑链就会把威胁推到确定无疑，这只在门槛均匀分布时成立；它关于稳健性的说明，还把巨大 $M$ 的作用方向说反了。第 4.2 节原先仅凭正方差就推出 $\gamma > 0$，这并不充分。命题 3 的效用已改为对称的形式，第 1 节说明了加法效用在什么条件下能表示 A1 的偏好，主定理把沉默和先发制人分开，形式化的结论用 Lean 做了验证，包括命题 0 的反例、全局博弈中的均衡选择（适用于每一个均衡和每一个光滑先验）、复制者动态和突变之下的长期选择，以及所引用的 Friedman、Carlsson 和 van Damme、Kandori、Mailath 和 Rob 的定理在一大类博弈上的版本，第 8.7 节说明了证明无法解决的问题，第 9 节增加了一个模拟。*
+*2026 年 9 月 27 日修订。命题 2 原先声称，只要 $\pi > 0$，猜疑链就会把威胁推到确定无疑，这只在门槛均匀分布时成立；它关于稳健性的说明，还把巨大 $M$ 的作用方向说反了。第 4.2 节原先仅凭正方差就推出 $\gamma > 0$，这并不充分。命题 3 的效用已改为对称的形式，第 1 节说明了加法效用在什么条件下能表示 A1 的偏好，主定理把沉默和先发制人分开，形式化的结论用 Lean 做了验证，包括命题 0 的反例、全局博弈中的均衡选择（适用于每一个均衡和每一个光滑先验）、复制者动态和突变之下的长期选择，以及所引用的 Friedman、Carlsson 和 van Damme、Kandori、Mailath 和 Rob 的定理在一大类博弈上的版本，第 8.7 节说明了证明无法解决的问题，第 9 节增加了一个有两种模式的模拟：一种里行为被选择，另一种里文明按理论自己的规则推理。*
 
 {{% /zh %}}
 
