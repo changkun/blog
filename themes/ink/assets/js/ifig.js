@@ -45,6 +45,39 @@
     return t;
   }
 
+  // Text width for wrapping labels, measured the way the page sets them.
+  // Chinese wraps between characters, other text between words.
+  var measure = document.createElement('canvas').getContext('2d');
+  function wrap(text, font, max) {
+    measure.font = font;
+    var cjk = /[\u3000-\u9fff]/.test(text);
+    var parts = cjk ? Array.from(text) : text.split(' ');
+    var lines = [], line = '';
+    parts.forEach(function (p) {
+      var next = line ? line + (cjk ? '' : ' ') + p : p;
+      if (measure.measureText(next).width > max && line) { lines.push(line); line = p; }
+      else line = next;
+    });
+    if (line) lines.push(line);
+    return lines;
+  }
+
+  // The page's sans font, for measuring text the way it is drawn.
+  function sans() { return getComputedStyle(document.body).fontFamily; }
+
+  // A line with an open arrowhead at (x2, y2), in the current text color.
+  function arrow(parent, x1, y1, x2, y2) {
+    var g = svg('g', {}, parent);
+    svg('line', { x1: x1, y1: y1, x2: x2, y2: y2, stroke: 'currentColor', 'stroke-width': 1.4 }, g);
+    var a = Math.atan2(y2 - y1, x2 - x1), s = 6;
+    svg('path', {
+      d: 'M' + (x2 - s * Math.cos(a - 0.45)) + ',' + (y2 - s * Math.sin(a - 0.45)) + ' L' + x2 + ',' + y2 +
+         ' L' + (x2 - s * Math.cos(a + 0.45)) + ',' + (y2 - s * Math.sin(a + 0.45)),
+      fill: 'none', stroke: 'currentColor', 'stroke-width': 1.4, 'stroke-linejoin': 'round'
+    }, g);
+    return g;
+  }
+
   function langOf(node) {
     var block = node.closest('.lang-en, .lang-zh');
     return block && block.classList.contains('lang-zh') ? 'zh' : 'en';
@@ -147,7 +180,8 @@
 
   window.ifig = {
     register: function (file, build) { registry[file] = build; },
-    el: el, svg: svg, sub: sub, button: button, slider: slider, player: player, loop: loop, reduced: reduced
+    el: el, svg: svg, sub: sub, wrap: wrap, sans: sans, arrow: arrow,
+    button: button, slider: slider, player: player, loop: loop, reduced: reduced
   };
 
   // The kit and the post's figure script both load deferred, and deferred

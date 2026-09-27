@@ -10,36 +10,9 @@
   'use strict';
   var F = window.ifig;
   if (!F) return;
-  var svg = F.svg, sub = F.sub, el = F.el;
+  var svg = F.svg, sub = F.sub, el = F.el, wrap = F.wrap, arrow = F.arrow;
+  var SANS = F.sans();
 
-  // Text width for wrapping labels, measured the way the page sets them.
-  var measure = document.createElement('canvas').getContext('2d');
-  function wrap(text, font, max) {
-    measure.font = font;
-    var cjk = /[　-鿿]/.test(text);
-    var parts = cjk ? Array.from(text) : text.split(' ');
-    var lines = [], line = '';
-    parts.forEach(function (p) {
-      var next = line ? line + (cjk ? '' : ' ') + p : p;
-      if (measure.measureText(next).width > max && line) { lines.push(line); line = p; }
-      else line = next;
-    });
-    if (line) lines.push(line);
-    return lines;
-  }
-  var SANS = getComputedStyle(document.body).fontFamily;
-
-  function arrow(parent, x1, y1, x2, y2) {
-    var g = svg('g', {}, parent);
-    svg('line', { x1: x1, y1: y1, x2: x2, y2: y2, stroke: 'currentColor', 'stroke-width': 1.4 }, g);
-    var a = Math.atan2(y2 - y1, x2 - x1), s = 6;
-    svg('path', {
-      d: 'M' + (x2 - s * Math.cos(a - 0.45)) + ',' + (y2 - s * Math.sin(a - 0.45)) + ' L' + x2 + ',' + y2 +
-         ' L' + (x2 - s * Math.cos(a + 0.45)) + ',' + (y2 - s * Math.sin(a + 0.45)),
-      fill: 'none', stroke: 'currentColor', 'stroke-width': 1.4, 'stroke-linejoin': 'round'
-    }, g);
-    return g;
-  }
   function styled(node, css) { node.setAttribute('style', css); return node; }
 
   // ------------------------------------------------------------------
