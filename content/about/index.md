@@ -11,7 +11,7 @@ date: 2013-03-23 18:54:55
 
 - Founder of [Latere AI](https://latere.ai), building AI infrastructure with human intelligence in the loop. Previously at Sixt SE (2022–2026), from 2025 as a Staff Engineer, leading AI transformation initiatives across enterprise AI platforms.
 - Research: intelligent human-in-the-loop systems, and most recently trust calibration for agentic AI. See [research](https://changkun.de/research).
-- Writing: *AI as an Infrastructure* and *An Unverifiable World*; *Go: Under the Hood* and the *Modern C++ Tutorial* remain online. See [books](https://changkun.de/books/).
+- Writing: *AI as an Infrastructure*, *An Unverifiable World*, and *Bayesian Optimization: From First Principles to Human Preferences*; *Go: Under the Hood* and the *Modern C++ Tutorial* remain online. See [books](https://changkun.de/books/).
 - Open source for over a decade: open books, Go packages, and contributions to the Go project itself. See [GitHub](https://github.com/changkun).
 - Still living in Munich.
 
@@ -79,7 +79,7 @@ A: I live in Munich and work as a research assistant and Ph.D. student at LMU M�
 
 - [Latere AI](https://latere.ai) 创始人，构建让人类智慧始终在回路中的 AI 基础设施。曾就职于 Sixt SE（2022–2026），2025 年起任首席工程师，主导企业 AI 平台的 AI 转型。
 - 研究：人在回路的智能系统，近期关注智能体 AI 的信任校准。见[研究主页](https://changkun.de/research)。
-- 写作：《AI 基建：从系统到智能体》与《在无法验证的世界里》；《Go 语言原本》与《现代 C++ 教程》仍在线。见[书籍](https://changkun.de/books/)。
+- 写作：《AI 基建：从系统到智能体》《在无法验证的世界里》与《贝叶斯优化：从基本原理到人类偏好》；《Go 语言原本》与《现代 C++ 教程》仍在线。见[书籍](https://changkun.de/books/)。
 - 十余年来持续参与开源：开放书籍、Go 软件包，以及为 Go 项目本身贡献代码。见 [GitHub](https://github.com/changkun)。
 - 仍居住在慕尼黑。
 
