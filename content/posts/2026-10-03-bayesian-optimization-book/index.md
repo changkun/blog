@@ -1,5 +1,5 @@
 ---
-date: 2026-10-03T10:00:00+02:00
+date: 2026-10-03T09:00:00+02:00
 toc: false
 id:
 slug: /posts/bayesian-optimization-book
