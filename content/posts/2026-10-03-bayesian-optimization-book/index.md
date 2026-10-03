@@ -12,7 +12,7 @@ title: "I Wrote a Book on Bayesian Optimization"
 title_zh: "我写了一本关于贝叶斯优化的书"
 ---
 {{% en %}}
-I wrote a book: [*Bayesian Optimization: From First Principles to Human Preferences*](https://changkun.de/bobook/en/). There is also a [Chinese edition](https://changkun.de/bobook/zh/).
+I wrote a book: [*Bayesian Optimization: From First Principles to Human Preferences*](https://changkun.de/bobook/en/).
 
 It started with a practical question. Some things can only be judged by a person: whether a photo looks right, whether a design feels good, whether an exoskeleton is comfortable to walk in. To tune something like that, there is no formula to optimize. You can only ask the person, and every question costs them time and patience. So how do you find a good setting with as few questions as possible?
 
@@ -26,7 +26,7 @@ Most figures in the book can be played with. You drag points around, step throug
 {{% /en %}}
 
 {{% zh %}}
-我写了一本书：[《贝叶斯优化：从基本原理到人类偏好》](https://changkun.de/bobook/zh/)，另有[英文版](https://changkun.de/bobook/en/)。
+我写了一本书：[《贝叶斯优化：从基本原理到人类偏好》](https://changkun.de/bobook/zh/)。
 
 起因是一个很实际的问题。有些东西只能靠人来判断：一张照片调得对不对，一个设计看着舒不舒服，一副外骨骼穿着走路顺不顺。想把这样的东西调好，没有公式可以拿来优化，只能去问人，而每问一次，都要花掉对方的时间和耐心。那么，怎样用尽可能少的提问，找到一个好的设置？
 
