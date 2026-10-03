@@ -8,8 +8,8 @@ tags:
     - 随笔
     - 研究
     - 贝叶斯优化
-title: "I Wrote a Book on Bayesian Optimization"
-title_zh: "我写了一本关于贝叶斯优化的书"
+title: "A Book on Bayesian Optimization"
+title_zh: "一本关于贝叶斯优化的书"
 ---
 {{% en %}}
 I wrote a book: [*Bayesian Optimization: From First Principles to Human Preferences*](https://changkun.de/bobook/en/).
