@@ -8,29 +8,33 @@ tags:
     - 随笔
     - 研究
     - 贝叶斯优化
-title: "A Book on Bayesian Optimization and Human Preferences"
-title_zh: "一本关于贝叶斯优化与人类偏好的书"
+title: "I Wrote a Book on Bayesian Optimization"
+title_zh: "我写了一本关于贝叶斯优化的书"
 ---
 {{% en %}}
-I have written an interactive book, [*Bayesian Optimization: From First Principles to Human Preferences*](https://changkun.de/bobook/). It is free to read online, in [English](https://changkun.de/bobook/en/) and in [Chinese](https://changkun.de/bobook/zh/).
+I wrote a book: [*Bayesian Optimization: From First Principles to Human Preferences*](https://changkun.de/bobook/). It is free to read online, in [English](https://changkun.de/bobook/en/) and in [Chinese](https://changkun.de/bobook/zh/).
 
-Some functions are expensive to evaluate and impossible to write down: the accuracy of a model after a day of training, the comfort of an exoskeleton after a minute of walking, the look of a design that only a person can judge. Bayesian optimization finds good inputs for such functions with few evaluations. When the only measurement is a person choosing between two options, the same idea becomes preferential Bayesian optimization, and the person becomes part of the system being studied.
+It started with a practical question. Some things can only be judged by a person: whether a photo looks right, whether a design feels good, whether an exoskeleton is comfortable to walk in. To tune something like that, there is no formula to optimize. You can only ask the person, and every question costs them time and patience. So how do you find a good setting with as few questions as possible?
 
-The book starts from the probability and linear algebra a software engineer may not have used since school, builds Gaussian processes and the optimization loop on top, and extends them to learning from comparisons. Four case studies work real problems end to end: a classifier, a chemical reaction, an exoskeleton, and a photograph you enhance yourself. The second half follows the research through 2026: what has been proved, what happened when these methods met real people, and what psychology, economics, neuroscience, and philosophy say about whether a preference is there to be found.
+There is a well-developed answer, called Bayesian optimization. It keeps a running guess about every setting it has not tried yet, and uses that guess to decide what to try next. When all a person can tell you is "this one, not that one", the same idea still works; it just learns from comparisons instead of scores.
 
-Its argument is that the algorithms are now mature, and the hard part has moved to measurement: what a single comparison measures, and what asking does to the person who answers.
+Using it with real people left me with a doubt, though. The method assumes the person already has a preference, fixed and waiting to be found. The people in front of it did not always behave as if they had one.
 
-Most figures can be changed. You place observations and watch a Gaussian process respond, step an optimizer through its decisions, and in several places you are the person being optimized.
+So the book has two halves. The first half builds the method from scratch, starting with the probability and linear algebra you may have forgotten since school, until you could write it yourself. The second half follows the research up to 2026: what has been proved, how it went with real people, and what psychology, economics, neuroscience, and philosophy have to say about what a preference is. Where I ended up: the algorithms are in good shape now. The hard part is the measurement, knowing what one comparison actually tells you, and what asking does to the person who answers.
+
+Most figures in the book can be played with. You drag points around, step through the algorithm one decision at a time, and in a few of them, you are the one being optimized.
 {{% /en %}}
 
 {{% zh %}}
-我写了一本交互式的书：[《贝叶斯优化：从基本原理到人类偏好》](https://changkun.de/bobook/zh/)，可在线免费阅读，有[中文版](https://changkun.de/bobook/zh/)和[英文版](https://changkun.de/bobook/en/)。
+我写了一本书：[《贝叶斯优化：从基本原理到人类偏好》](https://changkun.de/bobook/zh/)，可以免费在线阅读，有[中文版](https://changkun.de/bobook/zh/)和[英文版](https://changkun.de/bobook/en/)。
 
-有些函数评估代价高昂，又无法写出解析式：模型训练一整天后的准确率、穿戴外骨骼行走一分钟后的舒适度、只能由人判断的设计美观程度，都属此类。贝叶斯优化能以很少的评估次数为这类函数找到好的输入。当唯一的测量手段是由人在两个选项中做出取舍时，同样的思路便成为偏好贝叶斯优化，而做出取舍的人本身也成为被研究系统的一部分。
+起因是一个很实际的问题。有些东西只能靠人来判断：一张照片调得对不对，一个设计看着舒不舒服，一副外骨骼穿着走路顺不顺。想把这样的东西调好，没有公式可以拿来优化，只能去问人，而每问一次，都要花掉对方的时间和耐心。那么，怎样用尽可能少的提问，找到一个好的设置？
 
-本书从基础讲起，不假定读者还记得学校里的概率论与线性代数；在此之上依次讲解高斯过程、优化循环和基于比较的学习，并通过四个案例完整演示这些方法：分类器调参、化学反应优化、外骨骼调节，以及由读者亲自参与的照片增强。后半部分梳理截至 2026 年的研究：哪些结论已得到证明，这些方法用于真人时效果如何，以及心理学、经济学、神经科学与哲学如何看待偏好是否预先存在、有待发现。
+这个问题有一个相当成熟的答案，叫贝叶斯优化。它对每个还没试过的设置都保留一个估计，再用这个估计决定下一步试什么。如果人能告诉你的只有“这个比那个好”，同样的思路照样适用，只不过改成从比较里学习。
 
-全书的核心论点是：算法已趋成熟，难点已转向测量，即一次比较究竟测量了什么，以及提问本身如何影响回答者。
+可真拿它在人身上用过之后，我心里多了一个疑问。这套方法默认人心里早就有一个固定的偏好，只等着被找出来；可坐在它面前的人，并不总是这样。
 
-书中大部分图都可以交互：读者可以添加观测，观察高斯过程如何响应，逐步执行优化过程；在部分图中，读者本人就是被优化的对象。
+所以这本书分成两半。前一半从头把这套方法讲清楚，从上学时学过、可能早就忘了的概率论和线性代数讲起，一直讲到读者自己能把它写出来。后一半跟着研究走到 2026 年：哪些已经被证明了，用在真人身上效果如何，以及心理学、经济学、神经科学和哲学怎么看“偏好”这件事。我最后的看法是：算法本身已经相当成熟，难的是测量，也就是一次比较到底告诉了我们什么，提问本身又会怎样影响回答的人。
+
+书里大部分图都可以动手试：拖动数据点，一步一步看算法怎么做决定；有几张图里，被优化的就是你自己。
 {{% /zh %}}
