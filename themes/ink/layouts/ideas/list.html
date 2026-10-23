@@ -212,24 +212,42 @@ function toggleAugmented(btn) {
 <div id="compose-overlay" class="compose-overlay"></div>
 <div id="compose-window" class="compose-window" role="dialog" aria-modal="true" aria-labelledby="compose-heading">
   <div class="compose-header">
-    <span id="compose-heading" class="compose-heading"><span class="lang-en">New Idea</span><span class="lang-zh">新想法</span></span>
+    <div id="compose-heading" class="compose-heading"><time id="compose-date" class="compose-date"></time><span class="lang-en">New idea</span><span class="lang-zh">新想法</span></div>
+    <div class="compose-modes" role="group">
+      <button class="compose-mode" type="button" data-mode="write" aria-pressed="true"><span class="lang-en">Write</span><span class="lang-zh">编辑</span></button>
+      <button class="compose-mode" type="button" data-mode="preview" aria-pressed="false"><span class="lang-en">Preview</span><span class="lang-zh">预览</span></button>
+    </div>
     <button id="compose-expand" class="compose-icon compose-expand" type="button"><svg class="compose-expand-max" aria-hidden="true"><use href="#i-maximize"/></svg><svg class="compose-expand-min" aria-hidden="true"><use href="#i-minimize"/></svg></button>
     <button id="compose-close" class="compose-icon" type="button"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
   </div>
   <div class="compose-body">
-    <input type="text" id="compose-title" class="compose-title" placeholder="" autocomplete="off" />
-    <div class="compose-editor">
-      <div class="compose-gutter" aria-hidden="true"><div class="compose-lines" id="compose-lines"></div></div>
-      <div class="compose-editor-area">
-        <div class="compose-highlight" id="compose-highlight" aria-hidden="true"></div>
-        <textarea id="compose-content" class="compose-content" placeholder="" spellcheck="false"></textarea>
-      </div>
+    <div class="compose-write">
+      <textarea id="compose-title" class="compose-title" rows="1" placeholder="" autocomplete="off"></textarea>
+      <textarea id="compose-content" class="compose-content" placeholder=""></textarea>
+    </div>
+    <div class="compose-preview">
+      <h2 id="compose-preview-title" class="idea-title"></h2>
+      <div id="compose-preview-body" class="idea-body prose post-body"></div>
     </div>
   </div>
   <div class="compose-footer">
-    <span id="compose-status" class="compose-status" role="status"></span>
-    <span class="compose-hint"><span class="lang-en">Markdown · <kbd class="compose-kbd"></kbd> to send</span><span class="lang-zh">支持 Markdown · <kbd class="compose-kbd"></kbd> 发送</span></span>
-    <button id="compose-send" class="compose-send" type="button"><span class="lang-en">Send</span><span class="lang-zh">发送</span></button>
+    <div class="compose-tools" role="toolbar">
+      <button class="compose-icon" type="button" data-tool="bold"><svg aria-hidden="true"><use href="#i-bold"/></svg></button>
+      <button class="compose-icon" type="button" data-tool="italic"><svg aria-hidden="true"><use href="#i-italic"/></svg></button>
+      <span class="compose-tools-sep"></span>
+      <button class="compose-icon" type="button" data-tool="heading"><svg aria-hidden="true"><use href="#i-heading"/></svg></button>
+      <button class="compose-icon" type="button" data-tool="quote"><svg aria-hidden="true"><use href="#i-quote"/></svg></button>
+      <button class="compose-icon" type="button" data-tool="list"><svg aria-hidden="true"><use href="#i-list"/></svg></button>
+      <button class="compose-icon" type="button" data-tool="ordered"><svg aria-hidden="true"><use href="#i-list-ordered"/></svg></button>
+      <span class="compose-tools-sep"></span>
+      <button class="compose-icon" type="button" data-tool="code"><svg aria-hidden="true"><use href="#i-code"/></svg></button>
+      <button class="compose-icon" type="button" data-tool="link"><svg aria-hidden="true"><use href="#i-link"/></svg></button>
+    </div>
+    <div class="compose-meta">
+      <span id="compose-status" class="compose-status" role="status"></span>
+      <span id="compose-count" class="compose-count"></span>
+    </div>
+    <button id="compose-send" class="compose-send" type="button"><span class="lang-en">Post</span><span class="lang-zh">发布</span></button>
   </div>
 </div>
 
