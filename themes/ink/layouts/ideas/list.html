@@ -210,15 +210,16 @@ function toggleAugmented(btn) {
 </script>
 
 <div id="compose-overlay" class="compose-overlay"></div>
-<div id="compose-window" class="compose-window">
+<div id="compose-window" class="compose-window" role="dialog" aria-modal="true" aria-labelledby="compose-heading">
   <div class="compose-header">
-    <span><span class="lang-en">New Idea</span><span class="lang-zh">新想法</span></span>
-    <button id="compose-close" class="compose-close">&times;</button>
+    <span id="compose-heading" class="compose-heading"><span class="lang-en">New Idea</span><span class="lang-zh">新想法</span></span>
+    <button id="compose-expand" class="compose-icon compose-expand" type="button"><svg class="compose-expand-max" aria-hidden="true"><use href="#i-maximize"/></svg><svg class="compose-expand-min" aria-hidden="true"><use href="#i-minimize"/></svg></button>
+    <button id="compose-close" class="compose-icon" type="button"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
   </div>
   <div class="compose-body">
     <input type="text" id="compose-title" class="compose-title" placeholder="" autocomplete="off" />
     <div class="compose-editor">
-      <div class="compose-lines" id="compose-lines" aria-hidden="true"></div>
+      <div class="compose-gutter" aria-hidden="true"><div class="compose-lines" id="compose-lines"></div></div>
       <div class="compose-editor-area">
         <div class="compose-highlight" id="compose-highlight" aria-hidden="true"></div>
         <textarea id="compose-content" class="compose-content" placeholder="" spellcheck="false"></textarea>
@@ -226,8 +227,9 @@ function toggleAugmented(btn) {
     </div>
   </div>
   <div class="compose-footer">
-    <span id="compose-status" class="compose-status"></span>
-    <button id="compose-send" class="compose-send"><span class="lang-en">Send</span><span class="lang-zh">发送</span></button>
+    <span id="compose-status" class="compose-status" role="status"></span>
+    <span class="compose-hint"><span class="lang-en">Markdown · <kbd class="compose-kbd"></kbd> to send</span><span class="lang-zh">支持 Markdown · <kbd class="compose-kbd"></kbd> 发送</span></span>
+    <button id="compose-send" class="compose-send" type="button"><span class="lang-en">Send</span><span class="lang-zh">发送</span></button>
   </div>
 </div>
 

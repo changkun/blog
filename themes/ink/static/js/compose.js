@@ -4,6 +4,7 @@
   var overlay = document.getElementById('compose-overlay');
   var win = document.getElementById('compose-window');
   var closeBtn = document.getElementById('compose-close');
+  var expandBtn = document.getElementById('compose-expand');
   var titleInput = document.getElementById('compose-title');
   var contentInput = document.getElementById('compose-content');
   var linesEl = document.getElementById('compose-lines');
@@ -32,21 +33,21 @@
   titleInput.addEventListener('input', saveDraft);
   contentInput.addEventListener('input', function() {
     saveDraft();
-    updateLines();
     updateHighlight();
   });
 
-  // Line numbers.
+  // Line numbers: each is as tall as its line in the highlight, which wraps
+  // as the textarea does, so a number stays beside the start of its line.
+  // The gutter is hidden on phones, where there is nothing to measure.
   function updateLines() {
-    var lines = contentInput.value.split('\n');
-    var count = Math.max(lines.length, 1);
+    if (!linesEl.offsetWidth) return;
+    var rows = highlightEl.children;
     var html = '';
-    for (var i = 1; i <= count; i++) {
-      html += '<span>' + i + '</span>';
+    for (var i = 0; i < rows.length; i++) {
+      html += '<span style="height:' + rows[i].getBoundingClientRect().height + 'px">' + (i + 1) + '</span>';
     }
     linesEl.innerHTML = html;
   }
-  updateLines();
 
   // Markdown syntax highlighting.
   function escapeHtml(str) {
@@ -110,7 +111,10 @@
       result.push(highlightInline(line));
     }
 
-    return result.join('\n');
+    // One block per line, so the gutter can measure how far each wraps.
+    return result.map(function(line) {
+      return '<div>' + (line || '<br>') + '</div>';
+    }).join('');
   }
 
   function highlightInline(text) {
@@ -203,25 +207,77 @@
     return tokens.join('');
   }
 
+  // The highlight takes the textarea's inner width, which a scrollbar
+  // narrows, so both wrap at the same column.
   function updateHighlight() {
-    highlightEl.innerHTML = highlightMarkdown(contentInput.value) + '\n';
+    highlightEl.style.width = contentInput.clientWidth + 'px';
+    highlightEl.innerHTML = highlightMarkdown(contentInput.value);
+    updateLines();
   }
-  updateHighlight();
 
   // Sync scroll between textarea, line numbers, and highlight overlay.
   contentInput.addEventListener('scroll', function() {
-    linesEl.scrollTop = contentInput.scrollTop;
-    highlightEl.style.transform = 'translateY(-' + contentInput.scrollTop + 'px)';
+    var shift = 'translateY(-' + contentInput.scrollTop + 'px)';
+    linesEl.style.transform = shift;
+    highlightEl.style.transform = shift;
   });
 
-  // Bilingual placeholders.
-  function updatePlaceholders() {
+  // Wrapping changes with the window's size: on expand, and on a phone
+  // when the keyboard comes and goes.
+  if (typeof ResizeObserver !== 'undefined') {
+    new ResizeObserver(function() {
+      if (win.style.display === 'flex') updateHighlight();
+    }).observe(contentInput);
+  }
+
+  // Expand: the window grows to nearly the whole screen, and stays so the
+  // next time it opens.
+  var EXPAND_KEY = 'compose-expanded';
+  var expanded = false;
+  try { expanded = localStorage.getItem(EXPAND_KEY) === '1'; } catch(e) {}
+  win.classList.toggle('expanded', expanded);
+
+  expandBtn.addEventListener('click', function() {
+    expanded = !expanded;
+    win.classList.toggle('expanded', expanded);
+    try { localStorage.setItem(EXPAND_KEY, expanded ? '1' : ''); } catch(e) {}
+    updateLabels();
+    contentInput.focus();
+  });
+
+  // On phones the window is a full sheet over the visual viewport, which
+  // the on-screen keyboard shrinks; the stylesheet reads these two values.
+  function fitViewport() {
+    var vv = window.visualViewport;
+    if (!vv) return;
+    win.style.setProperty('--compose-top', vv.offsetTop + 'px');
+    win.style.setProperty('--compose-height', vv.height + 'px');
+  }
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', fitViewport);
+    window.visualViewport.addEventListener('scroll', fitViewport);
+  }
+
+  // The send shortcut, as this platform writes it.
+  var mac = /Mac|iPhone|iPad/.test(navigator.platform);
+  var kbds = win.querySelectorAll('.compose-kbd');
+  for (var k = 0; k < kbds.length; k++) {
+    kbds[k].textContent = mac ? '⌘ Enter' : 'Ctrl Enter';
+  }
+
+  // Bilingual placeholders and button labels.
+  function updateLabels() {
     var zh = document.documentElement.getAttribute('data-lang') === 'zh';
     titleInput.placeholder = zh ? '标题（可选）' : 'Title (optional)';
     contentInput.placeholder = zh ? '写下你的想法...' : 'Write your idea...';
+    var expandLabel = expanded ? (zh ? '还原' : 'Restore') : (zh ? '展开' : 'Expand');
+    expandBtn.setAttribute('aria-label', expandLabel);
+    expandBtn.title = expandLabel;
+    closeBtn.setAttribute('aria-label', zh ? '关闭' : 'Close');
+    closeBtn.title = zh ? '关闭' : 'Close';
   }
-  updatePlaceholders();
-  new MutationObserver(updatePlaceholders).observe(document.documentElement, { attributes: true, attributeFilter: ['data-lang'] });
+  updateLabels();
+  new MutationObserver(updateLabels).observe(document.documentElement, { attributes: true, attributeFilter: ['data-lang'] });
 
   var REOPEN_KEY = 'compose-reopen';
 
@@ -263,7 +319,7 @@
     win.style.display = 'flex';
     status.textContent = '';
     sendBtn.disabled = false;
-    updateLines();
+    fitViewport();
     updateHighlight();
     contentInput.focus();
   }
@@ -330,7 +386,6 @@
           titleInput.value = '';
           contentInput.value = '';
           clearDraft();
-          updateLines();
           updateHighlight();
           closeCompose();
           showToast(zh ? '想法已提交！稍后会出现。' : 'Idea submitted! It will appear shortly.');
@@ -348,8 +403,8 @@
 
   sendBtn.addEventListener('click', send);
 
-  // Cmd/Ctrl+Enter to send.
-  contentInput.addEventListener('keydown', function(e) {
+  // Cmd/Ctrl+Enter to send, from the title or the content.
+  win.addEventListener('keydown', function(e) {
     if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
       e.preventDefault();
       send();
