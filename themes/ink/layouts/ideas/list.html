@@ -236,5 +236,6 @@ function toggleAugmented(btn) {
 <div id="compose-toast" class="compose-toast"></div>
 
 <script src="https://changkun.de/login-sdk.js"></script>
-<script src="/js/compose.js"></script>
+{{ $compose := resources.Get "js/compose.js" | minify | fingerprint }}
+<script src="{{ $compose.RelPermalink }}"></script>
 {{ end }}
