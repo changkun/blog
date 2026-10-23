@@ -971,16 +971,20 @@ svg { width: 16px; height: 16px; flex: none; }
     background: rgba(0, 0, 0, 0.35);
 }
 
+/* The window takes most of the screen so a long thought has room, and the
+ * expand button gives it the rest. The editor's text and its highlight read
+ * the same font size and line height, so both layers wrap alike. */
 .compose-window {
+    --compose-size: 14px;
+    --compose-leading: 1.7;
     display: none;
     position: fixed;
     top: 50%;
     left: 50%;
     z-index: 2090;
     flex-direction: column;
-    width: 560px;
-    max-width: calc(100vw - 32px);
-    max-height: 80vh;
+    width: min(760px, calc(100vw - 48px));
+    height: min(720px, calc(100vh - 80px));
     overflow: hidden;
     transform: translate(-50%, -50%);
     border: 1px solid var(--border-strong);
@@ -990,11 +994,16 @@ svg { width: 16px; height: 16px; flex: none; }
     font-family: var(--sans);
 }
 
+.compose-window.expanded {
+    width: min(1120px, calc(100vw - 48px));
+    height: calc(100vh - 48px);
+}
+
 .compose-header {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 8px 14px;
+    gap: 2px;
+    padding: 6px 8px 6px 16px;
     border-bottom: 1px solid var(--border);
     background: var(--bg-raised);
     font-size: 13px;
@@ -1002,82 +1011,107 @@ svg { width: 16px; height: 16px; flex: none; }
     color: var(--text);
 }
 
-.compose-close {
-    padding: 0 2px;
+.compose-heading { flex: 1; }
+
+.compose-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
     border: 0;
+    border-radius: 6px;
     background: none;
-    font-size: 18px;
-    line-height: 1;
     color: var(--text-muted);
     cursor: pointer;
+    transition: color 0.2s, background-color 0.2s;
 }
 
-.compose-close:hover { color: var(--text); }
+.compose-icon:hover { color: var(--text); background: var(--border); }
 
-.compose-body { display: flex; flex: 1; flex-direction: column; overflow: hidden; }
+.compose-icon svg { width: 15px; height: 15px; }
+
+.compose-expand-min,
+.compose-window.expanded .compose-expand-max { display: none; }
+
+.compose-window.expanded .compose-expand-min { display: block; }
+
+.compose-body { display: flex; flex: 1; flex-direction: column; min-height: 0; }
 
 .compose-title {
     width: 100%;
-    padding: 8px 14px;
+    padding: 12px 18px;
     border: 0;
     border-bottom: 1px solid var(--border);
     background: transparent;
-    font: 14px var(--sans);
+    font: 500 16px var(--sans);
     color: var(--text);
     outline: none;
 }
 
-.compose-editor { display: flex; flex: 1; min-height: 180px; max-height: 50vh; overflow: hidden; }
+.compose-title::placeholder { color: var(--text-muted); font-weight: 400; }
 
-.compose-lines {
-    width: 34px;
-    min-width: 34px;
-    padding: 8px 0;
+.compose-editor { display: flex; flex: 1; min-height: 0; overflow: hidden; }
+
+/* Each number is as tall as its line wraps to, set by compose.js, and sits
+ * on the line's first row. */
+.compose-gutter {
+    flex: none;
+    width: 40px;
     overflow: hidden;
     border-right: 1px solid var(--border);
     background: var(--bg-code);
-    font: 12px/1.6 var(--mono);
+}
+
+.compose-lines {
+    padding-top: 14px;
+    font: 12px/calc(var(--compose-size) * var(--compose-leading)) var(--mono);
     color: var(--text-muted);
     text-align: right;
     user-select: none;
 }
 
-.compose-lines span { display: block; padding-right: 6px; }
+.compose-lines span { display: block; padding-right: 8px; overflow: hidden; }
 
-.compose-editor-area { position: relative; flex: 1; width: 0; overflow: hidden; }
+.compose-editor-area { position: relative; flex: 1; min-width: 0; overflow: hidden; }
+
+.compose-highlight,
+.compose-content {
+    padding: 14px 18px;
+    font: var(--compose-size)/var(--compose-leading) var(--mono);
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    tab-size: 4;
+}
 
 .compose-highlight {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
-    padding: 8px 12px;
-    font: 12px/1.6 var(--mono);
     color: var(--text-prose);
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
     pointer-events: none;
 }
 
 .compose-content {
-    position: relative;
+    position: absolute;
+    inset: 0;
     z-index: 1;
     width: 100%;
     height: 100%;
-    padding: 8px 12px;
+    margin: 0;
     overflow-y: auto;
     border: 0;
     background: transparent;
-    font: 12px/1.6 var(--mono);
     color: transparent;
     caret-color: var(--text);
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
     outline: none;
     resize: none;
 }
+
+.compose-content::placeholder { color: var(--text-muted); }
 
 /* The editor's markdown marks take the syntax colors of a code block. */
 .compose-highlight .md-h,
@@ -1098,20 +1132,32 @@ svg { width: 16px; height: 16px; flex: none; }
 .compose-footer {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 8px 14px;
+    gap: 12px;
+    padding: 8px 10px 8px 18px;
     border-top: 1px solid var(--border);
 }
 
-.compose-status { flex: 1; margin-right: 10px; font-size: 12px; color: var(--text-muted); }
+/* A status message, once there is one, takes the hint's place. */
+.compose-status,
+.compose-hint { flex: 1; min-width: 0; font-size: 12px; color: var(--text-muted); }
+
+.compose-status:empty,
+.compose-status:not(:empty) + .compose-hint { display: none; }
+
+.compose-kbd {
+    padding: 1px 5px;
+    border: 1px solid var(--border-strong);
+    border-radius: 4px;
+    font: 11px var(--mono);
+}
 
 .compose-send {
-    padding: 5px 14px;
+    padding: 6px 16px;
     border: 0;
     border-radius: 6px;
     background: var(--text);
     color: var(--bg);
-    font-size: 12.5px;
+    font-size: 13px;
     font-weight: 500;
     cursor: pointer;
     transition: opacity 0.15s;
@@ -1176,7 +1222,37 @@ svg { width: 16px; height: 16px; flex: none; }
     .idea-augmented { padding: 14px 16px 4px; }
     .prenext { grid-template-columns: 1fr; }
     .prenext-older { text-align: left; }
-    .compose-window { left: 8px; right: 8px; width: auto; max-width: none; transform: translate(0, -50%); }
+}
+
+/* ---- Compose on phones, upright or on their side ---- */
+
+@media (max-width: 720px), (max-height: 520px) {
+    /* A full sheet that follows the visual viewport, which compose.js
+     * reports, so the keyboard shrinks it instead of covering Send. 16px
+     * text keeps iOS from zooming in on focus. */
+    .compose-window,
+    .compose-window.expanded {
+        --compose-size: 16px;
+        --compose-leading: 1.6;
+        top: var(--compose-top, 0);
+        left: 0;
+        width: 100%;
+        height: var(--compose-height, 100%);
+        transform: none;
+        border: 0;
+        border-radius: 0;
+    }
+    .compose-header { padding: 4px 4px 4px 16px; font-size: 15px; }
+    .compose-icon { width: 40px; height: 40px; }
+    .compose-icon svg { width: 18px; height: 18px; }
+    .compose-expand,
+    .compose-gutter,
+    .compose-hint { display: none; }
+    .compose-title { padding: 12px 16px; }
+    .compose-highlight,
+    .compose-content { padding: 12px 16px; }
+    .compose-footer { justify-content: flex-end; padding: 8px 12px; }
+    .compose-send { padding: 9px 20px; font-size: 14px; }
 }
 
 /* ---- Print ---- */
