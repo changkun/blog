@@ -1,17 +1,35 @@
 (function() {
   var DRAFT_KEY = 'compose-draft';
+  var EXPAND_KEY = 'compose-expanded';
+  var REOPEN_KEY = 'compose-reopen';
+  var MARKED_URL = 'https://cdnjs.cloudflare.com/ajax/libs/marked/15.0.7/marked.min.js';
+  var MARKED_SRI = 'sha384-H+hy9ULve6xfxRkWIh/YOtvDdpXgV2fmAGQkIDTxIgZwNoaoBal14Di2YTMR6MzR';
+
   var btn = document.getElementById('compose-btn');
   var overlay = document.getElementById('compose-overlay');
   var win = document.getElementById('compose-window');
-  var closeBtn = document.getElementById('compose-close');
+  var dateEl = document.getElementById('compose-date');
   var expandBtn = document.getElementById('compose-expand');
+  var closeBtn = document.getElementById('compose-close');
   var titleInput = document.getElementById('compose-title');
   var contentInput = document.getElementById('compose-content');
-  var linesEl = document.getElementById('compose-lines');
-  var highlightEl = document.getElementById('compose-highlight');
+  var previewTitle = document.getElementById('compose-preview-title');
+  var previewBody = document.getElementById('compose-preview-body');
+  var writePane = contentInput.parentNode;
+  var previewPane = previewBody.parentNode;
+  var modeBtns = win.querySelectorAll('.compose-mode');
+  var toolBtns = win.querySelectorAll('[data-tool]');
+  var countEl = document.getElementById('compose-count');
   var sendBtn = document.getElementById('compose-send');
   var status = document.getElementById('compose-status');
   var toast = document.getElementById('compose-toast');
+
+  var mac = /Mac|iPhone|iPad/.test(navigator.platform);
+  var mod = mac ? '⌘' : 'Ctrl+';
+
+  function isZh() {
+    return document.documentElement.getAttribute('data-lang') === 'zh';
+  }
 
   // Restore draft from localStorage.
   var draft = {};
@@ -20,219 +38,264 @@
   if (draft.content) contentInput.value = draft.content;
 
   function saveDraft() {
-    localStorage.setItem(DRAFT_KEY, JSON.stringify({
-      title: titleInput.value,
-      content: contentInput.value
-    }));
+    try {
+      localStorage.setItem(DRAFT_KEY, JSON.stringify({
+        title: titleInput.value,
+        content: contentInput.value
+      }));
+    } catch(e) {}
   }
 
   function clearDraft() {
-    localStorage.removeItem(DRAFT_KEY);
+    try { localStorage.removeItem(DRAFT_KEY); } catch(e) {}
   }
 
-  titleInput.addEventListener('input', saveDraft);
-  contentInput.addEventListener('input', function() {
+  // Title and text grow with what is in them inside one scrolling pane.
+  // Sizing goes through 'auto' first, which would clamp the pane's scroll,
+  // so the scroll is put back after.
+  function fit(el) {
+    var top = writePane.scrollTop;
+    el.style.height = 'auto';
+    el.style.height = el.scrollHeight + 'px';
+    writePane.scrollTop = top;
+  }
+
+  function fitAll() {
+    if (writePane.offsetParent === null) return;
+    fit(titleInput);
+    fit(contentInput);
+  }
+
+  // The title is one line that wraps as it grows; Enter moves on to the text.
+  function fitTitle() {
+    if (writePane.offsetParent !== null) fit(titleInput);
+  }
+
+  titleInput.addEventListener('input', function() {
+    if (titleInput.value.indexOf('\n') !== -1) {
+      titleInput.value = titleInput.value.replace(/\s*\n\s*/g, ' ');
+    }
+    fitTitle();
     saveDraft();
-    updateHighlight();
+    schedulePreview();
   });
 
-  // Line numbers: each is as tall as its line in the highlight, which wraps
-  // as the textarea does, so a number stays beside the start of its line.
-  // The gutter is hidden on phones, where there is nothing to measure.
-  function updateLines() {
-    if (!linesEl.offsetWidth) return;
-    var rows = highlightEl.children;
-    var html = '';
-    for (var i = 0; i < rows.length; i++) {
-      html += '<span style="height:' + rows[i].getBoundingClientRect().height + 'px">' + (i + 1) + '</span>';
+  titleInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.metaKey && !e.ctrlKey && !e.isComposing) {
+      e.preventDefault();
+      contentInput.focus();
     }
-    linesEl.innerHTML = html;
+  });
+
+  contentInput.addEventListener('input', function() {
+    fit(contentInput);
+    // Typing at the end grows the text below the fold; follow it.
+    if (contentInput.selectionEnd === contentInput.value.length) {
+      writePane.scrollTop = writePane.scrollHeight;
+    }
+    saveDraft();
+    updateCount();
+    schedulePreview();
+  });
+
+  window.addEventListener('resize', function() {
+    if (win.style.display === 'flex') fitAll();
+  });
+
+  // Words, with each Chinese or Japanese character counted as one.
+  var CJK = /[぀-ヿ㐀-鿿豈-﫿가-힯]/g;
+  function updateCount() {
+    var text = contentInput.value;
+    var n = (text.match(CJK) || []).length +
+      (text.replace(CJK, ' ').match(/[A-Za-z0-9À-ɏ'’-]+/g) || []).length;
+    countEl.textContent = isZh() ? n + ' 字' : n + (n === 1 ? ' word' : ' words');
   }
 
-  // Markdown syntax highlighting.
+  // Formatting. Edits go through insertText so the browser's undo keeps them.
+  function insert(text) {
+    contentInput.focus();
+    if (!document.execCommand('insertText', false, text)) {
+      contentInput.setRangeText(text, contentInput.selectionStart, contentInput.selectionEnd, 'end');
+      contentInput.dispatchEvent(new Event('input'));
+    }
+  }
+
+  // Wraps the selection in marks, or unwraps it when the marks are there.
+  function wrap(before, after, placeholder) {
+    var v = contentInput.value;
+    var s = contentInput.selectionStart;
+    var e = contentInput.selectionEnd;
+    var sel = v.slice(s, e);
+    if (v.slice(s - before.length, s) === before && v.slice(e, e + after.length) === after) {
+      contentInput.setSelectionRange(s - before.length, e + after.length);
+      insert(sel);
+      contentInput.setSelectionRange(s - before.length, e - before.length);
+      return;
+    }
+    var text = sel || placeholder;
+    insert(before + text + after);
+    contentInput.setSelectionRange(s + before.length, s + before.length + text.length);
+  }
+
+  // Puts a mark at the start of every selected line, or takes it off when
+  // every line has it already.
+  var LINE_MARKS = {
+    heading: { re: /^#{1,6}\s/, add: function() { return '## '; } },
+    quote: { re: /^>\s?/, add: function() { return '> '; } },
+    list: { re: /^([-*+]|\d+\.)\s/, own: /^[-*+]\s/, add: function() { return '- '; } },
+    ordered: { re: /^([-*+]|\d+\.)\s/, own: /^\d+\.\s/, add: function(i) { return (i + 1) + '. '; } }
+  };
+
+  function markLines(kind) {
+    var mark = LINE_MARKS[kind];
+    var own = mark.own || mark.re;
+    var v = contentInput.value;
+    var s = contentInput.selectionStart;
+    var e = contentInput.selectionEnd;
+    if (e > s && v[e - 1] === '\n') e--;
+    var start = v.lastIndexOf('\n', s - 1) + 1;
+    var end = v.indexOf('\n', e);
+    if (end === -1) end = v.length;
+    var lines = v.slice(start, end).split('\n');
+    var all = lines.every(function(l) { return own.test(l); });
+    var out = lines.map(function(l, i) {
+      return all ? l.replace(own, '') : mark.add(i) + l.replace(mark.re, '');
+    }).join('\n');
+    contentInput.setSelectionRange(start, end);
+    insert(out);
+    if (s === e) {
+      contentInput.setSelectionRange(start + out.length, start + out.length);
+    } else {
+      contentInput.setSelectionRange(start, start + out.length);
+    }
+  }
+
+  var TOOLS = {
+    bold: function() { wrap('**', '**', isZh() ? '粗体' : 'bold'); },
+    italic: function() { wrap('*', '*', isZh() ? '斜体' : 'italic'); },
+    heading: function() { markLines('heading'); },
+    quote: function() { markLines('quote'); },
+    list: function() { markLines('list'); },
+    ordered: function() { markLines('ordered'); },
+    code: function() {
+      var sel = contentInput.value.slice(contentInput.selectionStart, contentInput.selectionEnd);
+      if (sel.indexOf('\n') !== -1) wrap('```\n', '\n```', '');
+      else wrap('`', '`', 'code');
+    },
+    link: function() {
+      var s = contentInput.selectionStart;
+      var sel = contentInput.value.slice(s, contentInput.selectionEnd);
+      if (/^https?:\/\/\S+$/.test(sel)) {
+        var text = isZh() ? '链接' : 'text';
+        insert('[' + text + '](' + sel + ')');
+        contentInput.setSelectionRange(s + 1, s + 1 + text.length);
+      } else {
+        insert('[' + (sel || (isZh() ? '链接' : 'text')) + '](https://)');
+        var url = s + 1 + (sel || (isZh() ? '链接' : 'text')).length + 2;
+        contentInput.setSelectionRange(url, url + 8);
+      }
+    }
+  };
+
+  for (var t = 0; t < toolBtns.length; t++) {
+    // Keep the text's focus and selection, and a phone's keyboard, open.
+    toolBtns[t].addEventListener('mousedown', function(e) { e.preventDefault(); });
+    toolBtns[t].addEventListener('click', function() {
+      if (contentInput.offsetParent === null) setMode('write');
+      TOOLS[this.getAttribute('data-tool')]();
+    });
+  }
+
+  contentInput.addEventListener('keydown', function(e) {
+    if (!(e.metaKey || e.ctrlKey) || e.altKey || e.shiftKey) return;
+    var tool = { b: 'bold', i: 'italic', k: 'link' }[e.key.toLowerCase()];
+    if (tool) {
+      e.preventDefault();
+      TOOLS[tool]();
+    }
+  });
+
+  // Write and Preview. Expanded on a wide screen, both show at once.
+  function setMode(mode) {
+    win.setAttribute('data-mode', mode);
+    for (var i = 0; i < modeBtns.length; i++) {
+      modeBtns[i].setAttribute('aria-pressed', modeBtns[i].getAttribute('data-mode') === mode ? 'true' : 'false');
+    }
+    if (mode === 'write') {
+      fitAll();
+      contentInput.focus();
+    }
+    renderPreview();
+  }
+
+  for (var m = 0; m < modeBtns.length; m++) {
+    modeBtns[m].addEventListener('click', function() {
+      setMode(this.getAttribute('data-mode'));
+    });
+  }
+
+  // The preview renders with marked, fetched the first time it is needed.
+  var markedLoad = null;
+  function loadMarked() {
+    if (window.marked) return Promise.resolve(window.marked);
+    if (!markedLoad) {
+      markedLoad = new Promise(function(resolve, reject) {
+        var s = document.createElement('script');
+        s.src = MARKED_URL;
+        s.integrity = MARKED_SRI;
+        s.crossOrigin = 'anonymous';
+        s.onload = function() { resolve(window.marked); };
+        s.onerror = function() { markedLoad = null; reject(); };
+        document.head.appendChild(s);
+      });
+    }
+    return markedLoad;
+  }
+
   function escapeHtml(str) {
     return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }
 
-  function highlightMarkdown(text) {
-    var lines = text.split('\n');
-    var result = [];
-    var inCodeBlock = false;
+  var previewTimer = null;
+  function schedulePreview() {
+    clearTimeout(previewTimer);
+    previewTimer = setTimeout(renderPreview, 150);
+  }
 
-    for (var i = 0; i < lines.length; i++) {
-      var line = lines[i];
-
-      // Toggle fenced code blocks.
-      if (/^```/.test(line)) {
-        inCodeBlock = !inCodeBlock;
-        result.push('<span class="md-codeblock">' + escapeHtml(line) + '</span>');
-        continue;
-      }
-
-      if (inCodeBlock) {
-        result.push('<span class="md-code">' + escapeHtml(line) + '</span>');
-        continue;
-      }
-
-      // Headers.
-      var hMatch = line.match(/^(#{1,6}\s)/);
-      if (hMatch) {
-        result.push('<span class="md-h">' + escapeHtml(hMatch[1]) + '</span>' + highlightInline(line.slice(hMatch[1].length)));
-        continue;
-      }
-
-      // Blockquotes.
-      var bqMatch = line.match(/^(\s*>\s*)/);
-      if (bqMatch) {
-        result.push('<span class="md-blockquote">' + escapeHtml(bqMatch[1]) + '</span>' + highlightInline(line.slice(bqMatch[1].length)));
-        continue;
-      }
-
-      // Horizontal rules.
-      if (/^\s*([-*_])\s*\1\s*\1[\s\1]*$/.test(line)) {
-        result.push('<span class="md-hr">' + escapeHtml(line) + '</span>');
-        continue;
-      }
-
-      // Unordered list items.
-      var ulMatch = line.match(/^(\s*[-*+]\s)/);
-      if (ulMatch) {
-        result.push('<span class="md-list">' + escapeHtml(ulMatch[1]) + '</span>' + highlightInline(line.slice(ulMatch[1].length)));
-        continue;
-      }
-
-      // Ordered list items.
-      var olMatch = line.match(/^(\s*\d+\.\s)/);
-      if (olMatch) {
-        result.push('<span class="md-list">' + escapeHtml(olMatch[1]) + '</span>' + highlightInline(line.slice(olMatch[1].length)));
-        continue;
-      }
-
-      result.push(highlightInline(line));
+  function renderPreview() {
+    if (previewPane.offsetParent === null) return;
+    var title = titleInput.value.trim();
+    previewTitle.textContent = title;
+    previewTitle.style.display = title ? '' : 'none';
+    // The site adds its language and deep-dive shortcodes itself; a draft
+    // that carries them previews without.
+    var src = contentInput.value.replace(/\{\{[%<]\s*\/?\s*(en|zh|augmented)\s*[%>]\}\}/g, '');
+    if (!src.trim()) {
+      previewBody.innerHTML = '<p class="compose-preview-empty">' +
+        (isZh() ? '还没有内容可以预览。' : 'Nothing to preview yet.') + '</p>';
+      return;
     }
-
-    // One block per line, so the gutter can measure how far each wraps.
-    return result.map(function(line) {
-      return '<div>' + (line || '<br>') + '</div>';
-    }).join('');
-  }
-
-  function highlightInline(text) {
-    // Process inline markdown by scanning character by character to handle
-    // nesting correctly and avoid conflicts between patterns.
-    var tokens = [];
-    var i = 0;
-    var len = text.length;
-
-    while (i < len) {
-      // Images: ![alt](url)
-      if (text[i] === '!' && text[i + 1] === '[') {
-        var altEnd = text.indexOf(']', i + 2);
-        if (altEnd !== -1 && text[altEnd + 1] === '(') {
-          var urlEnd = text.indexOf(')', altEnd + 2);
-          if (urlEnd !== -1) {
-            tokens.push('<span class="md-img">' + escapeHtml(text.slice(i, urlEnd + 1)) + '</span>');
-            i = urlEnd + 1;
-            continue;
-          }
-        }
+    loadMarked().then(function(marked) {
+      // Math stays out of the parser's way and goes to MathJax after.
+      var math = [];
+      var held = src.replace(/\$\$[\s\S]+?\$\$|\$[^$\n]+?\$/g, function(x) {
+        math.push(x);
+        return '@@MATH' + (math.length - 1) + '@@';
+      });
+      previewBody.innerHTML = marked.parse(held).replace(/@@MATH(\d+)@@/g, function(_, i) {
+        return escapeHtml(math[+i]);
+      });
+      if (math.length && window.MathJax && MathJax.Hub) {
+        MathJax.Hub.Queue(['Typeset', MathJax.Hub, previewBody]);
       }
-
-      // Links: [text](url)
-      if (text[i] === '[') {
-        var tEnd = text.indexOf(']', i + 1);
-        if (tEnd !== -1 && text[tEnd + 1] === '(') {
-          var uEnd = text.indexOf(')', tEnd + 2);
-          if (uEnd !== -1) {
-            tokens.push(
-              '<span class="md-link-punc">[</span>' +
-              '<span class="md-link-text">' + escapeHtml(text.slice(i + 1, tEnd)) + '</span>' +
-              '<span class="md-link-punc">](</span>' +
-              '<span class="md-link-url">' + escapeHtml(text.slice(tEnd + 2, uEnd)) + '</span>' +
-              '<span class="md-link-punc">)</span>'
-            );
-            i = uEnd + 1;
-            continue;
-          }
-        }
-      }
-
-      // Inline code: `code`
-      if (text[i] === '`') {
-        var cEnd = text.indexOf('`', i + 1);
-        if (cEnd !== -1) {
-          tokens.push('<span class="md-code">' + escapeHtml(text.slice(i, cEnd + 1)) + '</span>');
-          i = cEnd + 1;
-          continue;
-        }
-      }
-
-      // Strikethrough: ~~text~~
-      if (text[i] === '~' && text[i + 1] === '~') {
-        var sEnd = text.indexOf('~~', i + 2);
-        if (sEnd !== -1) {
-          tokens.push('<span class="md-strike">' + escapeHtml(text.slice(i, sEnd + 2)) + '</span>');
-          i = sEnd + 2;
-          continue;
-        }
-      }
-
-      // Bold: **text** or __text__
-      if ((text[i] === '*' && text[i + 1] === '*') || (text[i] === '_' && text[i + 1] === '_')) {
-        var marker = text.slice(i, i + 2);
-        var bEnd = text.indexOf(marker, i + 2);
-        if (bEnd !== -1) {
-          tokens.push('<span class="md-bold">' + escapeHtml(text.slice(i, bEnd + 2)) + '</span>');
-          i = bEnd + 2;
-          continue;
-        }
-      }
-
-      // Italic: *text* or _text_ (single marker, not followed by same)
-      if ((text[i] === '*' && text[i + 1] !== '*') || (text[i] === '_' && text[i + 1] !== '_')) {
-        var m = text[i];
-        var iEnd = text.indexOf(m, i + 1);
-        if (iEnd !== -1 && iEnd > i + 1) {
-          tokens.push('<span class="md-italic">' + escapeHtml(text.slice(i, iEnd + 1)) + '</span>');
-          i = iEnd + 1;
-          continue;
-        }
-      }
-
-      // Plain character.
-      tokens.push(escapeHtml(text[i]));
-      i++;
-    }
-
-    return tokens.join('');
-  }
-
-  // The highlight takes the textarea's inner width, which a scrollbar
-  // narrows, so both wrap at the same column.
-  function updateHighlight() {
-    highlightEl.style.width = contentInput.clientWidth + 'px';
-    highlightEl.innerHTML = highlightMarkdown(contentInput.value);
-    updateLines();
-  }
-
-  // Sync scroll between textarea, line numbers, and highlight overlay.
-  contentInput.addEventListener('scroll', function() {
-    var shift = 'translateY(-' + contentInput.scrollTop + 'px)';
-    linesEl.style.transform = shift;
-    highlightEl.style.transform = shift;
-  });
-
-  // Wrapping changes with the window's size: on expand, and on a phone
-  // when the keyboard comes and goes.
-  if (typeof ResizeObserver !== 'undefined') {
-    new ResizeObserver(function() {
-      if (win.style.display === 'flex') updateHighlight();
-    }).observe(contentInput);
+    }).catch(function() {
+      previewBody.innerHTML = '<p class="compose-preview-empty">' +
+        (isZh() ? '预览加载失败。' : 'The preview could not load.') + '</p>';
+    });
   }
 
   // Expand: the window grows to nearly the whole screen, and stays so the
   // next time it opens.
-  var EXPAND_KEY = 'compose-expanded';
   var expanded = false;
   try { expanded = localStorage.getItem(EXPAND_KEY) === '1'; } catch(e) {}
   win.classList.toggle('expanded', expanded);
@@ -242,7 +305,9 @@
     win.classList.toggle('expanded', expanded);
     try { localStorage.setItem(EXPAND_KEY, expanded ? '1' : ''); } catch(e) {}
     updateLabels();
-    contentInput.focus();
+    fitAll();
+    renderPreview();
+    if (contentInput.offsetParent !== null) contentInput.focus();
   });
 
   // On phones the window is a full sheet over the visual viewport, which
@@ -252,38 +317,48 @@
     if (!vv) return;
     win.style.setProperty('--compose-top', vv.offsetTop + 'px');
     win.style.setProperty('--compose-height', vv.height + 'px');
+    if (win.style.display === 'flex') fitAll();
   }
   if (window.visualViewport) {
     window.visualViewport.addEventListener('resize', fitViewport);
     window.visualViewport.addEventListener('scroll', fitViewport);
   }
 
-  // The send shortcut, as this platform writes it.
-  var mac = /Mac|iPhone|iPad/.test(navigator.platform);
-  var kbds = win.querySelectorAll('.compose-kbd');
-  for (var k = 0; k < kbds.length; k++) {
-    kbds[k].textContent = mac ? '⌘ Enter' : 'Ctrl Enter';
+  // Bilingual placeholders and button labels.
+  var TOOL_LABELS = {
+    bold: ['Bold', '粗体', 'B'],
+    italic: ['Italic', '斜体', 'I'],
+    heading: ['Heading', '标题'],
+    quote: ['Quote', '引用'],
+    list: ['List', '列表'],
+    ordered: ['Numbered list', '编号列表'],
+    code: ['Code', '代码'],
+    link: ['Link', '链接', 'K']
+  };
+
+  function label(el, text) {
+    el.setAttribute('aria-label', text);
+    el.title = text;
   }
 
-  // Bilingual placeholders and button labels.
   function updateLabels() {
-    var zh = document.documentElement.getAttribute('data-lang') === 'zh';
+    var zh = isZh();
     titleInput.placeholder = zh ? '标题（可选）' : 'Title (optional)';
-    contentInput.placeholder = zh ? '写下你的想法...' : 'Write your idea...';
-    var expandLabel = expanded ? (zh ? '还原' : 'Restore') : (zh ? '展开' : 'Expand');
-    expandBtn.setAttribute('aria-label', expandLabel);
-    expandBtn.title = expandLabel;
-    closeBtn.setAttribute('aria-label', zh ? '关闭' : 'Close');
-    closeBtn.title = zh ? '关闭' : 'Close';
+    contentInput.placeholder = zh ? '写下你的想法，支持 Markdown。' : 'Write your idea. Markdown works.';
+    label(expandBtn, expanded ? (zh ? '还原' : 'Restore') : (zh ? '展开，并排预览' : 'Expand, with preview alongside'));
+    label(closeBtn, zh ? '关闭' : 'Close');
+    sendBtn.title = mod + 'Enter';
+    for (var i = 0; i < toolBtns.length; i++) {
+      var l = TOOL_LABELS[toolBtns[i].getAttribute('data-tool')];
+      label(toolBtns[i], l[zh ? 1 : 0] + (l[2] ? ' (' + mod + l[2] + ')' : ''));
+    }
+    updateCount();
   }
   updateLabels();
-  new MutationObserver(updateLabels).observe(document.documentElement, { attributes: true, attributeFilter: ['data-lang'] });
-
-  var REOPEN_KEY = 'compose-reopen';
-
-  function isZh() {
-    return document.documentElement.getAttribute('data-lang') === 'zh';
-  }
+  new MutationObserver(function() {
+    updateLabels();
+    renderPreview();
+  }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-lang'] });
 
   // Auth: a valid token is known synchronously from localStorage. On load we
   // also finish any pending login redirect (?code=...) and, if we came back
@@ -313,15 +388,26 @@
     latereAuth.login(window.location.href);
   });
 
+  function today() {
+    var d = new Date();
+    function pad(n) { return (n < 10 ? '0' : '') + n; }
+    return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+  }
+
   function openCompose() {
     document.body.style.overflow = 'hidden';
     overlay.style.display = 'block';
     win.style.display = 'flex';
+    dateEl.textContent = today();
     status.textContent = '';
     sendBtn.disabled = false;
     fitViewport();
-    updateHighlight();
-    contentInput.focus();
+    updateCount();
+    setMode('write');
+    // Pick a draft up where it ends.
+    var end = contentInput.value.length;
+    contentInput.setSelectionRange(end, end);
+    if (end) writePane.scrollTop = writePane.scrollHeight;
   }
 
   function closeCompose() {
@@ -386,7 +472,7 @@
           titleInput.value = '';
           contentInput.value = '';
           clearDraft();
-          updateHighlight();
+          updateCount();
           closeCompose();
           showToast(zh ? '想法已提交！稍后会出现。' : 'Idea submitted! It will appear shortly.');
         } else {
@@ -403,7 +489,7 @@
 
   sendBtn.addEventListener('click', send);
 
-  // Cmd/Ctrl+Enter to send, from the title or the content.
+  // Cmd/Ctrl+Enter to send, from the title or the text.
   win.addEventListener('keydown', function(e) {
     if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
       e.preventDefault();

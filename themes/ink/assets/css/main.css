@@ -971,12 +971,10 @@ svg { width: 16px; height: 16px; flex: none; }
     background: rgba(0, 0, 0, 0.35);
 }
 
-/* The window takes most of the screen so a long thought has room, and the
- * expand button gives it the rest. The editor's text and its highlight read
- * the same font size and line height, so both layers wrap alike. */
+/* The window reads like the idea it will become: the title in the serif of
+ * an idea's title, the text at the size of its body, and Preview renders it
+ * with the page's own styles. Expanded, it writes and previews side by side. */
 .compose-window {
-    --compose-size: 14px;
-    --compose-leading: 1.7;
     display: none;
     position: fixed;
     top: 50%;
@@ -994,31 +992,61 @@ svg { width: 16px; height: 16px; flex: none; }
     font-family: var(--sans);
 }
 
-.compose-window.expanded {
-    width: min(1120px, calc(100vw - 48px));
-    height: calc(100vh - 48px);
-}
-
 .compose-header {
     display: flex;
     align-items: center;
-    gap: 2px;
-    padding: 6px 8px 6px 16px;
+    gap: 6px;
+    padding: 10px 10px 10px 22px;
     border-bottom: 1px solid var(--border);
-    background: var(--bg-raised);
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text);
 }
 
-.compose-heading { flex: 1; }
+.compose-heading {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    font: 12px/1.5 var(--mono);
+    color: var(--text-muted);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.compose-date::after { content: ' · '; }
+
+.compose-modes {
+    display: inline-flex;
+    flex: none;
+    padding: 2px;
+    border-radius: 8px;
+    background: var(--bg-raised);
+}
+
+.compose-mode {
+    padding: 3px 12px;
+    border: 0;
+    border-radius: 6px;
+    background: none;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: color 0.2s, background-color 0.2s;
+}
+
+.compose-mode:hover { color: var(--text); }
+
+.compose-mode[aria-pressed="true"] {
+    background: var(--bg);
+    color: var(--text);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+}
 
 .compose-icon {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 28px;
-    height: 28px;
+    flex: none;
+    width: 30px;
+    height: 30px;
     padding: 0;
     border: 0;
     border-radius: 6px;
@@ -1028,131 +1056,101 @@ svg { width: 16px; height: 16px; flex: none; }
     transition: color 0.2s, background-color 0.2s;
 }
 
-.compose-icon:hover { color: var(--text); background: var(--border); }
-
-.compose-icon svg { width: 15px; height: 15px; }
+.compose-icon:hover { color: var(--text); background: var(--bg-raised); }
 
 .compose-expand-min,
 .compose-window.expanded .compose-expand-max { display: none; }
 
 .compose-window.expanded .compose-expand-min { display: block; }
 
-.compose-body { display: flex; flex: 1; flex-direction: column; min-height: 0; }
+.compose-body { display: flex; flex: 1; min-height: 0; }
 
-.compose-title {
-    width: 100%;
-    padding: 12px 18px;
-    border: 0;
-    border-bottom: 1px solid var(--border);
-    background: transparent;
-    font: 500 16px var(--sans);
-    color: var(--text);
-    outline: none;
-}
+/* Title and text scroll as one page, so the title moves out of the way of
+ * a long text, and of a phone's keyboard. */
+.compose-write { display: flex; flex: 1; flex-direction: column; min-width: 0; overflow-y: auto; }
 
-.compose-title::placeholder { color: var(--text-muted); font-weight: 400; }
-
-.compose-editor { display: flex; flex: 1; min-height: 0; overflow: hidden; }
-
-/* Each number is as tall as its line wraps to, set by compose.js, and sits
- * on the line's first row. */
-.compose-gutter {
-    flex: none;
-    width: 40px;
-    overflow: hidden;
-    border-right: 1px solid var(--border);
-    background: var(--bg-code);
-}
-
-.compose-lines {
-    padding-top: 14px;
-    font: 12px/calc(var(--compose-size) * var(--compose-leading)) var(--mono);
-    color: var(--text-muted);
-    text-align: right;
-    user-select: none;
-}
-
-.compose-lines span { display: block; padding-right: 8px; overflow: hidden; }
-
-.compose-editor-area { position: relative; flex: 1; min-width: 0; overflow: hidden; }
-
-.compose-highlight,
+.compose-title,
 .compose-content {
-    padding: 14px 18px;
-    font: var(--compose-size)/var(--compose-leading) var(--mono);
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-    tab-size: 4;
-}
-
-.compose-highlight {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    color: var(--text-prose);
-    pointer-events: none;
-}
-
-.compose-content {
-    position: absolute;
-    inset: 0;
-    z-index: 1;
+    display: block;
     width: 100%;
-    height: 100%;
     margin: 0;
-    overflow-y: auto;
     border: 0;
     background: transparent;
-    color: transparent;
-    caret-color: var(--text);
     outline: none;
     resize: none;
 }
 
-.compose-content::placeholder { color: var(--text-muted); }
+/* Both grow with what is in them, sized by compose.js; the text also
+ * fills what is left of the window, so a click anywhere below lands in it. */
+.compose-title {
+    flex: none;
+    padding: 28px 36px 0;
+    overflow: hidden;
+    font: 400 30px/1.15 var(--serif);
+    color: var(--text);
+}
 
-/* The editor's markdown marks take the syntax colors of a code block. */
-.compose-highlight .md-h,
-.compose-highlight .md-list { color: var(--navy); font-weight: 600; }
-.compose-highlight .md-bold { color: var(--text); font-weight: 700; }
-.compose-highlight .md-italic { color: var(--code-string); font-style: italic; }
-.compose-highlight .md-code,
-.compose-highlight .md-codeblock { color: var(--text-muted); }
-.compose-highlight .md-code { background: var(--bg-raised); border-radius: 2px; }
-.compose-highlight .md-link-text { color: var(--navy); }
-.compose-highlight .md-link-url { color: var(--code-keyword); }
-.compose-highlight .md-link-punc,
-.compose-highlight .md-blockquote,
-.compose-highlight .md-hr { color: var(--text-muted); }
-.compose-highlight .md-strike { color: var(--text-muted); text-decoration: line-through; }
-.compose-highlight .md-img { color: var(--code-number); }
+.compose-content {
+    flex: 1 0 auto;
+    padding: 14px 36px 28px;
+    overflow: hidden;
+    font: 16px/1.75 var(--sans);
+    color: var(--text-prose);
+}
+
+.compose-title::placeholder,
+.compose-content::placeholder { color: var(--text-muted); opacity: 1; }
+
+.compose-preview { flex: 1; min-width: 0; padding: 28px 36px; overflow-y: auto; }
+
+.compose-preview .idea-title { margin-top: 0; }
+
+.compose-preview-empty { color: var(--text-muted); }
+
+.compose-window[data-mode="write"] .compose-preview,
+.compose-window[data-mode="preview"] .compose-write { display: none; }
 
 .compose-footer {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 8px 10px 8px 18px;
+    padding: 8px 10px 8px 14px;
     border-top: 1px solid var(--border);
 }
 
-/* A status message, once there is one, takes the hint's place. */
-.compose-status,
-.compose-hint { flex: 1; min-width: 0; font-size: 12px; color: var(--text-muted); }
-
-.compose-status:empty,
-.compose-status:not(:empty) + .compose-hint { display: none; }
-
-.compose-kbd {
-    padding: 1px 5px;
-    border: 1px solid var(--border-strong);
-    border-radius: 4px;
-    font: 11px var(--mono);
+.compose-tools {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    gap: 2px;
+    min-width: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
 }
 
+.compose-tools::-webkit-scrollbar { display: none; }
+
+.compose-tools-sep { flex: none; width: 1px; height: 18px; margin: 0 6px; background: var(--border-strong); }
+
+.compose-meta {
+    flex: none;
+    max-width: 45%;
+    overflow: hidden;
+    font-size: 12px;
+    color: var(--text-muted);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.compose-count { font-family: var(--mono); }
+
+/* A status message, once there is one, takes the count's place. */
+.compose-status:empty,
+.compose-status:not(:empty) + .compose-count { display: none; }
+
 .compose-send {
-    padding: 6px 16px;
+    flex: none;
+    padding: 7px 18px;
     border: 0;
     border-radius: 6px;
     background: var(--text);
@@ -1166,6 +1164,17 @@ svg { width: 16px; height: 16px; flex: none; }
 .compose-send:hover { opacity: 0.85; }
 
 .compose-send:disabled { opacity: 0.5; cursor: default; }
+
+/* Expanded, where there is room for both: write and preview side by side. */
+@media (min-width: 721px) and (min-height: 521px) {
+    .compose-window.expanded {
+        width: min(1280px, calc(100vw - 48px));
+        height: calc(100vh - 48px);
+    }
+    .compose-window.expanded .compose-modes { display: none; }
+    .compose-window.expanded .compose-write { display: flex; }
+    .compose-window.expanded .compose-preview { display: block; border-left: 1px solid var(--border); }
+}
 
 .compose-toast {
     position: fixed;
@@ -1228,12 +1237,10 @@ svg { width: 16px; height: 16px; flex: none; }
 
 @media (max-width: 720px), (max-height: 520px) {
     /* A full sheet that follows the visual viewport, which compose.js
-     * reports, so the keyboard shrinks it instead of covering Send. 16px
+     * reports, so the keyboard shrinks it instead of covering Post. 16px
      * text keeps iOS from zooming in on focus. */
     .compose-window,
     .compose-window.expanded {
-        --compose-size: 16px;
-        --compose-leading: 1.6;
         top: var(--compose-top, 0);
         left: 0;
         width: 100%;
@@ -1242,17 +1249,21 @@ svg { width: 16px; height: 16px; flex: none; }
         border: 0;
         border-radius: 0;
     }
-    .compose-header { padding: 4px 4px 4px 16px; font-size: 15px; }
+    .compose-header { padding: 6px 6px 6px 16px; }
+    .compose-heading { font: 500 15px/1.4 var(--sans); color: var(--text); }
+    .compose-date,
+    .compose-expand,
+    .compose-count,
+    .compose-tools-sep { display: none; }
+    .compose-mode { padding: 6px 14px; font-size: 14px; }
     .compose-icon { width: 40px; height: 40px; }
     .compose-icon svg { width: 18px; height: 18px; }
-    .compose-expand,
-    .compose-gutter,
-    .compose-hint { display: none; }
-    .compose-title { padding: 12px 16px; }
-    .compose-highlight,
-    .compose-content { padding: 12px 16px; }
-    .compose-footer { justify-content: flex-end; padding: 8px 12px; }
-    .compose-send { padding: 9px 20px; font-size: 14px; }
+    .compose-title { padding: 18px 16px 0; font-size: 26px; }
+    .compose-content { padding: 10px 16px 20px; }
+    .compose-preview { padding: 18px 16px; }
+    .compose-footer { gap: 8px; padding: 6px 8px 6px 4px; }
+    .compose-tools .compose-icon { width: 35px; height: 40px; }
+    .compose-send { padding: 9px 18px; font-size: 14px; }
 }
 
 /* ---- Print ---- */
