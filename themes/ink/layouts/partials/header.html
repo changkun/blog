@@ -22,3 +22,11 @@
     </div>
   </div>
 </header>
+<script>
+  (function() {
+    var h = document.querySelector('.site-header');
+    var fit = function() { document.documentElement.style.setProperty('--header-h', h.offsetHeight + 'px'); };
+    fit();
+    if (window.ResizeObserver) new ResizeObserver(fit).observe(h);
+  })();
+</script>

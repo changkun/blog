@@ -23,6 +23,9 @@
     --rail: 232px;
     --wide: 1120px;
     --gutter: 24px;
+    /* The fixed header's height, kept by the script after the header;
+     * the page starts below it and anchors stop clear of it. */
+    --header-h: 69px;
 }
 
 [data-theme="dark"] {
@@ -43,10 +46,11 @@
 
 * { box-sizing: border-box; }
 
-html { scroll-padding-top: 24px; }
+html { scroll-padding-top: calc(var(--header-h) + 24px); }
 
 body {
     margin: 0;
+    padding-top: var(--header-h);
     background: var(--bg);
     color: var(--text-secondary);
     font: 15px/1.65 var(--sans);
@@ -78,7 +82,18 @@ svg { width: 16px; height: 16px; flex: none; }
 
 /* ---- Header ---- */
 
-.site-header { border-bottom: 1px solid var(--border); }
+/* Fixed, as the library's, so an elastic scroll past the top moves the
+ * page under it and not the header itself. */
+.site-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 20;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    transition: background-color 0.3s;
+}
 
 /* As the library's header: 16px at the top and right puts the theme
  * button where the home page has it. */
@@ -170,9 +185,9 @@ svg { width: 16px; height: 16px; flex: none; }
     .toc-rail {
         display: block;
         position: sticky;
-        top: 24px;
+        top: calc(var(--header-h) + 24px);
         align-self: start;
-        max-height: calc(100vh - 48px);
+        max-height: calc(100vh - var(--header-h) - 48px);
         margin-top: 56px;
         overflow-y: auto;
         scrollbar-width: thin;
@@ -1188,7 +1203,7 @@ svg { width: 16px; height: 16px; flex: none; }
 /* ---- Phones ---- */
 
 @media (max-width: 720px) {
-    :root { --gutter: 16px; }
+    :root { --gutter: 16px; --header-h: 102px; }
     .header-inner { flex-wrap: wrap; gap: 0 16px; padding-bottom: 0; }
     .site-nav {
         order: 3;
@@ -1256,6 +1271,8 @@ svg { width: 16px; height: 16px; flex: none; }
 /* ---- Print ---- */
 
 @media print {
+    body { padding-top: 0; }
+    .site-header { position: static; }
     :root { --bg: #fff; --text: #000; --text-prose: #111; --text-secondary: #222; --text-muted: #444; --navy: #000; }
     .site-header .site-nav,
     .header-actions,

@@ -38,12 +38,12 @@ gtag('config', '{{ .Site.Params.GoogleAnalytics }}');
     var targets = links.map(function(a) {
       return document.getElementById(decodeURIComponent(a.getAttribute('href').slice(1)));
     });
-    var marked = -2, ticking = false;
+    var marked = -2, ticking = false, header = document.querySelector('.site-header');
     function mark() {
       ticking = false;
-      var current = -1;
+      var current = -1, line = header.offsetHeight + 28;
       targets.forEach(function(t, i) {
-        if (t && t.offsetParent !== null && t.getBoundingClientRect().top <= 96) current = i;
+        if (t && t.offsetParent !== null && t.getBoundingClientRect().top <= line) current = i;
       });
       if (current === marked) return;
       marked = current;
