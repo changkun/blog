@@ -3,6 +3,8 @@ date: 2026-03-20T10:00:00+01:00
 toc: true
 id:
 slug: /posts/goalless-agents
+aliases:
+    - /images/posts/goless-agents/
 scripts:
     - figures.js
 tags:

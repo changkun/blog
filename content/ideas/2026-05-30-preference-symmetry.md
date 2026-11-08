@@ -1,6 +1,8 @@
 ---
 date: 2026-05-30T22:07:54
 slug: "preference-symmetry"
+aliases:
+    - /ideas/symmetric-preference-determinants/
 title: "Preference Determinants in Symmetric Options"
 title_zh: "对称选项中的偏好决定因素"
 ---

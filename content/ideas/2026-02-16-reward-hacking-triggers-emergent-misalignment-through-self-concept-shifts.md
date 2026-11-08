@@ -1,6 +1,8 @@
 ---
 date: 2026-02-16T03:23:17
 slug: "reward-hacking-misalignment"
+aliases:
+    - /ideas/2026-02-16-permissiveness-as-alignment-transparency-over-suppression-stabilizes-values/
 title: "Reward hacking triggers emergent misalignment through self-concept shifts"
 title_zh: "Reward hacking triggers emergent misalignment through self-concept shifts"
 ---

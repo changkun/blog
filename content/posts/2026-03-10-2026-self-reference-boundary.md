@@ -5,6 +5,7 @@ id:
 slug: /posts/2026-self-reference-boundary
 aliases:
     - /posts/self-reference-boundary
+    - /posts/2026-self-reference-boundry
 tags:
     - 随笔
     - 人生感悟
