@@ -5,9 +5,6 @@
 <div class="page{{ if $toc }} has-toc{{ end }}">
   <article class="article post-type-normal">
     <header class="article-header">
-      {{ if $dated }}
-      <div class="eyebrow">{{ if eq .Section "ideas" }}{{ partial "bilingual.html" "Idea" }}{{ else }}{{ partial "bilingual.html" "Post" }}{{ end }}</div>
-      {{ end }}
       <h1 class="article-title">{{ partial "bilingual_title.html" . }}</h1>
       {{ if $dated }}
       <div class="article-meta">
