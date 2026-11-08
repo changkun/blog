@@ -275,11 +275,14 @@ svg { width: 16px; height: 16px; flex: none; }
 }
 
 .intro-name {
-    margin: 0 0 0 -0.05em;
+    margin: 0;
     font: 600 clamp(30px, 5vw, 38px)/1.15 var(--sans);
     letter-spacing: -0.02em;
     color: var(--text);
 }
+
+/* Inter's C stands off its left edge; this sets it on the text's line. */
+.intro-name .lang-en { margin-left: -0.05em; }
 
 .intro-role { margin: 10px 0 0; font-size: 16px; color: var(--navy); }
 

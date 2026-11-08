@@ -3,7 +3,7 @@
 <section class="intro">
   <img class="intro-portrait" src="{{ .Site.Params.AuthorImg }}" alt="{{ .Site.Params.Author.Name }}" width="130" height="130">
   <div class="intro-name-block">
-    <h1 class="intro-name">{{ .Site.Params.Author.Name }}</h1>
+    <h1 class="intro-name">{{ partial "bilingual.html" "Name" }}</h1>
   </div>
   <div class="intro-about">
     <p class="intro-role">{{ partial "bilingual.html" "SiteSubtitle" }}</p>

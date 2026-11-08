@@ -2,7 +2,7 @@
 {{- $current := dict "Home" .IsHome "Ideas" (eq $section "ideas") "Posts" (eq $section "posts") "Tags" (eq $section "tags") "Bio" (eq $section "about") -}}
 <header class="site-header">
   <div class="header-inner">
-    <div class="brand"><a href="https://changkun.de/">Changkun Ou</a><span class="sep">/</span><a href="{{ .Site.BaseURL }}" rel="start">{{ partial "bilingual.html" "Blog" }}</a></div>
+    <div class="brand"><a href="https://changkun.de/">{{ partial "bilingual.html" "Name" }}</a><span class="sep">/</span><a href="{{ .Site.BaseURL }}" rel="start">{{ partial "bilingual.html" "Blog" }}</a></div>
     <nav class="site-nav" aria-label="Main">
       {{- range .Site.Menus.main }}
       <a href="{{ .URL }}"{{ if index $current .Name }} aria-current="page"{{ end }}>{{ partial "bilingual.html" (printf "Menu%s" .Name) }}</a>

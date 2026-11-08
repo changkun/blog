@@ -27,7 +27,7 @@
       {{ partial "post/tags.html" . }}
       {{ if eq .Section "posts" }}
       <dl class="article-license">
-        <dt>{{ partial "bilingual.html" "Author" }}</dt><dd>Changkun Ou</dd>
+        <dt>{{ partial "bilingual.html" "Author" }}</dt><dd>{{ partial "bilingual.html" "Name" }}</dd>
         <dt>{{ partial "bilingual.html" "LinkLabel" }}</dt><dd><a href="{{ .Permalink }}">{{ .Permalink }}</a></dd>
         <dd class="article-license-note">{{ partial "bilingual.html" "License" }} <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/">CC BY-NC-ND 4.0</a> {{ partial "bilingual.html" "LicenseEnd" }}</dd>
       </dl>
