@@ -1,5 +1,6 @@
 ---
 date: 2020-11-08T00:00:00
+slug: detach-a-context
 title: "Detach a Context"
 title_zh: "分离一个 Context"
 ---

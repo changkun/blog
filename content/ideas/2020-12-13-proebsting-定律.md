@@ -1,5 +1,6 @@
 ---
 date: 2020-12-13T00:00:00
+slug: proebstings-law
 title: "Proebsting's Law"
 title_zh: "Proebsting 定律"
 ---

@@ -1,5 +1,6 @@
 ---
 date: 2020-12-26T00:00:00
+slug: stability-patterns
 title: "Stability Patterns"
 title_zh: "稳定性模式"
 ---

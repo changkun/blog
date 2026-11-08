@@ -1,5 +1,6 @@
 ---
 date: 2020-10-30T00:00:00
+slug: getting-goroutine-id
 title: "Getting Goroutine ID"
 title_zh: "获取 Goroutine ID"
 ---

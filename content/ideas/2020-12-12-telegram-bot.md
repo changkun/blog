@@ -1,5 +1,6 @@
 ---
 date: 2020-12-12T00:00:00
+slug: telegram-bot
 title: "Telegram Bot"
 title_zh: "Telegram 机器人"
 ---

@@ -1,5 +1,6 @@
 ---
 date: 2020-12-15T00:00:00
+slug: worse-is-better
 title: "\"Worse is Better\""
 title_zh: "\"越差越好\""
 ---

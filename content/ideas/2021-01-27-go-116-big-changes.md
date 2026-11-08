@@ -1,5 +1,6 @@
 ---
 date: 2021-01-27T00:00:00
+slug: go-1.16-big-changes
 title: "Go 1.16 Big Changes"
 title_zh: "Go 1.16 的重大变化"
 ---

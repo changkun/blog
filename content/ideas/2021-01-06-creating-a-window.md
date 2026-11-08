@@ -1,5 +1,6 @@
 ---
 date: 2021-01-06T00:00:00
+slug: creating-a-window
 title: "Creating A Window"
 title_zh: "创建一个窗口"
 ---

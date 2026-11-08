@@ -1,5 +1,6 @@
 ---
 date: 2021-02-10T00:00:00
+slug: a-new-gc-pacer
 title: "A New GC Pacer"
 title_zh: "全新的 GC 调步器"
 ---

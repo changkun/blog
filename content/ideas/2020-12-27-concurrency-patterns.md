@@ -1,5 +1,6 @@
 ---
 date: 2020-12-27T00:00:00
+slug: concurrency-patterns
 title: "Concurrency Patterns"
 title_zh: "并发模式"
 ---

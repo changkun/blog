@@ -1,5 +1,6 @@
 ---
 date: 2026-02-15T15:49:15
+slug: testing-the-ideas-api
 title: "Testing the ideas API"
 title_zh: "测试想法 API"
 ---
