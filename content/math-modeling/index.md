@@ -1,3 +1,4 @@
+---
 title: "Mathematical Modeling Tutorial [Completed]"
 title_zh: 数学建模初步教程[已完结]
 id: 602
