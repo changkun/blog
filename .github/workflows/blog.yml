@@ -2,34 +2,23 @@ name: blog
 on:
   push:
     branches: [ main ]
+concurrency: blog
 jobs:
 
-  build:
+  deploy:
     name: blog
     runs-on: ubuntu-latest
     steps:
 
-    - name: Setup Hugo
-      uses: peaceiris/actions-hugo@v2
-      with:
-        hugo-version: '0.91.2'
-        extended: true
-
-    - name: Check out code into the Go module directory
-      uses: actions/checkout@v1
-
-    - name: Build Blog Website
+    - name: Pull the blog on the server
       env:
         USER: ${{ secrets.SERVER_USER }}
         TARGET: ${{ secrets.SERVER_PATH }}
         KEY: ${{ secrets.SERVER_KEY }}
         DOMAIN: ${{ secrets.SERVER_DOMAIN }}
       run: |
-        make
-        mkdir ~/.ssh
+        mkdir -p ~/.ssh
         echo "$KEY" | tr -d '\r' > ~/.ssh/idkey
         chmod 400 ~/.ssh/idkey
-        eval "$(ssh-agent -s)"
-        ssh-add ~/.ssh/idkey
-        ssh-keyscan -H $DOMAIN >> ~/.ssh/known_hosts
-        rsync -va public/* $USER@$DOMAIN:$TARGET
+        ssh-keyscan -H "$DOMAIN" >> ~/.ssh/known_hosts
+        ssh -i ~/.ssh/idkey "$USER@$DOMAIN" "git -C '$TARGET' pull --ff-only -q"
